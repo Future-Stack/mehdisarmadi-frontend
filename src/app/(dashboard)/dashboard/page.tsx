@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { StatCard } from "@/features/dashboard/components/StatCard";
 import { Badge } from "@/components/ui";
 import { cn } from "@/lib/utils";
+import { User, FolderKanban, CheckCircle, CircleAlert } from "lucide-react";
 
 export const metadata: Metadata = { title: "System Overview" };
 
@@ -10,42 +11,26 @@ const STATS = [
     title: "Total Users",
     value: "24",
     description: "Active Users",
-    icon: (
-      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-2.533-4.656 6.853 6.853 0 01-10.937 0 4.125 4.125 0 00-2.533 4.656 9.367 9.367 0 004.121.952 9.38 9.38 0 002.625-.372M7.5 7.5a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0z" />
-      </svg>
-    ),
+    icon: <User size={20} />,
   },
   {
     title: "Active Projects",
     value: "18",
     description: "Ongoing",
-    icon: (
-      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.625-1.25a3.375 3.375 0 00-3.375 3.375h1.5A1.125 1.125 0 0112 16.5v1.5a3.375 3.375 0 00-3.375-3.375H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-      </svg>
-    ),
+    icon: <FolderKanban size={20} />,
   },
   {
     title: "Completed Analyses",
     value: "120",
     description: "Completed",
-    icon: (
-      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    ),
+    icon: <CheckCircle size={20} />,
   },
   {
     title: "AI Errors",
     value: "02",
     changeType: "negative" as const,
     description: "Issues Detected",
-    icon: (
-      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-      </svg>
-    ),
+    icon: <CircleAlert size={20} />,
   },
 ];
 
@@ -63,7 +48,7 @@ export default function DashboardPage() {
         <h1 className="text-3xl font-bold tracking-tight text-gray-900">
           System Overview
         </h1>
-        <p className="text-sm font-medium text-gray-400">
+        <p className="text-[14px] font-medium text-[#968C8C]">
           Monitor platform activity and AI processing performance
         </p>
       </div>
@@ -82,12 +67,12 @@ export default function DashboardPage() {
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50/50">
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-tight text-gray-400">Project Name</th>
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-tight text-gray-400 text-center">Files</th>
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-tight text-gray-400 text-center">Addenda</th>
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-tight text-gray-400 text-center">Status</th>
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-tight text-gray-400 text-center">Quote</th>
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-tight text-gray-400 text-right">Last Updated</th>
+                <th className="px-6 py-4 text-[12px] font-bold uppercase tracking-tight text-[#968C8C]">Project Name</th>
+                <th className="px-6 py-4 text-[12px] font-bold uppercase tracking-tight text-[#968C8C] text-center">Files</th>
+                <th className="px-6 py-4 text-[12px] font-bold uppercase tracking-tight text-[#968C8C] text-center">Addenda</th>
+                <th className="px-6 py-4 text-[12px] font-bold uppercase tracking-tight text-[#968C8C] text-center">Status</th>
+                <th className="px-6 py-4 text-[12px] font-bold uppercase tracking-tight text-[#968C8C] text-center">Quote</th>
+                <th className="px-6 py-4 text-[12px] font-bold uppercase tracking-tight text-[#968C8C] text-right">Last Updated</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
@@ -98,21 +83,25 @@ export default function DashboardPage() {
                   <td className="px-6 py-5 text-sm font-medium text-gray-500 text-center">{p.addenda}</td>
                   <td className="px-6 py-5 text-center">
                     <span className={cn(
-                      "text-sm font-bold",
-                      p.status === "Completed" ? "text-green-500" : "text-amber-500"
+                      "inline-flex items-center px-3 py-1 rounded-lg text-sm font-semibold whitespace-nowrap",
+                      p.status === "Completed" 
+                        ? "bg-[#DDFFEB] text-[#008236]" 
+                        : "bg-[#FFFADA] text-[#92400E]"
                     )}>
                       {p.status}
                     </span>
                   </td>
                   <td className="px-6 py-5 text-center">
-                    <Badge className={cn(
-                      "font-bold px-4 py-1 border-none rounded-lg",
-                      p.quote === "Yes" ? "bg-[#E6F6ED] text-[#008236]" : "bg-gray-200 text-gray-500"
+                    <span className={cn(
+                      "inline-flex items-center px-4 py-1 rounded-lg text-sm font-semibold whitespace-nowrap",
+                      p.quote === "Yes" 
+                        ? "bg-[#DDFFEB] text-[#008236]" 
+                        : "bg-[#D1D5DC] text-[#4B5563]"
                     )}>
                       {p.quote}
-                    </Badge>
+                    </span>
                   </td>
-                  <td className="px-6 py-5 text-sm font-medium text-gray-400 text-right">{p.updated}</td>
+                  <td className="px-6 py-5 text-sm font-medium text-[#968C8C] text-right">{p.updated}</td>
                 </tr>
               ))}
             </tbody>
@@ -136,7 +125,7 @@ export default function DashboardPage() {
                   <div className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-secondary" />
                   <div>
                     <p className="text-sm font-semibold text-gray-900">{item.text}</p>
-                    <p className="text-[11px] font-medium text-gray-400 mt-1">{item.time}</p>
+                    <p className="text-[11px] font-medium text-[#968C8C] mt-1">{item.time}</p>
                   </div>
                 </li>
               ))}

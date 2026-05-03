@@ -20,16 +20,16 @@ export function StatCard({
   description,
 }: StatCardProps) {
   return (
-    <div className="card-premium p-6 flex items-center justify-between">
-      <div className="space-y-1">
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-tight">
+    <div className="card-premium p-8 flex items-center justify-between min-h-[140px]">
+      <div className="space-y-2">
+        <p className="text-[13px] font-semibold text-[#968C8C] uppercase tracking-wider">
           {title}
         </p>
         <p className="text-3xl font-bold text-black">
           {value}
         </p>
         {description && (
-          <p className="text-[10px] font-medium text-gray-400">
+          <p className="text-[12px] font-medium text-[#968C8C]">
             {description}
           </p>
         )}
