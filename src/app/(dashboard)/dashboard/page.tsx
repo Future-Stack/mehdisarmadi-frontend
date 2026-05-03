@@ -60,10 +60,10 @@ export default function DashboardPage() {
     <div className="space-y-8">
       {/* Page header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+        <h1 className="text-3xl font-black tracking-tight text-black">
           Overview
         </h1>
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        <p className="mt-1 text-sm font-medium text-black/70">
           Welcome back! Here&apos;s what&apos;s happening with your platform.
         </p>
       </div>
@@ -77,19 +77,19 @@ export default function DashboardPage() {
 
       {/* Placeholder for charts / activity feed */}
       <div className="grid gap-6 lg:grid-cols-3">
-        <div className="col-span-2 rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
-          <h2 className="mb-4 text-base font-semibold text-gray-900 dark:text-white">
+        <div className="col-span-2 card-premium p-6">
+          <h2 className="mb-4 text-lg font-black text-black">
             Activity Feed
           </h2>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-gray-500">
             Connect your analytics service to display real-time charts here.
           </p>
         </div>
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
-          <h2 className="mb-4 text-base font-semibold text-gray-900 dark:text-white">
+        <div className="card-premium p-6">
+          <h2 className="mb-4 text-lg font-black text-black">
             Quick Actions
           </h2>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-gray-500">
             Shortcuts and pending tasks will appear here.
           </p>
         </div>

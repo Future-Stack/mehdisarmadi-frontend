@@ -20,13 +20,13 @@ export function StatCard({
   description,
 }: StatCardProps) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-gray-800 dark:bg-gray-900">
+    <div className="card-premium p-6">
       <div className="flex items-start justify-between">
         <div className="space-y-1">
-          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+          <p className="text-sm font-bold text-black uppercase tracking-tight">
             {title}
           </p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white">
+          <p className="text-3xl font-black text-black">
             {value}
           </p>
           {description && (
@@ -35,7 +35,7 @@ export function StatCard({
             </p>
           )}
         </div>
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-secondary/10 text-secondary">
           {icon}
         </div>
       </div>
@@ -43,10 +43,10 @@ export function StatCard({
         <div className="mt-4 flex items-center gap-1">
           <span
             className={cn(
-              "inline-flex items-center text-xs font-medium",
-              changeType === "positive" && "text-green-600 dark:text-green-400",
-              changeType === "negative" && "text-red-600 dark:text-red-400",
-              changeType === "neutral" && "text-gray-500 dark:text-gray-400"
+              "inline-flex items-center text-xs font-bold",
+              changeType === "positive" && "text-secondary",
+              changeType === "negative" && "text-red-600",
+              changeType === "neutral" && "text-gray-500"
             )}
           >
             {changeType === "positive" && "↑ "}

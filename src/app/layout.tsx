@@ -11,11 +11,14 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Dashboard App",
-    template: "%s | Dashboard App",
+    default: "Renofield",
+    template: "%s | Renofield",
   },
-  description: "A production-ready client dashboard application.",
-  robots: { index: false }, // dashboard is private; don't index
+  description: "A production-ready project management dashboard for Renofield.",
+  icons: {
+    icon: "/Images/Renofield.png",
+  },
+  robots: { index: false },
 };
 
 export default function RootLayout({
@@ -23,7 +26,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
-      <body className="min-h-screen bg-gray-50 font-sans text-gray-900 antialiased dark:bg-gray-950 dark:text-gray-100">
+      <body className="min-h-screen bg-primary font-sans text-gray-900 antialiased dark:bg-primary dark:text-gray-900">
         <Providers>{children}</Providers>
       </body>
     </html>
