@@ -115,38 +115,40 @@ export default function Sidebar() {
   return (
     <aside
       className={cn(
-        "relative z-40 flex flex-col bg-primary text-secondary transition-all duration-300 ease-in-out border-r border-black/5 shadow-xl",
+        "relative z-40 flex flex-col bg-white text-gray-900 transition-all duration-300 ease-in-out border-r border-gray-100 shadow-sm",
         isOpen ? "w-64" : "w-20"
       )}
     >
       {/* Logo Area */}
-      <div className="flex h-24 shrink-0 items-center justify-center relative">
-        <Link href="/" className="flex items-center gap-3">
+      <div className="flex h-24 shrink-0 items-center justify-center relative py-6">
+        <Link href="/" className="flex flex-col items-center gap-1">
           <div className={cn(
             "relative transition-all duration-500",
-            isOpen ? "h-12 w-32" : "h-10 w-10 overflow-hidden rounded-lg"
+            isOpen ? "h-10 w-32" : "h-10 w-10 overflow-hidden"
           )}>
             <img 
               src="/Images/Renofield.png" 
               alt="Renofield Logo" 
-              className={cn(
-                "h-full w-full object-contain",
-                !isOpen && "object-cover scale-150"
-              )}
+              className="h-full w-full object-contain"
             />
           </div>
+          {isOpen && (
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-900 mt-1">
+              Renofield
+            </span>
+          )}
         </Link>
 
         {/* Toggle Handle */}
         <button
           onClick={() => dispatch(toggleSidebar())}
           className={cn(
-            "absolute -right-4 top-1/2 -translate-y-1/2 z-50 flex h-8 w-8 items-center justify-center rounded-lg bg-primary border border-black/10 shadow-lg transition-all hover:scale-110 hover:border-secondary/30 active:scale-95",
+            "absolute -right-4 top-1/2 -translate-y-1/2 z-50 flex h-8 w-8 items-center justify-center rounded-lg bg-white border border-gray-100 shadow-md transition-all hover:scale-110 active:scale-95",
             !isOpen && "rotate-180"
           )}
           aria-label={isOpen ? "Collapse sidebar" : "Expand sidebar"}
         >
-          <svg className="h-4 w-4 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+          <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
         </button>
@@ -154,7 +156,7 @@ export default function Sidebar() {
 
       {/* Nav Section */}
       <nav className="flex-1 overflow-y-auto overflow-x-hidden py-4 scrollbar-hide">
-        <ul className="flex flex-col items-center gap-1.5 px-3">
+        <ul className="flex flex-col items-center gap-1 px-3">
           {navItems.map((item) => {
             const isActive =
               item.href === ROUTES.DASHBOARD
@@ -167,11 +169,11 @@ export default function Sidebar() {
                   href={item.href}
                   title={!isOpen ? item.label : undefined}
                   className={cn(
-                    "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200",
+                    "group relative flex items-center gap-3 rounded-lg px-3 py-3 transition-all duration-200",
                     isOpen ? "justify-start" : "justify-center",
                     isActive
-                      ? "bg-secondary text-white shadow-md shadow-secondary/20"
-                      : "text-gray-600 hover:bg-black/5 hover:text-secondary"
+                      ? "bg-secondary text-white shadow-lg shadow-secondary/20"
+                      : "text-gray-500 hover:bg-gray-50 hover:text-secondary"
                   )}
                 >
                   <div className={cn(
@@ -182,14 +184,9 @@ export default function Sidebar() {
                   </div>
                   
                   {isOpen && (
-                    <span className="whitespace-nowrap text-[13px] font-semibold animate-in slide-in-from-left-2 fade-in duration-300">
+                    <span className="whitespace-nowrap text-[13px] font-medium animate-in slide-in-from-left-2 fade-in duration-300">
                       {item.label}
                     </span>
-                  )}
-
-                  {/* Active Indicator Dot */}
-                  {isActive && !isOpen && (
-                    <div className="absolute left-0 top-1/2 h-1.5 w-1 -translate-y-1/2 rounded-r-full bg-white z-10" />
                   )}
                 </Link>
               </li>
@@ -199,15 +196,15 @@ export default function Sidebar() {
       </nav>
 
       {/* Footer Section */}
-      <div className="mt-auto border-t border-black/5 p-4 bg-black/5">
+      <div className="mt-auto border-t border-gray-50 p-4 bg-gray-50/50">
         {isOpen ? (
           <div className="flex flex-col gap-1.5 px-2">
             <div className="flex items-center justify-between text-[10px] text-gray-400 uppercase tracking-widest font-bold">
               <span>System Health</span>
               <span>100%</span>
             </div>
-            <div className="h-1 w-full rounded-full bg-black/10">
-              <div className="h-full w-full rounded-full bg-secondary/50" />
+            <div className="h-1 w-full rounded-full bg-gray-200">
+              <div className="h-full w-full rounded-full bg-secondary/60" />
             </div>
           </div>
         ) : (
