@@ -4,7 +4,7 @@
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --color-primary: #ffffff;
   --color-secondary: #008236;
-  --color-bg-main: #f8fafc;
+  --color-bg-main: #ffffff;
 }
 
 @utility card-premium {

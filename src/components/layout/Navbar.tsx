@@ -1,60 +1,56 @@
 "use client";
 
 import { useAppSelector } from "@/store/hooks";
+import Image from "next/image";
 import { useLogout } from "@/features/auth/hooks/useAuth";
-import { Badge } from "@/components/ui";
+import { Bell } from "lucide-react";
 
 export default function Navbar() {
   const user = useAppSelector((s) => s.auth.user);
   const { mutate: logout, isPending } = useLogout();
 
   return (
-    <header className="sticky top-0 z-10 flex h-20 shrink-0 items-center justify-between border-b border-gray-100 bg-white px-6">
-      {/* Page Title Placeholder (Empty in image) */}
-      <div className="w-1/4" />
-
-      {/* Centered Search */}
-      <div className="flex-1 flex justify-center">
-        <div className="relative w-full max-w-md group">
-          <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input 
-            type="text" 
-            placeholder="Search..." 
-            className="h-10 w-full rounded-lg border border-gray-200 bg-white pl-10 pr-4 text-sm transition-all focus:border-secondary focus:outline-none focus:ring-4 focus:ring-secondary/5"
+    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-gray-100 bg-white px-8">
+      <div className="flex items-center gap-6">
+        {/* Search bar */}
+        <div className="relative hidden lg:block">
+          <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+            <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <input
+            type="text"
+            placeholder="Search projects, files or users..."
+            className="w-[589px] h-[42px] rounded-xl border border-[#99A1AF] bg-gray-50/30 pl-11 pr-4 text-sm focus:border-secondary focus:bg-white focus:outline-none transition-all placeholder:text-[#968C8C]"
           />
         </div>
       </div>
 
-      {/* Right section */}
-      <div className="w-1/4 flex items-center justify-end gap-6">
+      <div className="flex w-[283px] h-[48px] items-center gap-6 justify-end pr-8">
         {/* Notification bell (Red in image) */}
         <button
           type="button"
           aria-label="Notifications"
-          className="relative p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors"
+          className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gray-50/50 transition-all hover:bg-red-50 group"
         >
-          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-          </svg>
-          <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500 border-2 border-white" />
+          <Bell size={22} className="text-[#EF4444] transition-transform group-hover:scale-110" />
         </button>
 
         {/* User profile */}
         <div className="flex items-center gap-3">
-          <div className="text-right hidden sm:block">
-            <p className="text-sm font-bold text-gray-900 leading-none">
-              Admin User
-            </p>
-            <p className="mt-1 text-[10px] font-medium text-gray-500 uppercase tracking-tighter">
-              Md ismam Nibir
+          <div className="text-right">
+            <p className="text-xs font-bold text-black">Admin User</p>
+            <p className="text-[11px] font-medium text-[#968C8C]">
+              Akash Abrrar
             </p>
           </div>
           <div className="relative h-10 w-10 overflow-hidden rounded-full ring-2 ring-gray-100">
-             <img 
-               src={`https://api.dicebear.com/7.x/avataaars/svg?seed=Nibir`} 
+             <Image 
+               src={`https://api.dicebear.com/7.x/avataaars/svg?seed=Akash`} 
                alt="Avatar" 
+               width={40}
+               height={40}
                className="h-full w-full object-cover bg-gray-200"
              />
           </div>
