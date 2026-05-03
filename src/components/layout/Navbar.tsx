@@ -51,6 +51,7 @@ export default function Navbar() {
                alt="Avatar" 
                width={40}
                height={40}
+               unoptimized
                className="h-full w-full object-cover bg-gray-200"
              />
           </div>

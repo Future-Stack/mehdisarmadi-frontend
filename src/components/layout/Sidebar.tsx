@@ -105,6 +105,7 @@ export default function Sidebar() {
               width={157}
               height={38}
               priority
+              style={{ height: 'auto' }}
               className="object-contain"
             />
           </div>
