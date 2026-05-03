@@ -1,7 +1,11 @@
-import { redirect } from "next/navigation";
-import { ROUTES } from "@/constants";
+
+import Onboarding from "@/components/onBoarding/OnBoarding";
 
 // Root `/` redirects to dashboard — middleware will handle auth check
 export default function RootPage() {
-  redirect(ROUTES.DASHBOARD);
+  return (
+    <div>
+      <Onboarding/>;
+    </div>
+  )
 }
