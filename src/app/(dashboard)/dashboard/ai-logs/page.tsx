@@ -1,10 +1,5 @@
-import StaticPage from "@/components/layout/StaticDemoPage";
+import AILogs from "@/features/auth/components/adminComponents/AILogs";
 
 export default function AILogsPage() {
-  return (
-    <StaticPage 
-      title="AI Logs" 
-      description="View detailed logs and analysis from AI-driven insights and automations."
-    />
-  );
+  return <AILogs />;
 }

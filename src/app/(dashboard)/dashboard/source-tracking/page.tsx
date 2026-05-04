@@ -1,10 +1,5 @@
-import StaticPage from "@/components/layout/StaticDemoPage";
+import SourceTracking from "@/features/auth/components/adminComponents/SourceTracking";
 
 export default function SourceTrackingPage() {
-  return (
-    <StaticPage 
-      title="Source Tracking" 
-      description="Monitor the origin and supply chain of materials and resources."
-    />
-  );
+  return <SourceTracking />;
 }
