@@ -149,34 +149,7 @@ export default function DashboardPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25z" />
                 </svg>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-400 font-bold">Quote:</span>
-                <span className="px-3 py-1 bg-orange-100 text-orange-600 rounded-lg text-[11px] font-black uppercase tracking-wider">
-                  {project.status.quote}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 text-[11px] text-gray-400 pt-2 font-bold uppercase tracking-wider">
-              <Clock className="w-4 h-4" />
-              <span>Last Updated: {project.updated}</span>
-            </div>
-
-            <div className="flex gap-3 pt-2">
-              <Link href={`/dashboard/projects/${idx + 1}/results`} className="flex-1">
-                <Button
-                  variant="secondary"
-                  className="w-full h-12 rounded-2xl font-bold shadow-sm"
-                >
-                  Open
-                </Button>
-              </Link>
-              <Button
-                variant="primary"
-                className="flex-[1.5] h-12 rounded-2xl font-bold"
-              >
-                Continue
-              </Button>
+              <p className="text-sm font-semibold text-[#92400E] dark:text-yellow-300">AI processing delayed for Project #1024. Retrying...</p>
             </div>
           </div>
         </div>

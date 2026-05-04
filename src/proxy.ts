@@ -4,7 +4,7 @@ import { decrypt } from "@/lib/session";
 // ─── Route definitions ────────────────────────────────────────────────────
 
 const AUTH_ROUTES = ["/login", "/register"]; // redirect away if already logged in
-const PROTECTED_PREFIX = "/dashboard";
+const PROTECTED_PREFIX = "/admin";
 
 // ─── Middleware ───────────────────────────────────────────────────────────
 
@@ -17,7 +17,7 @@ export async function proxy(request: NextRequest) {
 
   // 1. Already logged-in users should not see auth pages
   if (isAuthenticated && AUTH_ROUTES.some((r) => pathname.startsWith(r))) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return NextResponse.redirect(new URL("/admin", request.url));
   }
 
   // 2. Unauthenticated users cannot access dashboard

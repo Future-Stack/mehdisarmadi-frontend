@@ -3,10 +3,13 @@
 import { useState, useRef, useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import Image from "next/image";
+import Link from "next/link";
 import { useLogout } from "@/features/auth/hooks/useAuth";
-import { Bell, Sun, Moon, LogOut, User, Settings } from "lucide-react";
+import { Bell, Sun, Moon, LogOut, User, Settings, Plus } from "lucide-react";
 import { setTheme } from "@/store/slices/uiSlice";
 import { cn } from "@/lib/utils";
+import Logo from "@/components/Reuseable/Logo";
+import { Button } from "@/components/ui/Button";
 
 export default function Navbar() {
   const dispatch = useAppDispatch();
@@ -30,12 +33,12 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-30 flex h-20 w-full items-center border-b border-emerald-100 bg-white shadow-sm shadow-emerald-200">
       <div className="max-w-7xl mx-auto w-full flex items-center justify-between px-6 lg:px-8">
-        <Link href={"/dashboard"}>
+        <Link href={"/admin"}>
           <Logo />
         </Link>
 
         <div className="flex items-center gap-3 lg:gap-4">
-          <Link href="/dashboard/projects/new">
+          <Link href="/admin/projects/new">
             <Button
               variant="primary"
               className="h-10 lg:h-11 px-4 lg:px-5 rounded-xl font-bold shadow-sm shadow-emerald-100"

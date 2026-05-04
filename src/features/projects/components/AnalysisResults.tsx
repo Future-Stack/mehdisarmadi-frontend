@@ -94,7 +94,7 @@ export default function AnalysisResults() {
         <div className="flex items-start justify-between">
           <div className="space-y-4">
             <Link
-              href="/dashboard"
+              href="/admin"
               className="flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-[#059669] transition-colors"
             >
               <ArrowLeft className="w-4 h-4" /> Back to Project

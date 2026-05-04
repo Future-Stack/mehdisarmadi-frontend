@@ -7,9 +7,9 @@ export const ROUTES = {
   HOME: "/",
   LOGIN: "/login",
   REGISTER: "/register",
-  DASHBOARD: "/dashboard",
-  USERS: "/dashboard/users",
-  SETTINGS: "/dashboard/settings",
+  DASHBOARD: "/admin",
+  USERS: "/admin/users",
+  SETTINGS: "/admin/settings",
 } as const;
 
 export const COOKIE_NAMES = {

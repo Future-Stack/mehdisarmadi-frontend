@@ -29,7 +29,7 @@ export default function AnalysisLoading() {
       return () => clearTimeout(timer);
     } else {
       const redirectTimer = setTimeout(() => {
-        router.push("/dashboard/projects/1/results");
+        router.push("/admin/projects/1/results");
       }, 1000);
       return () => clearTimeout(redirectTimer);
     }

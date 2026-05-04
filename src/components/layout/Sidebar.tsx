@@ -35,27 +35,27 @@ const navItems: NavItem[] = [
   },
   {
     label: "Projects",
-    href: "/dashboard/projects",
+    href: "/admin/projects",
     icon: <FolderKanban size={18} />,
   },
   {
     label: "Addenda",
-    href: "/dashboard/addenda",
+    href: "/admin/addenda",
     icon: <Network size={18} />,
   },
   {
     label: "Source Tracking",
-    href: "/dashboard/source-tracking",
+    href: "/admin/source-tracking",
     icon: <Search size={18} />,
   },
   {
     label: "AI Logs",
-    href: "/dashboard/ai-logs",
+    href: "/admin/ai-logs",
     icon: <Database size={18} />,
   },
   {
     label: "Quote Templates",
-    href: "/dashboard/quote-templates",
+    href: "/admin/quote-templates",
     icon: <ClipboardList size={18} />,
   },
   {
@@ -65,17 +65,17 @@ const navItems: NavItem[] = [
   },
   {
     label: "Notifications",
-    href: "/dashboard/notifications",
+    href: "/admin/notifications",
     icon: <Bell size={18} />,
   },
   {
     label: "Global Settings",
-    href: "/dashboard/global-settings",
+    href: "/admin/global-settings",
     icon: <Cog size={18} />,
   },
   {
     label: "System Settings",
-    href: "/dashboard/system-settings",
+    href: "/admin/system-settings",
     icon: <Settings size={18} />,
   },
 ];
