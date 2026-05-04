@@ -56,10 +56,10 @@ export function useRegister() {
   return useMutation({
     mutationFn: (payload: RegisterPayload) => authService.register(payload),
     onSuccess: async (res) => {
-      await handleLoginAction(res.data.user.id, res.data.user.role);
-      dispatch(setCredentials({ user: res.data.user, tokens: res.data.tokens }));
-      toast.success("Account created! Welcome aboard.");
-      router.push(ROUTES.DASHBOARD);
+      // await handleLoginAction(res.data.user.id, res.data.user.role);
+      // dispatch(setCredentials({ user: res.data.user, tokens: res.data.tokens }));
+      toast.success("Account created! Please login to continue.");
+      router.push(ROUTES.LOGIN);
     },
     onError: (err: { message: string }) => {
       toast.error(err.message ?? "Registration failed. Please try again.");
