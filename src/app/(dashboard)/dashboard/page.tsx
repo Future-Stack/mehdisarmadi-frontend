@@ -1,122 +1,153 @@
-"use client";
+import type { Metadata } from "next";
+import { StatCard } from "@/features/dashboard/components/StatCard";
+import { Badge } from "@/components/ui";
+import { cn } from "@/lib/utils";
+import { User, FolderKanban, CheckCircle, CircleAlert } from "lucide-react";
+import StaticPage from "@/components/layout/StaticDemoPage";
 
-import React from "react";
-import { Search, FileText, Share2, Clock } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import Link from "next/link";
+export const metadata: Metadata = { title: "System Overview" };
+
+const STATS = [
+  {
+    title: "Total Users",
+    value: "24",
+    description: "Active Users",
+    icon: <User size={20} />,
+  },
+  {
+    title: "Active Projects",
+    value: "18",
+    description: "Ongoing",
+    icon: <FolderKanban size={20} />,
+  },
+  {
+    title: "Completed Analyses",
+    value: "120",
+    description: "Completed",
+    icon: <CheckCircle size={20} />,
+  },
+  {
+    title: "AI Errors",
+    value: "02",
+    changeType: "negative" as const,
+    description: "Issues Detected",
+    icon: <CircleAlert size={20} />,
+  },
+];
 
 const PROJECTS = [
-  {
-    name: "Green Valley Residential Complex",
-    files: 5,
-    addenda: 2,
-    status: {
-      processing: "Processing",
-      analysis: "Done",
-      quote: "Draft",
-    },
-    updated: "2 hours ago",
-  },
-  {
-    name: "Downtown Office Tower",
-    files: 8,
-    addenda: 1,
-    status: {
-      processing: "Processing",
-      analysis: "Done",
-      quote: "Draft",
-    },
-    updated: "2 hours ago",
-  },
-  {
-    name: "City Center Shopping Mall",
-    files: 12,
-    addenda: 0,
-    status: {
-      processing: "Processing",
-      analysis: "Done",
-      quote: "Draft",
-    },
-    updated: "2 hours ago",
-  },
-  {
-    name: "Green Valley Residential Complex",
-    files: 5,
-    addenda: 2,
-    status: {
-      processing: "Processing",
-      analysis: "Done",
-      quote: "Draft",
-    },
-    updated: "2 hours ago",
-  },
+  { name: "City Mall Tender", files: 12, addenda: 3, status: "Completed", quote: "Yes", updated: "2 hours ago" },
+  { name: "Office Fitout", files: 8, addenda: 1, status: "Processing", quote: "No", updated: "30 min ago" },
+  { name: "Shopping Center", files: 10, addenda: 2, status: "Processing", quote: "No", updated: "1 hour ago" },
 ];
 
 export default function DashboardPage() {
   return (
-    <div className="space-y-10 py-6 max-w-[1400px] mx-auto">
-      {/* Search Bar */}
-      <div className="relative">
-        <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
-          <Search className="w-5 h-5 text-gray-400" />
+    <div className="space-y-10">
+      {/* Page header */}
+      <StaticPage 
+        title="System Overview" 
+        description="Monitor platform activity and AI processing performance" 
+      />
+
+      {/* Stats grid */}
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {STATS.map((stat) => (
+          <StatCard key={stat.title} {...stat} />
+        ))}
+      </div>
+
+      {/* Recent Projects Table */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white transition-colors">Recent Projects</h2>
+        <div className="card-premium overflow-hidden border border-gray-100 dark:border-gray-800 transition-colors">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 transition-colors">
+                <th className="px-6 py-4 text-[12px] font-bold uppercase tracking-tight text-[#968C8C] dark:text-gray-500">Project Name</th>
+                <th className="px-6 py-4 text-[12px] font-bold uppercase tracking-tight text-[#968C8C] dark:text-gray-500 text-center">Files</th>
+                <th className="px-6 py-4 text-[12px] font-bold uppercase tracking-tight text-[#968C8C] dark:text-gray-500 text-center">Addenda</th>
+                <th className="px-6 py-4 text-[12px] font-bold uppercase tracking-tight text-[#968C8C] dark:text-gray-500 text-center">Status</th>
+                <th className="px-6 py-4 text-[12px] font-bold uppercase tracking-tight text-[#968C8C] dark:text-gray-500 text-center">Quote</th>
+                <th className="px-6 py-4 text-[12px] font-bold uppercase tracking-tight text-[#968C8C] dark:text-gray-500 text-right">Last Updated</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50 dark:divide-gray-800 transition-colors">
+              {PROJECTS.map((p, i) => (
+                <tr key={i} className="hover:bg-gray-50/50 dark:hover:bg-gray-900/50 transition-colors">
+                  <td className="px-6 py-5 text-sm font-semibold text-gray-900 dark:text-white transition-colors">{p.name}</td>
+                  <td className="px-6 py-5 text-sm font-medium text-gray-500 dark:text-gray-400 text-center transition-colors">{p.files}</td>
+                  <td className="px-6 py-5 text-sm font-medium text-gray-500 dark:text-gray-400 text-center transition-colors">{p.addenda}</td>
+                  <td className="px-6 py-5 text-center">
+                    <span className={cn(
+                      "inline-flex items-center px-3 py-1 rounded-lg text-sm font-semibold whitespace-nowrap transition-colors",
+                      p.status === "Completed" 
+                        ? "bg-[#DDFFEB] text-[#008236] dark:bg-green-900/30 dark:text-green-400" 
+                        : "bg-[#FFFADA] text-[#92400E] dark:bg-yellow-900/30 dark:text-yellow-400"
+                    )}>
+                      {p.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-5 text-center">
+                    <span className={cn(
+                      "inline-flex items-center px-4 py-1 rounded-lg text-sm font-semibold whitespace-nowrap transition-colors",
+                      p.quote === "Yes" 
+                        ? "bg-[#DDFFEB] text-[#008236] dark:bg-green-900/30 dark:text-green-400" 
+                        : "bg-[#D1D5DC] text-[#4B5563] dark:bg-gray-800 dark:text-gray-400"
+                    )}>
+                      {p.quote}
+                    </span>
+                  </td>
+                  <td className="px-6 py-5 text-sm font-medium text-[#968C8C] dark:text-gray-500 text-right transition-colors">{p.updated}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-        <input
-          type="text"
-          placeholder="Search Projects..........."
-          className="w-full h-14 pl-14 pr-6 bg-white border border-emerald-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-200 transition-all placeholder:text-gray-300 font-medium"
-        />
       </div>
 
-      {/* Hero Section */}
-      <div className="space-y-3">
-        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-          Projects
-        </h1>
-        <p className="text-gray-500 max-w-3xl leading-relaxed font-medium">
-          Transform the way you manage construction tenders with AI-powered
-          automation. Analyze documents, identify risks, and generate
-          professional quotes in minutes.
-        </p>
-      </div>
+      {/* Bottom Grid */}
+      <div className="grid gap-8 lg:grid-cols-5">
+        <div className="lg:col-span-3 space-y-4">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white transition-colors">Recent Activity</h2>
+          <div className="card-premium p-8 h-full bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 transition-colors">
+            <ul className="space-y-6">
+              {[
+                { text: 'Project "City Mall Tender" analyzed', time: "2 minutes ago" },
+                { text: "New user registered", time: "15 minutes ago" },
+                { text: 'AI processing completed for "Office Fitout"', time: "1 hour ago" },
+                { text: 'Error detected in Document #4582', time: "2 hours ago" },
+              ].map((item, i) => (
+                <li key={i} className="flex gap-4">
+                  <div className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-secondary" />
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white transition-colors">{item.text}</p>
+                    <p className="text-[11px] font-medium text-[#968C8C] dark:text-gray-500 mt-1 transition-colors">{item.time}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
 
-      {/* Projects Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {PROJECTS.map((project, idx) => (
-          <div
-            key={idx}
-            className="bg-white border border-gray-50 rounded-[32px] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col gap-6"
-          >
-            <h3 className="font-bold text-gray-800 text-lg leading-tight min-h-[3rem]">
-              {project.name}
-            </h3>
-
-            <div className="flex items-center justify-between text-sm font-bold">
-              <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-lg">
-                <FileText className="w-4 h-4" />
-                <span>{project.files} Files</span>
+        <div className="lg:col-span-2 space-y-4">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white transition-colors">System Alerts</h2>
+          <div className="card-premium p-8 space-y-4 h-full bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 transition-colors">
+            <div className="flex items-center gap-4 rounded-xl border border-[#FEE2E2] dark:border-red-900/30 bg-[#FEF2F2] dark:bg-red-900/10 p-4 transition-all hover:scale-[1.02]">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white dark:bg-gray-800 text-[#EF4444] dark:text-red-400 border border-[#FEE2E2] dark:border-red-900/30 shadow-sm">
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m0 3.75h.008v.008H12v-.008z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25z" />
+                </svg>
               </div>
-              <div className="flex items-center gap-2 text-orange-500 bg-orange-50 px-3 py-1.5 rounded-lg">
-                <Share2 className="w-4 h-4" />
-                <span>{project.addenda} Addenda</span>
-              </div>
+              <p className="text-sm font-semibold text-[#991B1B] dark:text-red-300">AI failed to process document (Project ID #1023)</p>
             </div>
-
-            <div className="space-y-3.5 pt-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-400 font-bold">
-                  Processing:
-                </span>
-                <span className="px-3 py-1 bg-blue-100 text-blue-600 rounded-lg text-[11px] font-black uppercase tracking-wider">
-                  {project.status.processing}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-400 font-bold">
-                  Analysis:
-                </span>
-                <span className="px-3 py-1 bg-emerald-100 text-emerald-600 rounded-lg text-[11px] font-black uppercase tracking-wider">
-                  {project.status.analysis}
-                </span>
+            <div className="flex items-center gap-4 rounded-xl border border-[#FEF3C7] dark:border-yellow-900/30 bg-[#FFFBEB] dark:bg-yellow-900/10 p-4 transition-all hover:scale-[1.02]">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white dark:bg-gray-800 text-[#F59E0B] dark:text-yellow-400 border border-[#FEF3C7] dark:border-yellow-900/30 shadow-sm">
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m0 3.75h.008v.008H12v-.008z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25z" />
+                </svg>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-400 font-bold">Quote:</span>
@@ -148,7 +179,7 @@ export default function DashboardPage() {
               </Button>
             </div>
           </div>
-        ))}
+        </div>
       </div>
     </div>
   );

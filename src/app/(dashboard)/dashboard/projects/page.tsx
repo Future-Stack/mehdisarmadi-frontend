@@ -1,10 +1,10 @@
-import StaticPage from "@/components/layout/StaticDemoPage";
+import ProjectsManagement from "@/features/auth/components/adminComponents/ProjectsMangement";
 
 export default function ProjectsPage() {
   return (
-    <StaticPage 
-      title="Projects" 
-      description="Manage and track all ongoing construction and renovation projects."
+    <ProjectsManagement 
+      title="Projects Management" 
+      description="Manage user accounts, roles, and permissions" 
     />
   );
 }

@@ -1,14 +1,31 @@
 "use client";
 
-import { useAppSelector } from "@/store/hooks";
+import { useState, useRef, useEffect } from "react";
+import { useAppSelector, useAppDispatch } from "@/store/hooks";
+import Image from "next/image";
 import { useLogout } from "@/features/auth/hooks/useAuth";
-import Logo from "@/components/Reuseable/Logo";
-import { Plus, Settings, LogOut } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import Link from "next/link";
+import { Bell, Sun, Moon, LogOut, User, Settings } from "lucide-react";
+import { setTheme } from "@/store/slices/uiSlice";
+import { cn } from "@/lib/utils";
 
 export default function Navbar() {
+  const dispatch = useAppDispatch();
+  const theme = useAppSelector((s) => s.ui.theme);
+  const user = useAppSelector((s) => s.auth.user);
   const { mutate: logout, isPending } = useLogout();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <header className="sticky top-0 z-30 flex h-20 w-full items-center border-b border-emerald-100 bg-white shadow-sm shadow-emerald-200">

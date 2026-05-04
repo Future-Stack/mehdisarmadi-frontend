@@ -8,6 +8,7 @@ const Logo = () => {
         alt="logo"
         height={200}
         width={200}
+        style={{ width: "100%", height: "auto" }}
         className="object-contain"
       />
     </div>

@@ -1,10 +1,10 @@
-import StaticPage from "@/components/layout/StaticDemoPage";
+import AddendaManagement from "@/features/auth/components/adminComponents/AddendaManagement";
 
 export default function AddendaPage() {
   return (
-    <StaticPage 
-      title="Addenda" 
-      description="Review and manage project addenda and revisions."
+    <AddendaManagement 
+      title="Addenda Management" 
+      description="Track original documents and addenda revisions"
     />
   );
 }

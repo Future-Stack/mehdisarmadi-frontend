@@ -82,8 +82,8 @@ export function Modal({
       <div
         ref={panelRef}
         className={cn(
-          "relative w-full rounded-2xl bg-white p-6 shadow-2xl",
-          "dark:bg-gray-900 dark:ring-1 dark:ring-white/10",
+          "relative w-full rounded-2xl bg-white p-6 shadow-2xl dark:bg-gray-950 dark:border dark:border-gray-800 transition-colors",
+          "dark:ring-1 dark:ring-white/10",
           "animate-in fade-in zoom-in-95 duration-200",
           sizeClasses[size]
         )}
@@ -93,7 +93,7 @@ export function Modal({
           <div className="mb-4 flex items-center justify-between">
             <h2
               id="modal-title"
-              className="text-lg font-semibold text-gray-900 dark:text-gray-100"
+              className="text-lg font-semibold text-gray-900 dark:text-white transition-colors"
             >
               {title}
             </h2>
