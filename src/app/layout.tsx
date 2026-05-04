@@ -26,7 +26,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
-      <body className="min-h-screen bg-primary font-sans text-gray-900 antialiased dark:bg-primary dark:text-gray-900">
+      <body >
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -1,5 +1,4 @@
 "use client";
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
@@ -8,9 +7,11 @@ import { useRegister } from "@/features/auth/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { ROUTES } from "@/constants";
+import Logo from "@/components/Reuseable/Logo";
+import { ArrowLeft } from "lucide-react";
 
 export default function RegisterForm() {
-  const { mutate: register_, isPending } = useRegister();
+  const { mutate: registerUser, isPending } = useRegister();
 
   const {
     register,
@@ -20,90 +21,93 @@ export default function RegisterForm() {
     resolver: zodResolver(registerSchema),
   });
 
-  const onSubmit = (data: RegisterFormValues) => {
-    const { confirmPassword: _, ...payload } = data;
-    register_(payload);
-  };
+  const onSubmit = (data: RegisterFormValues) => registerUser(data);
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-5"
+      className="flex flex-col gap-8"
       noValidate
     >
-      <div className="flex flex-col gap-2 text-center">
-        <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-          Create your account
-        </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          Get started for free today
-        </p>
+      <div className="flex flex-col items-center gap-6 text-center">
+        <Logo />
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold text-[#059669]">
+            Create Account
+          </h1>
+          <p className="text-[15px] text-gray-500 font-medium">
+            Join TenderPro AI to streamline your workflow
+          </p>
+        </div>
       </div>
 
-      <Input
-        label="Full Name"
-        type="text"
-        id="register-name"
-        placeholder="Jane Doe"
-        autoComplete="name"
-        error={errors.name?.message}
-        required
-        {...register("name")}
-      />
+      <div className="space-y-5">
+        <Input
+          label="Full Name"
+          type="text"
+          id="register-name"
+          placeholder="Enter your Name"
+          error={errors.name?.message}
+          required
+          className="h-12 rounded-xl border-gray-200"
+          {...register("name")}
+        />
 
-      <Input
-        label="Email"
-        type="email"
-        id="register-email"
-        placeholder="you@example.com"
-        autoComplete="email"
-        error={errors.email?.message}
-        required
-        {...register("email")}
-      />
+        <Input
+          label="Email Address"
+          type="email"
+          id="register-email"
+          placeholder="Enter your email address"
+          autoComplete="email"
+          error={errors.email?.message}
+          required
+          className="h-12 rounded-xl border-gray-200"
+          {...register("email")}
+        />
 
-      <Input
-        label="Password"
-        type="password"
-        id="register-password"
-        placeholder="••••••••"
-        autoComplete="new-password"
-        hint="Min 8 chars with at least one letter and number"
-        error={errors.password?.message}
-        required
-        {...register("password")}
-      />
+        <Input
+          label="Password"
+          type="password"
+          id="register-password"
+          placeholder="Enter your Password"
+          autoComplete="new-password"
+          error={errors.password?.message}
+          required
+          className="h-12 rounded-xl border-gray-200"
+          {...register("password")}
+        />
+      </div>
 
-      <Input
-        label="Confirm Password"
-        type="password"
-        id="register-confirm-password"
-        placeholder="••••••••"
-        autoComplete="new-password"
-        error={errors.confirmPassword?.message}
-        required
-        {...register("confirmPassword")}
-      />
-
-      <Button
-        type="submit"
-        id="register-submit"
-        isLoading={isPending}
-        loadingText="Creating account…"
-        className="w-full"
-      >
-        Create account
-      </Button>
-
-      <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-        Already have an account?{" "}
-        <Link
-          href={ROUTES.LOGIN}
-          className="font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+      <div className="space-y-4">
+        <Button
+          type="submit"
+          id="register-submit"
+          isLoading={isPending}
+          loadingText="Creating account…"
+          className="w-full h-12 rounded-xl font-bold text-base"
         >
-          Sign in
-        </Link>
-      </p>
+          Sign Up
+        </Button>
+
+        <div className="flex flex-col items-center gap-4">
+          <p className="text-sm text-gray-500 font-medium">
+            Already have an account?{" "}
+            <Link
+              href={ROUTES.LOGIN}
+              className="font-bold text-[#059669] hover:underline ml-1"
+            >
+              Login
+            </Link>
+          </p>
+
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-sm text-gray-400 hover:text-[#059669] font-medium transition-colors mt-2"
+          >
+            <ArrowLeft className="w-4 h-4" /> Back to Home
+          </Link>
+        </div>
+      </div>
     </form>
   );
 }
