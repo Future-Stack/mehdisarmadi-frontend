@@ -11,13 +11,13 @@ import { ROUTES } from "@/constants";
 import { 
   LayoutDashboard, 
   FolderKanban, 
-  FileText, 
-  MapPin, 
-  Zap, 
-  FilePlus, 
+  Network, 
+  Search, 
+  Database, 
+  ClipboardList, 
   Users, 
   Bell, 
-  Globe, 
+  Cog, 
   Settings 
 } from "lucide-react";
 
@@ -41,22 +41,22 @@ const navItems: NavItem[] = [
   {
     label: "Addenda",
     href: "/dashboard/addenda",
-    icon: <FileText size={18} />,
+    icon: <Network size={18} />,
   },
   {
     label: "Source Tracking",
     href: "/dashboard/source-tracking",
-    icon: <MapPin size={18} />,
+    icon: <Search size={18} />,
   },
   {
     label: "AI Logs",
     href: "/dashboard/ai-logs",
-    icon: <Zap size={18} />,
+    icon: <Database size={18} />,
   },
   {
     label: "Quote Templates",
     href: "/dashboard/quote-templates",
-    icon: <FilePlus size={18} />,
+    icon: <ClipboardList size={18} />,
   },
   {
     label: "Users",
@@ -71,7 +71,7 @@ const navItems: NavItem[] = [
   {
     label: "Global Settings",
     href: "/dashboard/global-settings",
-    icon: <Globe size={18} />,
+    icon: <Cog size={18} />,
   },
   {
     label: "System Settings",
@@ -88,7 +88,7 @@ export default function Sidebar() {
   return (
     <aside
       className={cn(
-        "relative z-40 flex flex-col bg-white text-gray-900 transition-all duration-300 ease-in-out border-r border-gray-100 shadow-sm",
+        "relative z-40 flex flex-col bg-white text-gray-900 transition-all duration-300 ease-in-out border-r border-gray-100 shadow-sm dark:bg-gray-950 dark:text-white dark:border-gray-800",
         isOpen ? "w-64" : "w-20"
       )}
     >
@@ -105,11 +105,12 @@ export default function Sidebar() {
               width={157}
               height={38}
               priority
+              style={{ width: "100%", height: "auto" }}
               className="object-contain"
             />
           </div>
           {isOpen && (
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-900 mt-1">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-900 dark:text-white mt-1 transition-colors">
               Renofield
             </span>
           )}
@@ -119,7 +120,7 @@ export default function Sidebar() {
         <button
           onClick={() => dispatch(toggleSidebar())}
           className={cn(
-            "absolute -right-4 top-1/2 -translate-y-1/2 z-50 flex h-8 w-8 items-center justify-center rounded-lg bg-white border border-gray-100 shadow-md transition-all hover:scale-110 active:scale-95",
+            "absolute -right-4 top-1/2 -translate-y-1/2 z-50 flex h-8 w-8 items-center justify-center rounded-lg bg-white border border-gray-100 shadow-md transition-all hover:scale-110 active:scale-95 dark:bg-gray-900 dark:border-gray-800",
             !isOpen && "rotate-180"
           )}
           aria-label={isOpen ? "Collapse sidebar" : "Expand sidebar"}
@@ -149,18 +150,18 @@ export default function Sidebar() {
                     isOpen ? "justify-start" : "justify-center",
                     isActive
                       ? "bg-secondary text-white shadow-lg shadow-secondary/20"
-                      : "text-gray-500 hover:bg-gray-50 hover:text-secondary"
+                      : "text-gray-500 hover:bg-gray-50 hover:text-secondary dark:text-gray-400 dark:hover:bg-gray-900 dark:hover:text-white"
                   )}
                 >
                   <div className={cn(
                     "shrink-0 transition-transform duration-200 group-hover:scale-110",
-                    isActive ? "text-white" : "group-hover:text-secondary"
+                    isActive ? "text-white" : "group-hover:text-secondary dark:text-gray-400 dark:group-hover:text-white"
                   )}>
                     {item.icon}
                   </div>
                   
                   {isOpen && (
-                    <span className="whitespace-nowrap text-[13px] font-medium animate-in slide-in-from-left-2 fade-in duration-300">
+                    <span className="whitespace-nowrap text-[13px] font-medium animate-in slide-in-from-left-2 fade-in duration-300 dark:text-gray-300 dark:group-hover:text-white transition-colors">
                       {item.label}
                     </span>
                   )}

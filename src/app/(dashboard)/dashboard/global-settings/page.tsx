@@ -1,10 +1,5 @@
-import StaticPage from "@/components/layout/StaticDemoPage";
+import GlobalSettings from "@/features/auth/components/adminComponents/GlobalSettings";
 
 export default function GlobalSettingsPage() {
-  return (
-    <StaticPage 
-      title="Global Settings" 
-      description="Configure platform-wide preferences and defaults."
-    />
-  );
+  return <GlobalSettings />;
 }

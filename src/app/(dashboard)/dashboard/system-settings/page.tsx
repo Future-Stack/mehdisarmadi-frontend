@@ -1,10 +1,5 @@
-import StaticPage from "@/components/layout/StaticDemoPage";
+import SystemSettings from "@/features/auth/components/adminComponents/SystemSettings";
 
 export default function SystemSettingsPage() {
-  return (
-    <StaticPage 
-      title="System Settings" 
-      description="Advanced system configurations and audit logs for administrators."
-    />
-  );
+  return <SystemSettings />;
 }

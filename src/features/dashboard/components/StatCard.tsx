@@ -22,21 +22,21 @@ export function StatCard({
   return (
     <div className="card-premium p-8 flex items-center justify-between min-h-[140px]">
       <div className="space-y-2">
-        <p className="text-[13px] font-semibold text-[#968C8C] uppercase tracking-wider">
+        <p className="text-[13px] font-semibold text-[#968C8C] dark:text-gray-400 uppercase tracking-wider transition-colors">
           {title}
         </p>
-        <p className="text-3xl font-bold text-black">
+        <p className="text-3xl font-bold text-black dark:text-white transition-colors">
           {value}
         </p>
         {description && (
-          <p className="text-[12px] font-medium text-[#968C8C]">
+          <p className="text-[12px] font-medium text-[#968C8C] dark:text-gray-500 transition-colors">
             {description}
           </p>
         )}
       </div>
       <div className={cn(
-        "flex h-12 w-12 shrink-0 items-center justify-center rounded-full",
-        changeType === "negative" ? "bg-red-50 text-red-500" : "bg-secondary/10 text-secondary"
+        "flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition-colors",
+        changeType === "negative" ? "bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-400" : "bg-secondary/10 dark:bg-secondary/20 text-secondary"
       )}>
         {icon}
       </div>

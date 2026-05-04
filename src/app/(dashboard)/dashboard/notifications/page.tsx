@@ -1,10 +1,5 @@
-import StaticPage from "@/components/layout/StaticDemoPage";
+import Notifications from "@/features/auth/components/adminComponents/Notifications";
 
 export default function NotificationsPage() {
-  return (
-    <StaticPage 
-      title="Notifications" 
-      description="Stay updated with real-time alerts and project milestones."
-    />
-  );
+  return <Notifications />;
 }
