@@ -10,7 +10,7 @@ export default function Navbar() {
   const { mutate: logout, isPending } = useLogout();
 
   return (
-    <header className="sticky top-0 z-30 flex h-20 w-full items-center justify-between border-b border-emerald-100 bg-white px-8">
+    <header className="sticky top-0 z-30 flex h-20 w-full items-center justify-between border-b border-emerald-100 bg-white px-8 shadow-sm shadow-emerald-200">
       <Logo />
       
       <div className="flex items-center gap-4">
