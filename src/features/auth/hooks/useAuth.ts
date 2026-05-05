@@ -39,7 +39,8 @@ export function useLogin() {
       dispatch(setCredentials({ user: res.data.user, tokens: res.data.tokens }));
       queryClient.setQueryData([QUERY_KEYS.USER], res.data.user);
       toast.success(`Welcome back, ${res.data.user.name}!`);
-      router.push(ROUTES.DASHBOARD);
+      const redirectPath = res.data.user.role === "user" ? "/sub-user" : ROUTES.DASHBOARD;
+      router.push(redirectPath);
     },
     onError: (err: { message: string }) => {
       toast.error(err.message ?? "Login failed. Please try again.");
