@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Search, FileText, Share2, Clock } from "lucide-react";
+import { Search, FileText, Share2, Clock, Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 
@@ -52,9 +52,9 @@ const PROJECTS = [
   },
 ];
 
-export default function DashboardPage() {
+export default function SubUserDashboardPage() {
   return (
-    <div className="space-y-10 py-6 max-w-[1400px] mx-auto">
+    <div className="space-y-10 py-6">
       {/* Search Bar */}
       <div className="relative">
         <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
@@ -69,18 +69,23 @@ export default function DashboardPage() {
 
       {/* Hero Section */}
       <div className="space-y-3">
-        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-          Projects
-        </h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+            My Projects
+          </h1>
+          <Link href="/sub-user/projects/new">
+            <Button variant="primary" className="rounded-xl font-bold">
+              <Plus className="w-4 h-4 mr-2" /> Create New
+            </Button>
+          </Link>
+        </div>
         <p className="text-gray-500 max-w-3xl leading-relaxed font-medium">
-          Transform the way you manage construction tenders with AI-powered
-          automation. Analyze documents, identify risks, and generate
-          professional quotes in minutes.
+          Manage your construction tenders and analyze documents with AI.
         </p>
       </div>
 
       {/* Projects Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {PROJECTS.map((project, idx) => (
           <div
             key={idx}
@@ -132,7 +137,7 @@ export default function DashboardPage() {
             </div>
 
             <div className="flex gap-3 pt-2">
-              <Link href={`/dashboard/projects/${idx + 1}`} className="flex-1">
+              <Link href={`/sub-user/projects/${idx + 1}`} className="flex-1">
                 <Button
                   variant="secondary"
                   className="w-full h-12 rounded-2xl font-bold shadow-sm"
@@ -140,7 +145,7 @@ export default function DashboardPage() {
                   Open
                 </Button>
               </Link>
-              <Link href={`/dashboard/projects/${idx + 1}/results`} className="flex-[1.5]">
+              <Link href={`/sub-user/projects/${idx + 1}/results`} className="flex-[1.5]">
                 <Button
                   variant="primary"
                   className="w-full h-12 rounded-2xl font-bold"
