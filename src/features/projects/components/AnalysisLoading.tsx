@@ -17,7 +17,7 @@ const STEPS = [
   { id: 5, label: "Structuring output" },
 ];
 
-export default function AnalysisLoading() {
+export default function AnalysisLoading({ dashboardPath = "/dashboard" }: { dashboardPath?: string }) {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -29,7 +29,7 @@ export default function AnalysisLoading() {
       return () => clearTimeout(timer);
     } else {
       const redirectTimer = setTimeout(() => {
-        router.push("/dashboard/projects/1/results");
+        router.push(`${dashboardPath}/projects/1/results`);
       }, 1000);
       return () => clearTimeout(redirectTimer);
     }

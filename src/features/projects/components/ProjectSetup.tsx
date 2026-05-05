@@ -24,7 +24,7 @@ const DIVISIONS = [
   { id: "26", name: "Electrical", selected: false },
 ];
 
-export default function ProjectSetup() {
+export default function ProjectSetup({ dashboardPath = "/dashboard" }: { dashboardPath?: string }) {
   const originalInputRef = useRef<HTMLInputElement>(null);
   const addendaInputRef = useRef<HTMLInputElement>(null);
 
@@ -73,7 +73,7 @@ export default function ProjectSetup() {
 
       {/* Header Info */}
       <div className="space-y-4">
-        <Link href="/dashboard" className="flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-[#059669] transition-colors">
+        <Link href={dashboardPath} className="flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-[#059669] transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back to Dashboard
         </Link>
         <div className="space-y-1">
@@ -183,7 +183,7 @@ export default function ProjectSetup() {
             <div className="h-full bg-[#059669] w-full rounded-full transition-all duration-1000 shadow-sm" />
           </div>
         </div>
-        <Link href="/dashboard/projects/1/analyzing" className="w-full max-w-sm">
+        <Link href={`${dashboardPath}/projects/1/analyzing`} className="w-full max-w-sm">
           <Button variant="primary" className="w-full h-14 rounded-2xl font-black text-base shadow-xl shadow-emerald-200 flex items-center justify-center gap-3 active:scale-95 transition-all">
             <FileText className="w-5 h-5" /> Analyze Tender
           </Button>

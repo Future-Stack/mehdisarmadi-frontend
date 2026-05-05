@@ -163,7 +163,7 @@ export default function DashboardPage() {
             </div>
 
             <div className="flex gap-3 pt-2">
-              <Link href={`/dashboard/projects/${idx + 1}/results`} className="flex-1">
+              <Link href={`/dashboard/projects/${idx + 1}`} className="flex-1">
                 <Button
                   variant="secondary"
                   className="w-full h-12 rounded-2xl font-bold shadow-sm"
@@ -171,12 +171,14 @@ export default function DashboardPage() {
                   Open
                 </Button>
               </Link>
-              <Button
-                variant="primary"
-                className="flex-[1.5] h-12 rounded-2xl font-bold"
-              >
-                Continue
-              </Button>
+              <Link href={`/dashboard/projects/${idx + 1}/results`} className="flex-[1.5]">
+                <Button
+                  variant="primary"
+                  className="w-full h-12 rounded-2xl font-bold"
+                >
+                  Continue
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

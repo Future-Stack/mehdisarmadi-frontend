@@ -39,7 +39,13 @@ export const authService = {
       success: true,
       message: "Logged in successfully (MOCK)",
       data: {
-        user: MOCK_USER,
+        user: {
+          ...MOCK_USER,
+          id: payload.email === "user@renofield.com" ? "user-456" : MOCK_USER.id,
+          name: payload.email === "user@renofield.com" ? "Sub User" : MOCK_USER.name,
+          email: payload.email,
+          role: payload.email === "user@renofield.com" ? "user" : "admin",
+        },
         tokens: {
           accessToken: "mock-access-token",
           refreshToken: "mock-refresh-token",
