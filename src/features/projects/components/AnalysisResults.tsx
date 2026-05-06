@@ -97,7 +97,7 @@ export default function AnalysisResults({ dashboardPath = "/admin" }: { dashboar
   const filterButtons = ["All Scope", "Div 01", "Div 06", "Div 08", "Div 09"];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#ECFDF5] to-white">
+    <div className="min-h-screen bg-gradient-to-b from-[#ECFDF5] to-white dark:from-emerald-950/20 dark:to-[#0B0F1A] transition-colors duration-300">
       <div className="max-w-7xl mx-auto py-8 px-4 space-y-8 animate-in fade-in duration-500 pb-20">
         {/* Header */}
         <div className="flex items-start justify-between">
@@ -109,25 +109,25 @@ export default function AnalysisResults({ dashboardPath = "/admin" }: { dashboar
               <ArrowLeft className="w-4 h-4" /> Back to Project
             </Link>
             <div className="space-y-1">
-              <h1 className="text-3xl font-black text-gray-900 tracking-tight">
+              <h1 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">
                 AI Analysis Results
               </h1>
-              <p className="text-gray-400 font-bold text-sm uppercase tracking-widest flex items-center gap-2">
-                Residential Complex <span className="text-gray-200">•</span>{" "}
+              <p className="text-gray-400 dark:text-gray-500 font-bold text-sm uppercase tracking-widest flex items-center gap-2">
+                Residential Complex <span className="text-gray-200 dark:text-gray-800">•</span>{" "}
                 united states
               </p>
             </div>
           </div>
           <button 
             onClick={handleBuildQuote}
-            className="bg-[#059669] h-12 px-8 rounded-xl font-black text-white text-sm shadow-lg shadow-emerald-100 hover:bg-[#047857] transition-all active:scale-95"
+            className="bg-[#059669] h-12 px-8 rounded-xl font-black text-white text-sm shadow-lg shadow-emerald-100 dark:shadow-none hover:bg-[#047857] transition-all active:scale-95"
           >
             Build Quote
           </button>
         </div>
 
         {/* Navigation Tabs (Single Line Grid) */}
-        <div className="grid grid-cols-10 gap-1 p-1 bg-gray-50 border border-gray-100 rounded-2xl shadow-sm min-w-[1000px] overflow-hidden">
+        <div className="grid grid-cols-10 gap-1 p-1 bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-sm min-w-[1000px] overflow-hidden transition-colors">
           {TABS.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -137,7 +137,7 @@ export default function AnalysisResults({ dashboardPath = "/admin" }: { dashboar
                 className={`px-1 py-3 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all text-center whitespace-nowrap ${
                   isActive
                     ? "bg-[#059669] text-white shadow-md scale-[1.02]"
-                    : "bg-transparent text-gray-400 hover:text-gray-600 hover:bg-white"
+                    : "bg-transparent text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-white dark:hover:bg-gray-800"
                 }`}
               >
                 {tab.label}
@@ -150,10 +150,10 @@ export default function AnalysisResults({ dashboardPath = "/admin" }: { dashboar
         {activeTab === "scope" && (
           <div className="flex items-end justify-between px-2">
             <div className="space-y-1">
-              <h2 className="text-2xl font-black text-gray-900 tracking-tight">
+              <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">
                 Scope of Work
               </h2>
-              <p className="text-gray-400 text-xs font-bold">
+              <p className="text-gray-400 dark:text-gray-500 text-xs font-bold">
                 Showing {filteredScopeItems.length} of {SCOPE_ITEMS.length} scope
                 items
               </p>
@@ -166,7 +166,7 @@ export default function AnalysisResults({ dashboardPath = "/admin" }: { dashboar
                   className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider border transition-all ${
                     activeFilter === tag
                       ? "bg-[#059669] text-white shadow-md"
-                      : "bg-white text-gray-400 border-gray-100 hover:border-emerald-200"
+                      : "bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-500 border-gray-100 dark:border-gray-700 hover:border-emerald-200 dark:hover:border-emerald-900"
                   }`}
                 >
                   {tag}
@@ -177,7 +177,7 @@ export default function AnalysisResults({ dashboardPath = "/admin" }: { dashboar
         )}
 
         {/* Tab Content Container */}
-        <div className="bg-white rounded-[32px] border border-gray-100 p-8 shadow-sm min-h-[600px]">
+        <div className="bg-white dark:bg-[#111827] rounded-[32px] border border-gray-100 dark:border-gray-800 p-8 shadow-sm min-h-[600px] transition-colors duration-300">
           {activeTab === "summary" && <SummaryTab />}
           {activeTab === "scope" && (
             <ScopeTab
@@ -236,7 +236,7 @@ function SummaryTab() {
   return (
     <div className="space-y-10 animate-in fade-in duration-500">
       <div className="space-y-6">
-        <h2 className="text-2xl font-black text-gray-900 tracking-tight">
+        <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">
           Key Highlights
         </h2>
         <div className="space-y-4">
@@ -245,10 +245,10 @@ function SummaryTab() {
               key={i}
               className={`${h.bg} border-l-4 ${h.border} rounded-2xl p-6 transition-all hover:scale-[1.01]`}
             >
-              <h3 className="font-black text-gray-900 text-lg mb-1">
+              <h3 className="font-black text-gray-900 dark:text-gray-100 text-lg mb-1">
                 {h.title}
               </h3>
-              <p className="text-gray-600 font-medium text-sm leading-relaxed">
+              <p className="text-gray-600 dark:text-gray-400 font-medium text-sm leading-relaxed">
                 {h.content}
               </p>
             </div>
@@ -257,10 +257,10 @@ function SummaryTab() {
       </div>
       <div className="space-y-6">
         <div>
-          <h2 className="text-xl font-black text-gray-900 tracking-tight">
+          <h2 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">
             Selected Divisions
           </h2>
-          <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mt-1">
+          <p className="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-widest mt-1">
             Division breakdown and allocation
           </p>
         </div>
@@ -273,10 +273,10 @@ function SummaryTab() {
           ].map((div, i) => (
             <div
               key={i}
-              className="flex items-center gap-2 px-4 py-2.5 bg-emerald-50/50 border border-emerald-100 rounded-xl"
+              className="flex items-center gap-2 px-4 py-2.5 bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/30 rounded-xl"
             >
               <div className="w-1.5 h-1.5 bg-[#059669] rounded-full" />
-              <span className="text-xs font-bold text-gray-700">{div}</span>
+              <span className="text-xs font-bold text-gray-700 dark:text-gray-300">{div}</span>
             </div>
           ))}
         </div>
@@ -291,10 +291,10 @@ function ScopeTab({ items, activeFilter }: any) {
       {items.map((item: any, i: number) => (
         <div
           key={i}
-          className="bg-white rounded-[16px] border border-gray-100 p-6 shadow-sm space-y-5 hover:border-emerald-100 transition-all"
+          className="bg-white dark:bg-gray-800/40 rounded-[16px] border border-gray-100 dark:border-gray-800 p-6 shadow-sm space-y-5 hover:border-emerald-100 dark:hover:border-emerald-900 transition-all"
         >
           <div className="flex justify-between items-start">
-            <h3 className="text-lg font-bold text-gray-900">{item.title}</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">{item.title}</h3>
             <span className="px-2.5 py-1 bg-[#059669] text-white rounded-[6px] text-[9px] font-black uppercase tracking-wider">
               Division {item.div.split(" ")[1]}
             </span>
@@ -302,30 +302,30 @@ function ScopeTab({ items, activeFilter }: any) {
 
           <div className="grid grid-cols-2 gap-x-20">
             <div className="space-y-1">
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+              <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
                 Quantity
               </p>
-              <p className="text-sm font-medium text-gray-700">{item.qty}</p>
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{item.qty}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+              <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
                 Specifications
               </p>
-              <p className="text-sm font-medium text-gray-700 leading-relaxed">
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300 leading-relaxed">
                 {item.specs}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 pt-1 text-[10px] font-bold text-gray-300 uppercase tracking-widest">
+          <div className="flex items-center gap-2 pt-1 text-[10px] font-bold text-gray-300 dark:text-gray-600 uppercase tracking-widest">
             <FileText className="w-3.5 h-3.5" />
             <span>{item.source}</span>
           </div>
         </div>
       ))}
       {items.length === 0 && (
-        <div className="py-20 text-center space-y-3 bg-gray-50 rounded-3xl border border-dashed border-gray-200">
-          <p className="font-bold text-gray-400">
+        <div className="py-20 text-center space-y-3 bg-gray-50 dark:bg-gray-900/50 rounded-3xl border border-dashed border-gray-200 dark:border-gray-800">
+          <p className="font-bold text-gray-400 dark:text-gray-500">
             No items found for {activeFilter}
           </p>
         </div>
@@ -371,10 +371,10 @@ function PricingTab() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="space-y-1">
-        <h2 className="text-2xl font-black text-gray-900 tracking-tight">
+        <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">
           Pricing Impacts
         </h2>
-        <p className="text-gray-400 text-sm font-medium">
+        <p className="text-gray-400 dark:text-gray-500 text-sm font-medium">
           Cost factors identified from tender documents
         </p>
       </div>
@@ -382,20 +382,20 @@ function PricingTab() {
         {items.map((item, i) => (
           <div
             key={i}
-            className="bg-orange-50/20 border-l-4 border-orange-400 rounded-2xl p-6 space-y-4"
+            className="bg-orange-50/20 dark:bg-orange-900/10 border-l-4 border-orange-400 rounded-2xl p-6 space-y-4"
           >
             <div className="flex justify-between items-start">
               <div className="space-y-1">
-                <h3 className="font-black text-gray-900 text-lg">
+                <h3 className="font-black text-gray-900 dark:text-gray-100 text-lg">
                   {item.title}
                 </h3>
-                <p className="text-gray-500 text-sm font-medium">{item.desc}</p>
+                <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">{item.desc}</p>
               </div>
-              <p className="text-xl font-black text-gray-900 tracking-tight">
+              <p className="text-xl font-black text-gray-900 dark:text-white tracking-tight">
                 {item.val}
               </p>
             </div>
-            <div className="flex items-center gap-2 text-[10px] font-black text-gray-300 uppercase tracking-widest pt-2 border-t border-gray-100/50">
+            <div className="flex items-center gap-2 text-[10px] font-black text-gray-300 dark:text-gray-600 uppercase tracking-widest pt-2 border-t border-gray-100/50 dark:border-gray-800">
               <Paperclip className="w-3 h-3" /> {item.source}
             </div>
           </div>
@@ -440,10 +440,10 @@ function RisksTab() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="space-y-1">
-        <h2 className="text-2xl font-black text-gray-900 tracking-tight">
+        <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">
           Risks & Coordination Items
         </h2>
-        <p className="text-gray-400 text-sm font-medium">
+        <p className="text-gray-400 dark:text-gray-500 text-sm font-medium">
           Issues flagged from tender analysis
         </p>
       </div>
@@ -451,14 +451,14 @@ function RisksTab() {
         {risks.map((risk, i) => (
           <div
             key={i}
-            className="bg-red-50/20 border-l-4 border-red-500 rounded-2xl p-6 space-y-4"
+            className="bg-red-50/20 dark:bg-red-900/10 border-l-4 border-red-500 rounded-2xl p-6 space-y-4"
           >
             <div className="flex justify-between items-start">
               <div className="space-y-2">
-                <h3 className="font-black text-gray-900 text-lg">
+                <h3 className="font-black text-gray-900 dark:text-gray-100 text-lg">
                   {risk.title}
                 </h3>
-                <p className="text-gray-600 text-sm font-medium leading-relaxed">
+                <p className="text-gray-600 dark:text-gray-400 text-sm font-medium leading-relaxed">
                   {risk.desc}
                 </p>
               </div>
@@ -468,7 +468,7 @@ function RisksTab() {
                 {risk.badge}
               </span>
             </div>
-            <div className="flex items-center gap-2 text-[10px] font-black text-gray-300 uppercase tracking-widest pt-2 border-t border-gray-100/50">
+            <div className="flex items-center gap-2 text-[10px] font-black text-gray-300 dark:text-gray-600 uppercase tracking-widest pt-2 border-t border-gray-100/50 dark:border-gray-800">
               <Paperclip className="w-3 h-3" /> {risk.source}
             </div>
           </div>
@@ -490,10 +490,10 @@ function ClarificationsTab() {
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-black text-gray-900 tracking-tight">
+          <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">
             Clarifications Needed
           </h2>
-          <p className="text-gray-400 text-sm font-medium">
+          <p className="text-gray-400 dark:text-gray-500 text-sm font-medium">
             Items requiring clarification from owner/architect
           </p>
         </div>
@@ -505,15 +505,15 @@ function ClarificationsTab() {
         {items.map((item, i) => (
           <div
             key={i}
-            className="bg-emerald-50/20 border border-gray-100 rounded-2xl p-6 space-y-4"
+            className="bg-emerald-50/20 dark:bg-emerald-900/10 border border-gray-100 dark:border-gray-800 rounded-2xl p-6 space-y-4"
           >
             <div className="flex gap-4">
               <span className="font-black text-[#059669] text-lg">
                 {i + 1}.
               </span>
-              <p className="font-bold text-gray-700 leading-relaxed">{item}</p>
+              <p className="font-bold text-gray-700 dark:text-gray-300 leading-relaxed">{item}</p>
             </div>
-            <div className="flex items-center gap-2 text-[10px] font-black text-gray-300 uppercase tracking-widest pl-8">
+            <div className="flex items-center gap-2 text-[10px] font-black text-gray-300 dark:text-gray-600 uppercase tracking-widest pl-8">
               <FileText className="w-3 h-3" /> General Conditions.pdf • Page 8 •
               4.2 Working Hours
             </div>
@@ -536,10 +536,10 @@ function AssumptionsTab() {
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-black text-gray-900 tracking-tight">
+          <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">
             Assumptions
           </h2>
-          <p className="text-gray-400 text-sm font-medium">
+          <p className="text-gray-400 dark:text-gray-500 text-sm font-medium">
             Assumptions made based on tender documents
           </p>
         </div>
@@ -551,13 +551,13 @@ function AssumptionsTab() {
         {items.map((item, i) => (
           <div
             key={i}
-            className="bg-blue-50/20 border border-gray-50 rounded-2xl p-5 space-y-3"
+            className="bg-blue-50/20 dark:bg-blue-900/10 border border-gray-50 dark:border-gray-800 rounded-2xl p-5 space-y-3"
           >
             <div className="flex items-center gap-4">
               <CheckCircle className="w-5 h-5 text-blue-500" />
-              <p className="font-bold text-gray-700 text-sm">{item}</p>
+              <p className="font-bold text-gray-700 dark:text-gray-300 text-sm">{item}</p>
             </div>
-            <div className="flex items-center gap-2 text-[10px] font-black text-gray-300 uppercase tracking-widest pl-9">
+            <div className="flex items-center gap-2 text-[10px] font-black text-gray-300 dark:text-gray-600 uppercase tracking-widest pl-9">
               <FileText className="w-3 h-3" /> General Conditions.pdf • Page 11
               • 5.1 Site Access
             </div>
@@ -580,10 +580,10 @@ function ExclusionsTab() {
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-black text-gray-900 tracking-tight">
+          <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">
             Exclusions
           </h2>
-          <p className="text-gray-400 text-sm font-medium">
+          <p className="text-gray-400 dark:text-gray-500 text-sm font-medium">
             Items explicitly excluded from scope
           </p>
         </div>
@@ -595,13 +595,13 @@ function ExclusionsTab() {
         {items.map((item, i) => (
           <div
             key={i}
-            className="bg-red-50/20 border border-gray-50 rounded-2xl p-5 space-y-3"
+            className="bg-red-50/20 dark:bg-red-900/10 border border-gray-50 dark:border-gray-800 rounded-2xl p-5 space-y-3"
           >
             <div className="flex items-center gap-4">
               <XCircle className="w-5 h-5 text-red-500" />
-              <p className="font-bold text-gray-700 text-sm">{item}</p>
+              <p className="font-bold text-gray-700 dark:text-gray-300 text-sm">{item}</p>
             </div>
-            <div className="flex items-center gap-2 text-[10px] font-black text-gray-300 uppercase tracking-widest pl-9">
+            <div className="flex items-center gap-2 text-[10px] font-black text-gray-300 dark:text-gray-600 uppercase tracking-widest pl-9">
               <FileText className="w-3 h-3" /> Scope of Work.pdf • Page 4 •
               Division 26 (Not Included)
             </div>
@@ -616,10 +616,10 @@ function AddendaTab() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="space-y-1">
-        <h2 className="text-2xl font-black text-gray-900 tracking-tight">
+        <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">
           Addenda Changes
         </h2>
-        <p className="text-gray-400 text-sm font-medium">
+        <p className="text-gray-400 dark:text-gray-500 text-sm font-medium">
           Changes issued through addenda
         </p>
       </div>
@@ -645,30 +645,30 @@ function AddendaTab() {
       ].map((item, i) => (
         <div
           key={i}
-          className="bg-emerald-50/20 border border-gray-100 rounded-[24px] p-8 space-y-8"
+          className="bg-emerald-50/20 dark:bg-emerald-900/10 border border-gray-100 dark:border-gray-800 rounded-[24px] p-8 space-y-8 transition-colors"
         >
           <div className="flex items-center gap-3">
             <span className="px-3 py-1 bg-[#059669] text-white rounded-lg text-[9px] font-black uppercase tracking-wider">
               Addendum {item.id}
             </span>
-            <span className="text-gray-400 text-xs font-bold">{item.date}</span>
+            <span className="text-gray-400 dark:text-gray-500 text-xs font-bold">{item.date}</span>
           </div>
           <div className="space-y-2">
-            <h3 className="text-xl font-black text-gray-900">{item.title}</h3>
-            <p className="text-gray-500 font-medium">{item.desc}</p>
+            <h3 className="text-xl font-black text-gray-900 dark:text-gray-100">{item.title}</h3>
+            <p className="text-gray-500 dark:text-gray-400 font-medium">{item.desc}</p>
           </div>
-          <div className="grid grid-cols-2 gap-12 border-t border-gray-100 pt-8">
+          <div className="grid grid-cols-2 gap-12 border-t border-gray-100 dark:border-gray-800 pt-8">
             <div className="grid grid-cols-2 gap-8">
               <div className="space-y-1">
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
                   Impact Type
                 </p>
-                <span className="px-2 py-0.5 bg-white border border-gray-100 rounded text-[9px] font-bold">
+                <span className="px-2 py-0.5 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded text-[9px] font-bold dark:text-gray-300">
                   {item.type}
                 </span>
               </div>
               <div className="space-y-1">
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
                   Affected Divisions
                 </p>
                 <span className="px-2 py-0.5 bg-[#059669] text-white rounded text-[9px] font-bold">
@@ -678,22 +678,22 @@ function AddendaTab() {
             </div>
             <div className="grid grid-cols-2 gap-8">
               <div className="space-y-1">
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
                   Scope Change
                 </p>
-                <p className="text-sm font-bold text-gray-800">Add</p>
+                <p className="text-sm font-bold text-gray-800 dark:text-gray-200">Add</p>
               </div>
               <div className="space-y-1">
                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
                   Pricing Impact
                 </p>
-                <p className="text-sm font-black text-gray-900">
+                <p className="text-sm font-black text-gray-900 dark:text-white">
                   {item.impact}
                 </p>
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-[10px] font-black text-gray-300 uppercase tracking-widest pt-2">
+          <div className="flex items-center gap-2 text-[10px] font-black text-gray-300 dark:text-gray-600 uppercase tracking-widest pt-2">
             <FileText className="w-3.5 h-3.5" /> Addendum_01.pdf • Page 2 • item
             3
           </div>
@@ -707,28 +707,28 @@ function QuoteDraftTab({ onBuildQuote }: { onBuildQuote: () => void }) {
   return (
     <div className="space-y-10 animate-in fade-in duration-500">
       <div className="space-y-1">
-        <h2 className="text-2xl font-black text-gray-900 tracking-tight">
+        <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">
           Suggested Quote Information
         </h2>
-        <p className="text-gray-400 text-sm font-medium">
+        <p className="text-gray-400 dark:text-gray-500 text-sm font-medium">
           Preliminary quote data for review
         </p>
       </div>
 
-      <div className="bg-emerald-50/40 rounded-[24px] p-8 space-y-4">
-        <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest">
+      <div className="bg-emerald-50/40 dark:bg-emerald-900/10 rounded-[24px] p-8 space-y-4 transition-colors">
+        <h3 className="text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest">
           Recommended Lump Sum
         </h3>
         <div className="space-y-2">
-          <p className="text-4xl font-black text-[#059669]">$485,000 + HST</p>
-          <p className="text-xs text-gray-400 font-bold">
+          <p className="text-4xl font-black text-[#059669] dark:text-emerald-400">$485,000 + HST</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 font-bold">
             Based on scope analysis and pricing factors
           </p>
         </div>
       </div>
 
-      <div className="bg-gray-50/50 rounded-[24px] p-8 space-y-6">
-        <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest">
+      <div className="bg-gray-50/50 dark:bg-gray-900/30 rounded-[24px] p-8 space-y-6 transition-colors">
+        <h3 className="text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest">
           Division Breakdown
         </h3>
         <div className="space-y-4">
@@ -740,12 +740,12 @@ function QuoteDraftTab({ onBuildQuote }: { onBuildQuote: () => void }) {
           ].map((row, i) => (
             <div
               key={i}
-              className="flex justify-between items-center border-b border-gray-100 pb-4 last:border-0 last:pb-0"
+              className="flex justify-between items-center border-b border-gray-100 dark:border-gray-800 pb-4 last:border-0 last:pb-0"
             >
-              <span className="text-sm font-bold text-gray-600">
+              <span className="text-sm font-bold text-gray-600 dark:text-gray-400">
                 {row.label}
               </span>
-              <span className="text-sm font-black text-gray-900">
+              <span className="text-sm font-black text-gray-900 dark:text-white">
                 {row.val}
               </span>
             </div>
@@ -753,8 +753,8 @@ function QuoteDraftTab({ onBuildQuote }: { onBuildQuote: () => void }) {
         </div>
       </div>
 
-      <div className="bg-blue-50/30 rounded-[24px] p-8 space-y-6">
-        <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest">
+      <div className="bg-blue-50/30 dark:bg-blue-900/10 rounded-[24px] p-8 space-y-6 transition-colors">
+        <h3 className="text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest">
           Additional Costs
         </h3>
         <div className="space-y-4">
@@ -763,10 +763,10 @@ function QuoteDraftTab({ onBuildQuote }: { onBuildQuote: () => void }) {
             { label: "Performance Bond (5%)", val: "$24,250" },
           ].map((row, i) => (
             <div key={i} className="flex justify-between items-center">
-              <span className="text-sm font-bold text-gray-600">
+              <span className="text-sm font-bold text-gray-600 dark:text-gray-400">
                 {row.label}
               </span>
-              <span className="text-sm font-black text-gray-900">
+              <span className="text-sm font-black text-gray-900 dark:text-white">
                 {row.val}
               </span>
             </div>
@@ -799,10 +799,10 @@ function SourcesTab() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="space-y-1">
-        <h2 className="text-2xl font-black text-gray-900 tracking-tight">
+        <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">
           Source Documents
         </h2>
-        <p className="text-gray-400 text-sm font-medium">
+        <p className="text-gray-400 dark:text-gray-500 text-sm font-medium">
           All documents analyzed by AI
         </p>
       </div>
@@ -810,13 +810,13 @@ function SourcesTab() {
         {sources.map((source, i) => (
           <div
             key={i}
-            className="bg-emerald-50/20 border-l-4 border-[#059669] rounded-2xl p-6 flex justify-between items-center group hover:bg-emerald-50/40 transition-all"
+            className="bg-emerald-50/20 dark:bg-emerald-900/10 border-l-4 border-[#059669] rounded-2xl p-6 flex justify-between items-center group hover:bg-emerald-50/40 dark:hover:bg-emerald-900/20 transition-all"
           >
             <div className="space-y-1">
-              <h3 className="font-black text-gray-900 text-base">
+              <h3 className="font-black text-gray-900 dark:text-gray-100 text-base">
                 {source.name}
               </h3>
-              <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">
+              <p className="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-widest">
                 {source.pages} pages • Uploaded {source.date}
               </p>
             </div>

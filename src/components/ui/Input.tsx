@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
-import { type InputHTMLAttributes, forwardRef } from "react";
+import React, { type InputHTMLAttributes, forwardRef } from "react";
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "prefix"> {
   label?: string;
   error?: string;
   hint?: string;
@@ -40,10 +40,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               "w-full rounded-lg border px-3 py-2 text-sm shadow-sm transition-all",
               "border-gray-200 bg-white text-gray-900 placeholder:text-gray-400",
               "focus:border-[#059669] focus:outline-none focus:ring-4 focus:ring-[#059669]/10",
-              "dark:border-gray-600 dark:bg-white dark:text-gray-900 dark:placeholder:text-gray-400",
+              "dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500",
               "disabled:cursor-not-allowed disabled:opacity-60",
-              prefix && "pl-8",
-              error && "border-red-500 focus:border-red-500 focus:ring-red-500/10",
+              prefix ? "pl-8" : undefined,
+              error ? "border-red-500 focus:border-red-500 focus:ring-red-500/10" : undefined,
               className
             )}
             aria-invalid={!!error}

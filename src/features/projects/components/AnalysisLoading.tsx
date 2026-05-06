@@ -37,15 +37,15 @@ export default function AnalysisLoading({ dashboardPath = "/admin" }: { dashboar
 
   return (
     <div className="w-full max-w-2xl animate-in fade-in slide-in-from-bottom-8 duration-700">
-      <div className="bg-white rounded-[32px] border border-gray-100 p-12 shadow-[0_20px_50px_rgba(0,0,0,0.04)] flex flex-col items-center text-center space-y-10">
+      <div className="bg-white dark:bg-[#111827] rounded-[32px] border border-gray-100 dark:border-gray-800 p-12 shadow-[0_20px_50px_rgba(0,0,0,0.04)] dark:shadow-none flex flex-col items-center text-center space-y-10 transition-colors duration-300">
         
         {/* Icon Animation */}
         <div className="relative">
-          <div className="w-24 h-24 bg-emerald-50 rounded-full flex items-center justify-center text-[#059669] animate-pulse">
+          <div className="w-24 h-24 bg-emerald-50 dark:bg-emerald-900/20 rounded-full flex items-center justify-center text-[#059669] animate-pulse">
             <Sparkles className="w-10 h-10" />
           </div>
           <div className="absolute -top-2 -right-2">
-            <div className="w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center border border-gray-50">
+            <div className="w-8 h-8 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center border border-gray-50 dark:border-gray-700">
               <Loader2 className="w-4 h-4 text-[#059669] animate-spin" />
             </div>
           </div>
@@ -53,8 +53,8 @@ export default function AnalysisLoading({ dashboardPath = "/admin" }: { dashboar
 
         {/* Text */}
         <div className="space-y-3">
-          <h1 className="text-3xl font-black text-gray-900 tracking-tight">Analyzing Your Tender Document</h1>
-          <p className="text-gray-500 font-medium">Please wait while AI processes your document</p>
+          <h1 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">Analyzing Your Tender Document</h1>
+          <p className="text-gray-500 dark:text-gray-400 font-medium">Please wait while AI processes your document</p>
         </div>
 
         {/* Steps List */}
@@ -75,7 +75,7 @@ export default function AnalysisLoading({ dashboardPath = "/admin" }: { dashboar
                 ) : (
                   <Circle className="w-6 h-6 text-gray-300" />
                 )}
-                <span className={`font-bold text-sm ${isCurrent ? "text-blue-600" : isCompleted ? "text-gray-700" : "text-gray-400"}`}>
+                <span className={`font-bold text-sm ${isCurrent ? "text-blue-600 dark:text-blue-400" : isCompleted ? "text-gray-700 dark:text-gray-300" : "text-gray-400 dark:text-gray-600"}`}>
                   {step.label}
                 </span>
               </div>
@@ -84,9 +84,9 @@ export default function AnalysisLoading({ dashboardPath = "/admin" }: { dashboar
         </div>
 
         {/* Tip */}
-        <div className="w-full bg-[#EFF6FF] border border-blue-100 rounded-2xl p-5 text-center">
-          <p className="text-xs font-bold text-blue-600 uppercase tracking-widest">
-            Tip: <span className="text-blue-500 normal-case font-medium">This may take a few moments depending on document size</span>
+        <div className="w-full bg-[#EFF6FF] dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-2xl p-5 text-center transition-colors">
+          <p className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest">
+            Tip: <span className="text-blue-500 dark:text-blue-300 normal-case font-medium">This may take a few moments depending on document size</span>
           </p>
         </div>
       </div>

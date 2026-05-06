@@ -6,7 +6,7 @@ export default function SubUserLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-[#F8FAFC]">
+    <div className="flex flex-col h-screen overflow-hidden bg-[#F8FAFC] dark:bg-[#0B0F1A] transition-colors duration-300">
       <SubUserNavbar />
       <main
         id="main-content"
