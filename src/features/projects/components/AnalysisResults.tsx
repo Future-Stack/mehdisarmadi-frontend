@@ -25,6 +25,7 @@ import {
   DraftingCompass,
   Search,
 } from "lucide-react";
+import { useRouter, useParams } from "next/navigation";
 
 const TABS = [
   { id: "summary", label: "Summary" },
@@ -80,6 +81,13 @@ const SCOPE_ITEMS = [
 export default function AnalysisResults({ dashboardPath = "/admin" }: { dashboardPath?: string }) {
   const [activeTab, setActiveTab] = useState("summary");
   const [activeFilter, setActiveFilter] = useState("All Scope");
+  const router = useRouter();
+  const { id } = useParams();
+
+  const handleBuildQuote = () => {
+    const basePath = window.location.pathname.includes("/admin") ? "/admin" : "/sub-user";
+    router.push(`${basePath}/projects/${id}/quote-builder`);
+  };
 
   const filteredScopeItems =
     activeFilter === "All Scope"
@@ -110,7 +118,10 @@ export default function AnalysisResults({ dashboardPath = "/admin" }: { dashboar
               </p>
             </div>
           </div>
-          <button className="bg-[#059669] h-12 px-8 rounded-xl font-black text-white text-sm shadow-lg shadow-emerald-100 hover:bg-[#047857] transition-all active:scale-95">
+          <button 
+            onClick={handleBuildQuote}
+            className="bg-[#059669] h-12 px-8 rounded-xl font-black text-white text-sm shadow-lg shadow-emerald-100 hover:bg-[#047857] transition-all active:scale-95"
+          >
             Build Quote
           </button>
         </div>
@@ -180,7 +191,7 @@ export default function AnalysisResults({ dashboardPath = "/admin" }: { dashboar
           {activeTab === "assumptions" && <AssumptionsTab />}
           {activeTab === "exclusions" && <ExclusionsTab />}
           {activeTab === "addenda" && <AddendaTab />}
-          {activeTab === "quote" && <QuoteDraftTab />}
+          {activeTab === "quote" && <QuoteDraftTab onBuildQuote={handleBuildQuote} />}
           {activeTab === "sources" && <SourcesTab />}
         </div>
       </div>
@@ -692,7 +703,7 @@ function AddendaTab() {
   );
 }
 
-function QuoteDraftTab() {
+function QuoteDraftTab({ onBuildQuote }: { onBuildQuote: () => void }) {
   return (
     <div className="space-y-10 animate-in fade-in duration-500">
       <div className="space-y-1">
@@ -764,7 +775,10 @@ function QuoteDraftTab() {
       </div>
 
       <div className="flex justify-end">
-        <button className="bg-[#059669] h-12 px-8 rounded-xl font-black text-white text-sm flex items-center gap-2 shadow-lg shadow-emerald-100 hover:bg-[#047857] transition-all">
+        <button 
+          onClick={onBuildQuote}
+          className="bg-[#059669] h-12 px-8 rounded-xl font-black text-white text-sm flex items-center gap-2 shadow-lg shadow-emerald-100 hover:bg-[#047857] transition-all"
+        >
           Open Build Quote <ArrowRight className="w-4 h-4" />
         </button>
       </div>

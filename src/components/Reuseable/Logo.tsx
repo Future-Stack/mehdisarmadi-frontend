@@ -6,8 +6,8 @@ const Logo = () => {
       <Image
         src="/Images/Renofield.png"
         alt="logo"
-        height={200}
-        width={200}
+        height={140}
+        width={120}
         style={{ width: "100%", height: "auto" }}
         className="object-contain"
       />

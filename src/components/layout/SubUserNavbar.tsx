@@ -1,6 +1,5 @@
 "use client";
 
-import { useAppSelector } from "@/store/hooks";
 import { useLogout } from "@/features/auth/hooks/useAuth";
 import Logo from "@/components/Reuseable/Logo";
 import { Plus, Settings, LogOut, LayoutDashboard, FolderKanban } from "lucide-react";
@@ -26,7 +25,7 @@ export default function SubUserNavbar() {
             <Logo />
           </Link>
           
-          <nav className="hidden md:flex items-center gap-1">
+          {/* <nav className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
               <Link 
                 key={link.href} 
@@ -42,7 +41,7 @@ export default function SubUserNavbar() {
                 {link.label}
               </Link>
             ))}
-          </nav>
+          </nav> */}
         </div>
 
         <div className="flex items-center gap-3 lg:gap-4">
