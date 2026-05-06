@@ -120,12 +120,20 @@ export default function Sidebar() {
         <button
           onClick={() => dispatch(toggleSidebar())}
           className={cn(
-            "absolute -right-4 top-1/2 -translate-y-1/2 z-50 flex h-8 w-8 items-center justify-center rounded-lg bg-white border border-gray-100 shadow-md transition-all hover:scale-110 active:scale-95 dark:bg-gray-900 dark:border-gray-800",
-            !isOpen && "rotate-180"
+            "absolute -right-9 top-1/2 -translate-y-1/2 z-50 flex h-9 w-9 items-center justify-center rounded-r-xl bg-white border border-l-0 border-gray-100 transition-all hover:bg-gray-50 active:scale-95 dark:bg-gray-950 dark:border-gray-800 dark:hover:bg-gray-900"
           )}
           aria-label={isOpen ? "Collapse sidebar" : "Expand sidebar"}
         >
-          <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+          <svg 
+            className={cn(
+              "h-4 w-4 text-black dark:text-white transition-transform duration-300",
+              !isOpen && "rotate-180"
+            )} 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor" 
+            strokeWidth={3}
+          >
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
         </button>

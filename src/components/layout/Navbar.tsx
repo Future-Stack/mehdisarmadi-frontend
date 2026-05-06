@@ -33,11 +33,8 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-gray-100 bg-white px-8 dark:bg-gray-900 dark:border-gray-800 transition-colors duration-300">
       <div className="flex items-center gap-6">
-        <Link href={"/admin"}>
-          <Logo />
-        </Link>
         {/* Search bar */}
-        <div className="relative hidden lg:block">
+        <div className="relative hidden lg:block ml-4">
           <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
             <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -46,7 +43,7 @@ export default function Navbar() {
           <input
             type="text"
             placeholder="Search projects, files or users..."
-            className="w-[589px] h-[42px] rounded-xl border border-[#99A1AF] bg-gray-50/30 pl-11 pr-4 text-sm focus:border-secondary focus:bg-white focus:outline-none transition-all placeholder:text-[#968C8C] dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-500"
+            className="w-[589px] h-[42px] rounded-xl border border-[#99A1AF] bg-gray-50/30 pl-11 pr-4 text-sm focus:border-secondary focus:outline-none transition-all placeholder:text-[#968C8C] dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 text-gray-900 focus:bg-white dark:focus:bg-gray-700"
           />
         </div>
       </div>

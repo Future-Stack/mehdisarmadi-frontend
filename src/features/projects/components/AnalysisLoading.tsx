@@ -33,7 +33,7 @@ export default function AnalysisLoading({ dashboardPath = "/admin" }: { dashboar
       }, 1000);
       return () => clearTimeout(redirectTimer);
     }
-  }, [currentStep, router]);
+  }, [currentStep, dashboardPath, router]);
 
   return (
     <div className="w-full max-w-2xl animate-in fade-in slide-in-from-bottom-8 duration-700">
