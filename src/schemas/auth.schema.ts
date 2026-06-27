@@ -11,9 +11,9 @@ export type LoginFormValues = z.infer<typeof loginSchema>;
 
 export const registerSchema = z
   .object({
-    name: z
+    fullName: z
       .string()
-      .min(2, { error: "Name must be at least 2 characters" })
+      .min(2, { error: "Full name must be at least 2 characters" })
       .trim(),
     email: z.email({ error: "Enter a valid email address" }).trim(),
     password: z
@@ -29,3 +29,14 @@ export const registerSchema = z
   });
 
 export type RegisterFormValues = z.infer<typeof registerSchema>;
+
+export const verifyEmailSchema = z.object({
+  email: z.email({ error: "Enter a valid email address" }).trim(),
+  code: z
+    .string()
+    .min(6, { error: "Verification code must be 6 digits" })
+    .max(6, { error: "Verification code must be 6 digits" })
+    .regex(/^\d+$/, { error: "Verification code must contain only numbers" }),
+});
+
+export type VerifyEmailFormValues = z.infer<typeof verifyEmailSchema>;

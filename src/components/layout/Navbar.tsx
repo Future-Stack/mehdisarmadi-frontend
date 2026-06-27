@@ -15,7 +15,7 @@ export default function Navbar() {
   const dispatch = useAppDispatch();
   const theme = useAppSelector((s) => s.ui.theme);
   const user = useAppSelector((s) => s.auth.user);
-  const { mutate: logout, isPending } = useLogout();
+  const { logout, isLoading } = useLogout();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -123,7 +123,7 @@ export default function Navbar() {
                 <hr className="border-gray-100 dark:border-gray-800 mx-2" />
                 <button
                   onClick={() => logout()}
-                  disabled={isPending}
+                  disabled={isLoading}
                   className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
                 >
                   <LogOut size={18} />

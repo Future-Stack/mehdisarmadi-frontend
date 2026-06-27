@@ -15,6 +15,7 @@ const MOCK_USERS: User[] = Array.from({ length: 10 }).map((_, i) => ({
   id: `user-${i + 1}`,
   name: i === 0 ? "Akash Abrrar" : `Mock User ${i + 1}`,
   email: `user${i + 1}@example.com`,
+  status: "active",
   role: i % 3 === 0 ? "admin" : i % 2 === 0 ? "manager" : "user",
   avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${i}`,
   createdAt: new Date().toISOString(),
