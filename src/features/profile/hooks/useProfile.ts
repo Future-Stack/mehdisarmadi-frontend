@@ -1,50 +1,48 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { profileService } from "@/services/profile.service";
-import { QUERY_KEYS } from "@/constants";
+import { useGetProfileQuery, useUpdateProfileMutation, useUpdatePasswordMutation } from "@/store/api/profileApi";
 import { toast } from "sonner";
 import { useAppDispatch } from "@/store/hooks";
 import { setUser } from "@/store/slices/authSlice";
 
 export function useProfile() {
-  const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
 
-  const profileQuery = useQuery({
-    queryKey: [QUERY_KEYS.USER],
-    queryFn: profileService.getProfile,
-  });
+  const profileQuery = useGetProfileQuery();
 
-  const updateProfileMutation = useMutation({
-    mutationFn: profileService.updateProfile,
-    onSuccess: (response) => {
-      queryClient.setQueryData([QUERY_KEYS.USER], response);
+  const [updateProfileApi, updateProfileState] = useUpdateProfileMutation();
+  const [updatePasswordApi, updatePasswordState] = useUpdatePasswordMutation();
+
+  const updateProfile = async (payload: any) => {
+    try {
+      const response = await updateProfileApi(payload).unwrap();
       dispatch(setUser(response.data));
       toast.success("Profile updated successfully");
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to update profile");
-    },
-  });
+      return response;
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to update profile");
+      throw error;
+    }
+  };
 
-  const updatePasswordMutation = useMutation({
-    mutationFn: profileService.updatePassword,
-    onSuccess: () => {
+  const updatePassword = async (payload: any) => {
+    try {
+      const response = await updatePasswordApi(payload).unwrap();
       toast.success("Password updated successfully");
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to update password");
-    },
-  });
+      return response;
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to update password");
+      throw error;
+    }
+  };
 
   return {
     profile: profileQuery.data?.data,
     isLoading: profileQuery.isLoading,
-    updateProfile: updateProfileMutation.mutate,
-    isUpdating: updateProfileMutation.isPending,
-    updatePassword: updatePasswordMutation.mutate,
-    isUpdatingPassword: updatePasswordMutation.isPending,
+    updateProfile,
+    isUpdating: updateProfileState.isLoading,
+    updatePassword,
+    isUpdatingPassword: updatePasswordState.isLoading,
   };
 }

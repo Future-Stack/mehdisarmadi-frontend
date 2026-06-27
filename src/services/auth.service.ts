@@ -7,80 +7,124 @@ export interface LoginPayload {
 }
 
 export interface RegisterPayload {
-  name: string;
+  fullName: string;
   email: string;
   password: string;
 }
 
-export interface AuthResponse {
-  user: User;
-  tokens: AuthTokens;
+export interface VerifyEmailPayload {
+  email: string;
+  code: string;
 }
 
-// ─── Mock User for static development ────────────────────────────────────────
-const MOCK_USER: User = {
-  id: "user-123",
-  name: "Akash Abrrar",
-  email: "akash@example.com",
-  role: "admin",
-  avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Akash",
-  bio: "Senior Frontend Architect building scalable web applications.",
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-};
+export interface RegisterResponse {
+  user: {
+    id: string;
+    email: string;
+    status: string;
+    createdAt: string;
+  };
+}
+
+export interface VerifyEmailResponse {
+  user: User;
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface LoginResponse {
+  user: User;
+  isFirstTimer: boolean;
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface AuthResponse {
+  user: User;
+  accessToken?: string;
+  refreshToken?: string;
+  isFirstTimer?: boolean;
+}
 
 export const authService = {
-  login: async (payload: LoginPayload): Promise<ApiResponse<{ user: User; tokens: AuthTokens }>> => {
-    console.log("[Mock Login]", payload);
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    
-    return {
-      success: true,
-      message: "Logged in successfully (MOCK)",
-      data: {
-        user: {
-          ...MOCK_USER,
-          id: payload.email === "user@renofield.com" ? "user-456" : MOCK_USER.id,
-          name: payload.email === "user@renofield.com" ? "Sub User" : MOCK_USER.name,
-          email: payload.email,
-          role: payload.email === "user@renofield.com" ? "user" : "admin",
-        },
-        tokens: {
-          accessToken: "mock-access-token",
-          refreshToken: "mock-refresh-token",
-        },
-      },
-    };
+  register: async (payload: RegisterPayload): Promise<ApiResponse<RegisterResponse>> => {
+    try {
+      const response = await apiClient.post<ApiResponse<RegisterResponse>>(
+        "/auth/register",
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   },
 
-  register: async (payload: RegisterPayload): Promise<ApiResponse<{ user: User; tokens: AuthTokens }>> => {
-    console.log("[Mock Register]", payload);
-    await new Promise((resolve) => setTimeout(resolve, 800));
+  verifyEmail: async (
+    payload: VerifyEmailPayload
+  ): Promise<ApiResponse<VerifyEmailResponse>> => {
+    try {
+      const response = await apiClient.post<ApiResponse<VerifyEmailResponse>>(
+        "/auth/verify-email",
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
 
-    return {
-      success: true,
-      message: "Account created (MOCK)",
-      data: {
-        user: { ...MOCK_USER, name: payload.name, email: payload.email },
-        tokens: {
-          accessToken: "mock-access-token",
-          refreshToken: "mock-refresh-token",
-        },
-      },
-    };
+  login: async (payload: LoginPayload): Promise<ApiResponse<LoginResponse>> => {
+    try {
+      const response = await apiClient.post<ApiResponse<LoginResponse>>(
+        "/auth/login",
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   },
 
   logout: async (): Promise<ApiResponse<void>> => {
-    return { success: true, message: "Logged out", data: undefined };
+    try {
+      const response = await apiClient.post<ApiResponse<void>>("/auth/logout");
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   },
 
-  refreshToken: (refreshToken: string) =>
-    apiClient
-      .post<ApiResponse<AuthTokens>>("/auth/refresh", { refreshToken })
-      .then((r) => r.data),
+  refreshToken: async (refreshToken: string): Promise<ApiResponse<AuthTokens>> => {
+    try {
+      const response = await apiClient.post<ApiResponse<AuthTokens>>(
+        "/auth/refresh-token",
+        { refreshToken }
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  adminLogin: async (payload: LoginPayload): Promise<ApiResponse<LoginResponse>> => {
+    try {
+      const response = await apiClient.post<ApiResponse<LoginResponse>>(
+        "/auth/admin/login",
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
 
   getMe: async (): Promise<ApiResponse<User>> => {
-    return { success: true, message: "User fetched (MOCK)", data: MOCK_USER };
+    try {
+      const response = await apiClient.get<ApiResponse<User>>("/auth/me");
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   },
 };
+

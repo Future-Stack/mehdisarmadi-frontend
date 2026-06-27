@@ -1,29 +1,39 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { authService, type LoginPayload, type RegisterPayload, type AuthResponse } from "@/services/auth.service";
-import type { ApiResponse } from "@/types";
+import {
+  authService,
+  type LoginPayload,
+  type RegisterPayload,
+  type VerifyEmailPayload,
+  type LoginResponse,
+  type VerifyEmailResponse,
+  type RegisterResponse,
+} from "@/services/auth.service";
+import type { User, AuthTokens } from "@/types";
 
-export const loginThunk = createAsyncThunk<
-  AuthResponse,
-  LoginPayload,
-  {
-    rejectValue: string;
-  }
->("auth/login", async (payload, { rejectWithValue }) => {
-  try {
-    const response = await authService.login(payload);
-    if (!response.success) {
-      return rejectWithValue(response.message || "Login failed");
-    }
-    return response.data;
-  } catch (error) {
-    return rejectWithValue(
-      error instanceof Error ? error.message : "Login failed"
-    );
-  }
-});
+export interface LoginThunkResponse {
+  user: User;
+  isFirstTimer: boolean;
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface RegisterThunkResponse {
+  user: {
+    id: string;
+    email: string;
+    status: string;
+    createdAt: string;
+  };
+}
+
+export interface VerifyEmailThunkResponse {
+  user: User;
+  accessToken: string;
+  refreshToken: string;
+}
 
 export const registerThunk = createAsyncThunk<
-  AuthResponse,
+  RegisterThunkResponse,
   RegisterPayload,
   {
     rejectValue: string;
@@ -38,6 +48,46 @@ export const registerThunk = createAsyncThunk<
   } catch (error) {
     return rejectWithValue(
       error instanceof Error ? error.message : "Registration failed"
+    );
+  }
+});
+
+export const verifyEmailThunk = createAsyncThunk<
+  VerifyEmailThunkResponse,
+  VerifyEmailPayload,
+  {
+    rejectValue: string;
+  }
+>("auth/verify-email", async (payload, { rejectWithValue }) => {
+  try {
+    const response = await authService.verifyEmail(payload);
+    if (!response.success) {
+      return rejectWithValue(response.message || "Email verification failed");
+    }
+    return response.data;
+  } catch (error) {
+    return rejectWithValue(
+      error instanceof Error ? error.message : "Email verification failed"
+    );
+  }
+});
+
+export const loginThunk = createAsyncThunk<
+  LoginThunkResponse,
+  LoginPayload,
+  {
+    rejectValue: string;
+  }
+>("auth/login", async (payload, { rejectWithValue }) => {
+  try {
+    const response = await authService.login(payload);
+    if (!response.success) {
+      return rejectWithValue(response.message || "Login failed");
+    }
+    return response.data;
+  } catch (error) {
+    return rejectWithValue(
+      error instanceof Error ? error.message : "Login failed"
     );
   }
 });
@@ -80,3 +130,4 @@ export const refreshTokenThunk = createAsyncThunk<
     );
   }
 });
+

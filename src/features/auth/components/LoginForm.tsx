@@ -2,26 +2,41 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useState } from "react";
 import { loginSchema, type LoginFormValues } from "@/schemas/auth.schema";
-import { useLogin } from "@/features/auth/hooks/useAuth";
+import { useLogin, useAdminLogin } from "@/features/auth/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { ROUTES } from "@/constants";
 import Logo from "@/components/Reuseable/Logo";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Shield } from "lucide-react";
 
 export default function LoginForm() {
-  const { mutate: login, isPending } = useLogin();
+  const [isAdminLogin, setIsAdminLogin] = useState(false);
+  const { login, isLoading } = useLogin();
+  const { adminLogin, isLoading: isAdminLoading } = useAdminLogin();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = (data: LoginFormValues) => login(data);
+  const onSubmit = async (data: LoginFormValues) => {
+    if (isAdminLogin) {
+      await adminLogin(data.email, data.password);
+    } else {
+      await login(data.email, data.password);
+    }
+  };
+
+  const toggleLoginMode = () => {
+    setIsAdminLogin(!isAdminLogin);
+    reset();
+  };
 
   return (
     <form
@@ -32,11 +47,14 @@ export default function LoginForm() {
       <div className="flex flex-col items-center gap-6 text-center">
         <Logo />
         <div className="space-y-1">
-          <h1 className="text-3xl font-bold text-[#059669]">
-            Welcome Back
-          </h1>
+          <div className="flex items-center justify-center gap-2">
+            {isAdminLogin && <Shield size={24} className="text-purple-600" />}
+            <h1 className="text-3xl font-bold text-[#059669]">
+              {isAdminLogin ? "Admin Login" : "Welcome Back"}
+            </h1>
+          </div>
           <p className="text-[15px] text-gray-500 font-medium">
-            Login to manage your tender projects
+            {isAdminLogin ? "Access admin dashboard" : "Login to manage your tender projects"}
           </p>
         </div>
       </div>
@@ -71,12 +89,20 @@ export default function LoginForm() {
         <Button
           type="submit"
           id="login-submit"
-          isLoading={isPending}
-          loadingText="Signing in…"
+          isLoading={isAdminLogin ? isAdminLoading : isLoading}
+          loadingText={isAdminLogin ? "Admin login..." : "Signing in…"}
           className="w-full h-12 rounded-xl font-bold text-base"
         >
-          Login
+          {isAdminLogin ? "Admin Login" : "Login"}
         </Button>
+
+        <button
+          type="button"
+          onClick={toggleLoginMode}
+          className="w-full text-sm font-medium text-gray-500 hover:text-[#059669] transition-colors py-2 rounded-xl hover:bg-gray-50"
+        >
+          {isAdminLogin ? "← Back to User Login" : "Admin Login →"}
+        </button>
 
         <div className="flex flex-col items-center gap-4">
           <Link
@@ -104,44 +130,70 @@ export default function LoginForm() {
           </Link>
 
           <div className="mt-8 p-4 bg-emerald-50 rounded-2xl border border-emerald-100 w-full">
-            <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-3 text-center">Default Credentials</p>
+            <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-3 text-center">
+              {isAdminLogin ? "Admin Test Account" : "Default Credentials"}
+            </p>
             <div className="grid grid-cols-2 gap-3">
-              <button 
-                type="button"
-                onClick={() => {
-                  const form = document.querySelector('form');
-                  if (form) {
+              {!isAdminLogin && (
+                <>
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      const email = document.getElementById('login-email') as HTMLInputElement;
+                      const pass = document.getElementById('login-password') as HTMLInputElement;
+                      if (email && pass) {
+                        email.value = "user@renofield.com";
+                        pass.value = "password123";
+                        email.dispatchEvent(new Event('input', { bubbles: true }));
+                        pass.dispatchEvent(new Event('input', { bubbles: true }));
+                      }
+                    }}
+                    className="px-3 py-2 bg-white rounded-xl border border-emerald-100 text-[11px] font-bold text-gray-600 hover:bg-emerald-100 transition-all"
+                  >
+                    Sub-User
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      setIsAdminLogin(true);
+                      const email = document.getElementById('login-email') as HTMLInputElement;
+                      const pass = document.getElementById('login-password') as HTMLInputElement;
+                      if (email && pass) {
+                        setTimeout(() => {
+                          email.value = "gorimo2418@disiok.com";
+                          pass.value = "adminPassword123";
+                          email.dispatchEvent(new Event('input', { bubbles: true }));
+                          pass.dispatchEvent(new Event('input', { bubbles: true }));
+                        }, 100);
+                      }
+                    }}
+                    className="px-3 py-2 bg-white rounded-xl border border-emerald-100 text-[11px] font-bold text-gray-600 hover:bg-emerald-100 transition-all"
+                  >
+                    Switch to Admin
+                  </button>
+                </>
+              )}
+              {isAdminLogin && (
+                <button 
+                  type="button"
+                  onClick={() => {
+                    setIsAdminLogin(false);
                     const email = document.getElementById('login-email') as HTMLInputElement;
                     const pass = document.getElementById('login-password') as HTMLInputElement;
                     if (email && pass) {
-                      email.value = "user@renofield.com";
-                      pass.value = "password123";
-                      // Trigger react-hook-form change
-                      email.dispatchEvent(new Event('input', { bubbles: true }));
-                      pass.dispatchEvent(new Event('input', { bubbles: true }));
+                      setTimeout(() => {
+                        email.value = "user@renofield.com";
+                        pass.value = "password123";
+                        email.dispatchEvent(new Event('input', { bubbles: true }));
+                        pass.dispatchEvent(new Event('input', { bubbles: true }));
+                      }, 100);
                     }
-                  }
-                }}
-                className="px-3 py-2 bg-white rounded-xl border border-emerald-100 text-[11px] font-bold text-gray-600 hover:bg-emerald-100 transition-all"
-              >
-                Login as User
-              </button>
-              <button 
-                type="button"
-                onClick={() => {
-                  const email = document.getElementById('login-email') as HTMLInputElement;
-                  const pass = document.getElementById('login-password') as HTMLInputElement;
-                  if (email && pass) {
-                    email.value = "admin@renofield.com";
-                    pass.value = "password123";
-                    email.dispatchEvent(new Event('input', { bubbles: true }));
-                    pass.dispatchEvent(new Event('input', { bubbles: true }));
-                  }
-                }}
-                className="px-3 py-2 bg-white rounded-xl border border-emerald-100 text-[11px] font-bold text-gray-600 hover:bg-emerald-100 transition-all"
-              >
-                Login as Admin
-              </button>
+                  }}
+                  className="col-span-2 px-3 py-2 bg-purple-100 rounded-xl border border-purple-200 text-[11px] font-bold text-purple-700 hover:bg-purple-200 transition-all"
+                >
+                  gorimo2418@disiok.com
+                </button>
+              )}
             </div>
           </div>
         </div>

@@ -11,7 +11,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 export default function SubUserNavbar() {
-  const { mutate: logout, isPending } = useLogout();
+  const { logout, isLoading } = useLogout();
   const pathname = usePathname();
   const dispatch = useAppDispatch();
   const theme = useAppSelector((s) => s.ui.theme);
@@ -97,7 +97,7 @@ export default function SubUserNavbar() {
           <Button
             variant="secondary"
             onClick={() => logout()}
-            isLoading={isPending}
+            isLoading={isLoading}
             className="h-10 lg:h-11 px-4 lg:px-5 rounded-xl font-bold border-gray-100 hover:bg-red-50 hover:text-red-600 hover:border-red-100 px-3"
           >
             <LogOut className="w-4 h-4" />

@@ -1,51 +1,84 @@
 "use client";
 
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { authService } from "@/services/auth.service";
-import { setCredentials, clearCredentials } from "@/store/slices/authSlice";
 import { useAppDispatch } from "@/store/hooks";
-import { QUERY_KEYS, ROUTES } from "@/constants";
-import type { LoginPayload, RegisterPayload } from "@/services/auth.service";
+import { setCredentials, clearCredentials, setRegistrationEmail } from "@/store/slices/authSlice";
+import { ROUTES } from "@/constants";
+import {
+  useRegisterMutation,
+  useVerifyEmailMutation,
+  useLoginMutation,
+  useAdminLoginMutation,
+  useLogoutMutation,
+  useGetMeQuery,
+} from "@/store/api/authApi";
 import { handleLoginAction, handleLogoutAction } from "../actions";
-
-// ─── Current user ─────────────────────────────────────────────────────────
-
-export function useGetMe() {
-  return useQuery({
-    queryKey: [QUERY_KEYS.USER],
-    queryFn: () => authService.getMe(),
-    retry: false,
-    staleTime: 5 * 60 * 1000,
-  });
-}
 
 // ─── Login ────────────────────────────────────────────────────────────────
 
 export function useLogin() {
   const dispatch = useAppDispatch();
-  const queryClient = useQueryClient();
   const router = useRouter();
+  const [login, { isLoading, error }] = useLoginMutation();
 
-  return useMutation({
-    mutationFn: (payload: LoginPayload) => authService.login(payload),
-    onSuccess: async (res) => {
-      await handleLoginAction(res.data.user.id, res.data.user.role);
-      dispatch(setCredentials({ user: res.data.user, tokens: res.data.tokens }));
-      queryClient.setQueryData([QUERY_KEYS.USER], res.data.user);
-      toast.success(`Welcome back, ${res.data.user.name}!`);
-      const redirectPath = res.data.user.role === "user" ? "/sub-user" : ROUTES.DASHBOARD;
-      router.push(redirectPath);
+  return {
+    login: async (email: string, password: string) => {
+      try {
+        const result = await login({ email, password }).unwrap();
+        await handleLoginAction(result.data.user.id, result.data.user.role);
+        dispatch(
+          setCredentials({
+            user: result.data.user,
+            accessToken: result.data.accessToken,
+            refreshToken: result.data.refreshToken,
+          })
+        );
+        toast.success(`Welcome back, ${result.data.user.fullName || result.data.user.name}!`);
+        const redirectPath =
+          result.data.user.role === "USER" ? "/sub-user" : ROUTES.DASHBOARD;
+        router.push(redirectPath);
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : "Login failed. Please try again.";
+        toast.error(errorMsg);
+        throw err;
+      }
     },
-    onError: (err: { message: string }) => {
-      toast.error(err.message ?? "Login failed. Please try again.");
+    isLoading,
+    error,
+  };
+}
+
+// ─── Admin Login ──────────────────────────────────────────────────────────
+
+export function useAdminLogin() {
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const [adminLogin, { isLoading, error }] = useAdminLoginMutation();
+
+  return {
+    adminLogin: async (email: string, password: string) => {
+      try {
+        const result = await adminLogin({ email, password }).unwrap();
+        await handleLoginAction(result.data.user.id, result.data.user.role);
+        dispatch(
+          setCredentials({
+            user: result.data.user,
+            accessToken: result.data.accessToken,
+            refreshToken: result.data.refreshToken,
+          })
+        );
+        toast.success(`Welcome back, ${result.data.user.fullName || result.data.user.name}!`);
+        router.push(ROUTES.DASHBOARD);
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : "Admin login failed. Please try again.";
+        toast.error(errorMsg);
+        throw err;
+      }
     },
-  });
+    isLoading,
+    error,
+  };
 }
 
 // ─── Register ─────────────────────────────────────────────────────────────
@@ -53,42 +86,89 @@ export function useLogin() {
 export function useRegister() {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const [register, { isLoading, error }] = useRegisterMutation();
 
-  return useMutation({
-    mutationFn: (payload: RegisterPayload) => authService.register(payload),
-    onSuccess: async (res) => {
-      // await handleLoginAction(res.data.user.id, res.data.user.role);
-      // dispatch(setCredentials({ user: res.data.user, tokens: res.data.tokens }));
-      toast.success("Account created! Please login to continue.");
-      router.push(ROUTES.LOGIN);
+  return {
+    register: async (fullName: string, email: string, password: string) => {
+      try {
+        const result = await register({ fullName, email, password }).unwrap();
+        dispatch(setRegistrationEmail(result.data.user.email));
+        toast.success("Account created! Please check your email for verification code.");
+        router.push(`/verify-email?email=${encodeURIComponent(result.data.user.email)}`);
+      } catch (err) {
+        const errorMsg =
+          err instanceof Error ? err.message : "Registration failed. Please try again.";
+        toast.error(errorMsg);
+        throw err;
+      }
     },
-    onError: (err: { message: string }) => {
-      toast.error(err.message ?? "Registration failed. Please try again.");
+    isLoading,
+    error,
+  };
+}
+
+// ─── Verify Email ─────────────────────────────────────────────────────────
+
+export function useVerifyEmail() {
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const [verifyEmail, { isLoading, error }] = useVerifyEmailMutation();
+
+  return {
+    verifyEmail: async (email: string, code: string) => {
+      try {
+        const result = await verifyEmail({ email, code }).unwrap();
+        await handleLoginAction(result.data.user.id, result.data.user.role);
+        dispatch(
+          setCredentials({
+            user: result.data.user,
+            accessToken: result.data.accessToken,
+            refreshToken: result.data.refreshToken,
+          })
+        );
+        toast.success("Email verified successfully!");
+        const redirectPath =
+          result.data.user.role === "USER" ? "/sub-user" : ROUTES.DASHBOARD;
+        router.push(redirectPath);
+      } catch (err) {
+        const errorMsg =
+          err instanceof Error ? err.message : "Email verification failed. Please try again.";
+        toast.error(errorMsg);
+        throw err;
+      }
     },
-  });
+    isLoading,
+    error,
+  };
 }
 
 // ─── Logout ───────────────────────────────────────────────────────────────
 
 export function useLogout() {
   const dispatch = useAppDispatch();
-  const queryClient = useQueryClient();
   const router = useRouter();
+  const [logout, { isLoading }] = useLogoutMutation();
 
-  return useMutation({
-    mutationFn: () => authService.logout(),
-    onSuccess: async () => {
-      await handleLogoutAction();
-      dispatch(clearCredentials());
-      queryClient.clear();
-      toast.success("You have been signed out.");
-      router.push(ROUTES.LOGIN);
+  return {
+    logout: async () => {
+      try {
+        await logout().unwrap();
+        toast.success("You have been signed out.");
+      } catch {
+        // Ignore API errors for logout, we still want to log them out locally
+      } finally {
+        // Always clear cookie and local state, even on network failure
+        await handleLogoutAction();
+        dispatch(clearCredentials());
+        router.push(ROUTES.LOGIN);
+      }
     },
-    onError: () => {
-      // Always clear locally, even on network failure
-      dispatch(clearCredentials());
-      queryClient.clear();
-      router.push(ROUTES.LOGIN);
-    },
-  });
+    isLoading,
+  };
+}
+
+// ─── Get Current User ─────────────────────────────────────────────────────
+
+export function useGetMe() {
+  return useGetMeQuery();
 }
