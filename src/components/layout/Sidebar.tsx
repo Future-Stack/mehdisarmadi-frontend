@@ -38,11 +38,11 @@ const navItems: NavItem[] = [
     href: "/admin/projects",
     icon: <FolderKanban size={18} />,
   },
-  {
-    label: "Addenda",
-    href: "/admin/addenda",
-    icon: <Network size={18} />,
-  },
+  // {
+  //   label: "Addenda",
+  //   href: "/admin/addenda",
+  //   icon: <Network size={18} />,
+  // },
   {
     label: "Source Tracking",
     href: "/admin/source-tracking",
@@ -53,11 +53,11 @@ const navItems: NavItem[] = [
     href: "/admin/ai-logs",
     icon: <Database size={18} />,
   },
-  {
-    label: "Quote Templates",
-    href: "/admin/quote-templates",
-    icon: <ClipboardList size={18} />,
-  },
+  // {
+  //   label: "Quote Templates",
+  //   href: "/admin/quote-templates",
+  //   icon: <ClipboardList size={18} />,
+  // },
   {
     label: "Users",
     href: ROUTES.USERS,
