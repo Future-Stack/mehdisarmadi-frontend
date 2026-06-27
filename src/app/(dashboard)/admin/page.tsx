@@ -1,43 +1,23 @@
 "use client";
 
-import type { Metadata } from "next";
 import { StatCard } from "@/features/dashboard/components/StatCard";
-import { Badge } from "@/components/ui";
+
 import { cn } from "@/lib/utils";
-import { User, FolderKanban, CheckCircle, CircleAlert } from "lucide-react";
+import { User, FolderKanban, CheckCircle } from "lucide-react";
 import StaticPage from "@/components/layout/StaticDemoPage";
 import { useGetDashboardDataQuery } from "@/store/api/admin/Dashboard/getDashboardData";
-
-const PROJECTS = [
-  {
-    name: "City Mall Tender",
-    files: 12,
-    addenda: 3,
-    status: "Completed",
-    quote: "Yes",
-    updated: "2 hours ago",
-  },
-  {
-    name: "Office Fitout",
-    files: 8,
-    addenda: 1,
-    status: "Processing",
-    quote: "No",
-    updated: "30 min ago",
-  },
-  {
-    name: "Shopping Center",
-    files: 10,
-    addenda: 2,
-    status: "Processing",
-    quote: "No",
-    updated: "1 hour ago",
-  },
-];
+import { useGetRecentProjectsQuery } from "@/store/api/admin/Dashboard/recentProjects";
 
 export default function DashboardPage() {
   const { data, isLoading } = useGetDashboardDataQuery();
   const recentActivities = data?.data.recentActivity ?? [];
+
+  const { data: projectsData, isLoading: projectsLoading } =
+    useGetRecentProjectsQuery({
+      page: 1,
+      limit: 5,
+    });
+  const projects = projectsData?.data.items ?? [];
   const stats = [
     {
       title: "Total Users",
@@ -102,50 +82,61 @@ export default function DashboardPage() {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50 dark:divide-gray-800 transition-colors">
-              {PROJECTS.map((p, i) => (
-                <tr
-                  key={i}
-                  className="hover:bg-gray-50/50 dark:hover:bg-gray-900/50 transition-colors"
-                >
-                  <td className="px-6 py-5 text-sm font-semibold text-gray-900 dark:text-white transition-colors">
-                    {p.name}
-                  </td>
-                  <td className="px-6 py-5 text-sm font-medium text-gray-500 dark:text-gray-400 text-center transition-colors">
-                    {p.files}
-                  </td>
-                  <td className="px-6 py-5 text-sm font-medium text-gray-500 dark:text-gray-400 text-center transition-colors">
-                    {p.addenda}
-                  </td>
-                  <td className="px-6 py-5 text-center">
-                    <span
-                      className={cn(
-                        "inline-flex items-center px-3 py-1 rounded-lg text-sm font-semibold whitespace-nowrap transition-colors",
-                        p.status === "Completed"
-                          ? "bg-[#DDFFEB] text-[#008236] dark:bg-green-900/30 dark:text-green-400"
-                          : "bg-[#FFFADA] text-[#92400E] dark:bg-yellow-900/30 dark:text-yellow-400",
-                      )}
-                    >
-                      {p.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-5 text-center">
-                    <span
-                      className={cn(
-                        "inline-flex items-center px-4 py-1 rounded-lg text-sm font-semibold whitespace-nowrap transition-colors",
-                        p.quote === "Yes"
-                          ? "bg-[#DDFFEB] text-[#008236] dark:bg-green-900/30 dark:text-green-400"
-                          : "bg-[#D1D5DC] text-[#4B5563] dark:bg-gray-800 dark:text-gray-400",
-                      )}
-                    >
-                      {p.quote}
-                    </span>
-                  </td>
-                  <td className="px-6 py-5 text-sm font-medium text-[#968C8C] dark:text-gray-500 text-right transition-colors">
-                    {p.updated}
+
+            <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
+              {projectsLoading ? (
+                <tr>
+                  <td colSpan={6} className="py-8 text-center text-gray-500">
+                    Loading...
                   </td>
                 </tr>
-              ))}
+              ) : projects.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-8 text-center text-gray-500">
+                    No recent projects found.
+                  </td>
+                </tr>
+              ) : (
+                projects.map((p) => (
+                  <tr key={p.id}>
+                    <td className="px-6 py-5 font-semibold">{p.projectName}</td>
+
+                    <td className="px-6 py-5 text-center">{p.files}</td>
+
+                    <td className="px-6 py-5 text-center">{p.addenda}</td>
+
+                    <td className="px-6 py-5 text-center">
+                      <span
+                        className={cn(
+                          "inline-flex items-center px-3 py-1 rounded-lg text-sm font-semibold",
+                          p.status === "Completed"
+                            ? "bg-[#DDFFEB] text-secondary"
+                            : "bg-[#FFFADA] text-[#92400E]",
+                        )}
+                      >
+                        {p.status}
+                      </span>
+                    </td>
+
+                    <td className="px-6 py-5 text-center">
+                      <span
+                        className={cn(
+                          "inline-flex items-center px-4 py-1 rounded-lg text-sm font-semibold",
+                          p.quote
+                            ? "bg-[#DDFFEB] text-secondary"
+                            : "bg-[#D1D5DC] text-[#4B5563]",
+                        )}
+                      >
+                        {p.quote ? "Yes" : "No"}
+                      </span>
+                    </td>
+
+                    <td className="px-6 py-5 text-right text-[#968C8C]">
+                      {p.relativeTime}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -188,7 +179,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="lg:col-span-2 space-y-4">
+        {/* <div className="lg:col-span-2 space-y-4">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white transition-colors">
             System Alerts
           </h2>
@@ -244,7 +235,7 @@ export default function DashboardPage() {
               </p>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
