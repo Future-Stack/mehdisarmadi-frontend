@@ -18,7 +18,8 @@ import {
   Users, 
   Bell, 
   Cog, 
-  Settings 
+  Settings, 
+  ChartBarStacked
 } from "lucide-react";
 
 interface NavItem {
@@ -43,6 +44,11 @@ const navItems: NavItem[] = [
   //   href: "/admin/addenda",
   //   icon: <Network size={18} />,
   // },
+  {
+    label: "Division",
+    href: "/admin/division",
+    icon: <ChartBarStacked size={18} />,
+  },
   {
     label: "Source Tracking",
     href: "/admin/source-tracking",
