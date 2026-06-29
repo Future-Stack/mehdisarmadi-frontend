@@ -1,5 +1,6 @@
 import dynamic from "next/dynamic";
 import Navbar from "@/components/layout/Navbar";
+import { Toaster } from "sonner";
 
 // Sidebar is client-only (reads Redux); lazy-load it
 const Sidebar = dynamic(() => import("@/components/layout/Sidebar"), {
@@ -23,6 +24,7 @@ export default function DashboardLayout({
           className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8"
         >
           {children}
+          <Toaster position="top-right" />
         </main>
       </div>
     </div>
