@@ -1,10 +1,76 @@
 "use client";
 
-import React from "react";
-import { FileText, Save, Hash, CreditCard, ShieldCheck, ListTodo, Ban, StickyNote, Clock } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { FileText, Save, Hash, CreditCard, ShieldCheck, ListTodo, Ban, StickyNote, Clock, Loader } from "lucide-react";
 import { Input, Button } from "@/components/ui";
+import { useGetTemplateQuery } from "@/store/api/sub-user/Template/getTemplate";
+import { useUpdateTemplateMutation } from "@/store/api/sub-user/Template/updateTemplate";
+import { toast } from "sonner";
 
 export function TemplateSettings() {
+  const { data, isLoading } =
+    useGetTemplateQuery();
+
+  const [
+    updateTemplate,
+    { isLoading: saving },
+  ] = useUpdateTemplateMutation();
+
+  const [form, setForm] = useState({
+    footerText: "",
+    quoteValidity: "",
+    hstWording: "",
+    paymentTerms: "",
+    holdbackTerms: "",
+    defaultAssumptions: "",
+    defaultExclusions: "",
+    defaultNotes: "",
+  });
+  useEffect(() => {
+    if (!data?.data) return;
+
+    setForm({
+      footerText: data.data.footerText,
+      quoteValidity: data.data.quoteValidity,
+      hstWording: data.data.hstWording,
+      paymentTerms: data.data.paymentTerms,
+      holdbackTerms: data.data.holdbackTerms,
+      defaultAssumptions:
+        data.data.defaultAssumptions,
+      defaultExclusions:
+        data.data.defaultExclusions,
+      defaultNotes: data.data.defaultNotes,
+    });
+  }, [data]);
+
+  const handleSave = async () => {
+    const toastId = toast.loading(
+      "Saving template..."
+    );
+
+    try {
+      const res = await updateTemplate(form).unwrap();
+
+      toast.success(res.message, {
+        id: toastId,
+      });
+    } catch (error: any) {
+      toast.error("Failed to save template", {
+        id: toastId,
+        description:
+          error?.data?.message ??
+          "Something went wrong.",
+      });
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex h-[400px] items-center justify-center">
+        <Loader className="h-7 w-7 animate-spin text-emerald-600" />
+      </div>
+    );
+  }
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center gap-3">
@@ -21,19 +87,37 @@ export function TemplateSettings() {
         <div className="grid gap-6 sm:grid-cols-2">
           <Input
             label="Footer Text"
-            placeholder="Thank you for your business!"
+            value={form.footerText}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                footerText: e.target.value,
+              })
+            }
             prefix={<StickyNote className="w-4 h-4 opacity-50" />}
           />
           <Input
             label="Quote Validity (Days)"
-            placeholder="30"
+            value={form.quoteValidity}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                quoteValidity: e.target.value,
+              })
+            }
             prefix={<Clock className="w-4 h-4 opacity-50" />}
           />
         </div>
 
         <Input
           label="HST Number"
-          placeholder="Enter HST registration number"
+          value={form.hstWording}
+          onChange={(e) =>
+            setForm({
+              ...form,
+              hstWording: e.target.value,
+            })
+          }
           prefix={<Hash className="w-4 h-4 opacity-50" />}
         />
 
@@ -44,9 +128,15 @@ export function TemplateSettings() {
               Payment Terms
             </label>
             <textarea
-              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm transition-all focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
               rows={3}
-              placeholder="e.g. 50% upfront, 50% upon completion"
+              value={form.paymentTerms}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  paymentTerms: e.target.value,
+                })
+              }
+              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm transition-all focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
             />
           </div>
 
@@ -56,9 +146,15 @@ export function TemplateSettings() {
               Holdback Terms
             </label>
             <textarea
-              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm transition-all focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
               rows={3}
-              placeholder="Enter standard holdback percentage or terms"
+              value={form.holdbackTerms}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  holdbackTerms: e.target.value,
+                })
+              }
+              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm transition-all focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
             />
           </div>
 
@@ -68,9 +164,15 @@ export function TemplateSettings() {
               Default Assumptions
             </label>
             <textarea
-              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm transition-all focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
               rows={4}
-              placeholder="List standard assumptions for your projects"
+              value={form.defaultAssumptions}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  defaultAssumptions: e.target.value,
+                })
+              }
+              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm transition-all focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
             />
           </div>
 
@@ -80,9 +182,15 @@ export function TemplateSettings() {
               Default Exclusions
             </label>
             <textarea
-              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm transition-all focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
               rows={4}
-              placeholder="List standard exclusions from your quotes"
+              value={form.defaultExclusions}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  defaultExclusions: e.target.value,
+                })
+              }
+              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm transition-all focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
             />
           </div>
 
@@ -92,9 +200,15 @@ export function TemplateSettings() {
               Default Notes
             </label>
             <textarea
-              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm transition-all focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
               rows={4}
-              placeholder="Additional default notes for your quotes"
+              value={form.defaultNotes}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  defaultNotes: e.target.value,
+                })
+              }
+              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm transition-all focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
             />
           </div>
         </div>
@@ -102,9 +216,16 @@ export function TemplateSettings() {
 
       <div className="flex justify-end pt-6">
         <Button
+          onClick={handleSave}
+          disabled={saving}
           className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 font-bold px-8 shadow-lg shadow-emerald-200 dark:shadow-none"
         >
-          <Save size={16} />
+          {saving ? (
+            <Loader className="w-4 h-4 animate-spin" />
+          ) : (
+            <Save size={16} />
+          )}
+
           Save Changes
         </Button>
       </div>
