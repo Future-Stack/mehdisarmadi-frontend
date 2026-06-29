@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Loader, Plus, X } from "lucide-react";
 import { toast } from "sonner";
-import { useCreateDivisionMutation } from "@/store/api/admin/Dashboard/Division/postDivision";
+import { useCreateDivisionMutation } from "@/store/api/admin/Division/postDivision";
 
 interface Props {
   onClose: () => void;

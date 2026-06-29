@@ -1,10 +1,10 @@
 "use client"
 
 import StaticPage from "@/components/layout/StaticDemoPage";
-import { useDeleteDivisionMutation } from "@/store/api/admin/Dashboard/Division/deleteDivision";
-import { Division, useGetDivisionsQuery } from "@/store/api/admin/Dashboard/Division/getDivision";
-import { useGetDivisionByIdQuery } from "@/store/api/admin/Dashboard/Division/getDivisionbyId";
-import { useUpdateDivisionMutation } from "@/store/api/admin/Dashboard/Division/updateDivision";
+import { useDeleteDivisionMutation } from "@/store/api/admin/Division/deleteDivision";
+import { Division, useGetDivisionsQuery } from "@/store/api/admin/Division/getDivision";
+import { useGetDivisionByIdQuery } from "@/store/api/admin/Division/getDivisionbyId";
+import { useUpdateDivisionMutation } from "@/store/api/admin/Division/updateDivision";
 import { ChevronLeft, ChevronRight, Edit, Eye, Loader, Plus, Search, Trash, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";

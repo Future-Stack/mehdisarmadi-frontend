@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { Bell, Check, Trash2, AlertCircle, CheckCircle, Info, Trash } from "lucide-react";
 import StaticPage from "@/components/layout/StaticDemoPage";
-import { useGetNotificationsQuery } from "@/store/api/admin/Dashboard/Notifications/getNotification";
-import { useMarkAllNotificationsReadMutation, useMarkNotificationReadMutation } from "@/store/api/admin/Dashboard/Notifications/markRead";
-import { useClearNotificationsMutation, useDeleteNotificationMutation } from "@/store/api/admin/Dashboard/Notifications/deleteNotification";
+import { useGetNotificationsQuery } from "@/store/api/admin/Notifications/getNotification";
+import { useMarkAllNotificationsReadMutation, useMarkNotificationReadMutation } from "@/store/api/admin/Notifications/markRead";
+import { useClearNotificationsMutation, useDeleteNotificationMutation } from "@/store/api/admin/Notifications/deleteNotification";
 import { toast } from "sonner";
 
 export default function Notifications() {

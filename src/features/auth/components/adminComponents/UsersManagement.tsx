@@ -5,13 +5,13 @@ import { useState } from "react";
 import { Eye, UserMinus, Trash2, Plus, ChevronDown, Search, ChevronLeft, ChevronRight, Loader } from "lucide-react";
 import StaticPage from "@/components/layout/StaticDemoPage";
 import { Modal } from "@/components/ui/Modal";
-import { useGetAdminUsersQuery, type AdminUser } from "@/store/api/admin/Dashboard/Users/getAdminUsers";
-import { useGetActiveUsersCountQuery } from "@/store/api/admin/Dashboard/Users/getActiveUsers";
-import { useGetUsersCountQuery } from "@/store/api/admin/Dashboard/Users/getUsers";
-import { useDeleteUsersMutation } from "@/store/api/admin/Dashboard/Users/deleteUsers";
-import { useCreateUserMutation, type CreateUserPayload } from "@/store/api/admin/Dashboard/Users/createUsers";
+import { useGetAdminUsersQuery, type AdminUser } from "@/store/api/admin/Users/getAdminUsers";
+import { useGetActiveUsersCountQuery } from "@/store/api/admin/Users/getActiveUsers";
+import { useGetUsersCountQuery } from "@/store/api/admin/Users/getUsers";
+import { useDeleteUsersMutation } from "@/store/api/admin/Users/deleteUsers";
+import { useCreateUserMutation, type CreateUserPayload } from "@/store/api/admin/Users/createUsers";
 import { toast } from "sonner";
-import { useSuspendUserMutation } from "@/store/api/admin/Dashboard/Users/suspendUser";
+import { useSuspendUserMutation } from "@/store/api/admin/Users/suspendUser";
 
 function RoleBadge({ role }: { role: AdminUser["role"] }) {
   if (role === "ADMIN") {
@@ -497,9 +497,9 @@ export default function UsersManagement() {
             </button>
             <button
               onClick={handleSuspendUser}
-              disabled={suspending || selectedUser?.status === "suspend"}
+              disabled={suspending || selectedUser?.status === "suspended"}
               className={`flex-1 inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors
-    ${selectedUser?.status === "suspend"
+    ${selectedUser?.status === "suspended"
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-orange-500 hover:bg-orange-600"
                 }`}
@@ -508,7 +508,7 @@ export default function UsersManagement() {
                 <Loader size={14} className="animate-spin" />
               )}
 
-              {selectedUser?.status === "suspend"
+              {selectedUser?.status === "suspended"
                 ? "Already Suspended"
                 : "Suspend"}
             </button>
