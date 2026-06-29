@@ -1,10 +1,81 @@
 "use client";
 
-import React from "react";
-import { User, Mail, Lock, LogOut, Save } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { User, Mail, Lock, LogOut, Save, Loader } from "lucide-react";
 import { Input, Button } from "@/components/ui";
+import { useGetProfileQuery } from "@/store/api/sub-user/profile/getProfile";
+import { useUpdateProfileMutation } from "@/store/api/sub-user/profile/updateProfile";
+import { useChangePasswordMutation } from "@/store/api/ChangePassword";
+import { toast } from "sonner";
 
 export function AccountSettings() {
+  const { data, isLoading } = useGetProfileQuery();
+
+  const [updateProfile, { isLoading: updating }] =
+    useUpdateProfileMutation();
+
+  const [changePassword, { isLoading: changingPassword }] =
+    useChangePasswordMutation();
+
+  const [profile, setProfile] = useState({
+    fullName: "",
+    email: "",
+  });
+
+  const [password, setPassword] = useState({
+  currentPassword: "",
+  newPassword: "",
+});
+  useEffect(() => {
+    if (!data?.data) return;
+
+    setProfile({
+      fullName: data.data.fullName,
+      email: data.data.email,
+    });
+  }, [data]);
+
+ const handleSave = async () => {
+  if (
+    (password.currentPassword && !password.newPassword) ||
+    (!password.currentPassword && password.newPassword)
+  ) {
+    toast.error("Please enter both current and new password.");
+    return;
+  }
+
+  const toastId = toast.loading("Saving changes...");
+
+  try {
+    await updateProfile({
+      fullName: profile.fullName,
+    }).unwrap();
+
+    if (password.currentPassword && password.newPassword) {
+      await changePassword({
+        currentPassword: password.currentPassword,
+        newPassword: password.newPassword,
+      }).unwrap();
+    }
+
+    toast.success("Profile updated successfully", {
+      id: toastId,
+    });
+
+    setPassword({
+      currentPassword: "",
+      newPassword: "",
+      
+    });
+  } catch (error: any) {
+    toast.error("Failed to save changes", {
+      id: toastId,
+      description:
+        error?.data?.message ?? "Something went wrong.",
+    });
+  }
+};
+
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center gap-3">
@@ -20,14 +91,20 @@ export function AccountSettings() {
       <div className="grid gap-6 sm:grid-cols-2">
         <Input
           label="Full Name"
-          placeholder="John Doe"
-          defaultValue="John Doe"
+          value={profile.fullName}
+          onChange={(e) =>
+            setProfile({
+              ...profile,
+              fullName: e.target.value,
+            })
+          }
           prefix={<User className="w-4 h-4 opacity-50" />}
         />
         <Input
           label="Email Address"
-          placeholder="john.doe@example.com"
-          defaultValue="john.doe@example.com"
+          value={profile.email}
+          readOnly
+          disabled
           prefix={<Mail className="w-4 h-4 opacity-50" />}
         />
       </div>
@@ -42,21 +119,26 @@ export function AccountSettings() {
           <Input
             label="Current Password"
             type="password"
-            placeholder="********"
-            prefix={<Lock className="w-4 h-4 opacity-50" />}
+            value={password.currentPassword}
+            onChange={(e) =>
+              setPassword({
+                ...password,
+                currentPassword: e.target.value,
+              })
+            }
           />
           <Input
             label="New Password"
             type="password"
-            placeholder="********"
-            prefix={<Lock className="w-4 h-4 opacity-50" />}
+            value={password.newPassword}
+            onChange={(e) =>
+              setPassword({
+                ...password,
+                newPassword: e.target.value,
+              })
+            }
           />
-          <Input
-            label="Confirm Password"
-            type="password"
-            placeholder="********"
-            prefix={<Lock className="w-4 h-4 opacity-50" />}
-          />
+
         </div>
       </div>
 
@@ -69,9 +151,15 @@ export function AccountSettings() {
           Logout
         </Button>
         <Button
+          onClick={handleSave}
+          disabled={updating || changingPassword}
           className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 font-bold px-8 shadow-lg shadow-emerald-200 dark:shadow-none"
         >
-          <Save size={16} />
+          {(updating || changingPassword) ? (
+            <Loader className="w-4 h-4 animate-spin" />
+          ) : (
+            <Save size={16} />
+          )}
           Save Changes
         </Button>
       </div>
