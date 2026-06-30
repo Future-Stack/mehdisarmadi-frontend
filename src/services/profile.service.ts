@@ -7,6 +7,7 @@ const MOCK_USER: User = {
   id: "user-123",
   name: "Akash Abrrar",
   email: "akash@example.com",
+  status: "active",
   role: "admin",
   avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Akash",
   bio: "Senior Frontend Architect building scalable web applications.",

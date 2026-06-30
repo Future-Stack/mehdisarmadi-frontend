@@ -18,7 +18,8 @@ import {
   Users, 
   Bell, 
   Cog, 
-  Settings 
+  Settings, 
+  ChartBarStacked
 } from "lucide-react";
 
 interface NavItem {
@@ -38,10 +39,15 @@ const navItems: NavItem[] = [
     href: "/admin/projects",
     icon: <FolderKanban size={18} />,
   },
+  // {
+  //   label: "Addenda",
+  //   href: "/admin/addenda",
+  //   icon: <Network size={18} />,
+  // },
   {
-    label: "Addenda",
-    href: "/admin/addenda",
-    icon: <Network size={18} />,
+    label: "Division",
+    href: "/admin/division",
+    icon: <ChartBarStacked size={18} />,
   },
   {
     label: "Source Tracking",
@@ -53,11 +59,11 @@ const navItems: NavItem[] = [
     href: "/admin/ai-logs",
     icon: <Database size={18} />,
   },
-  {
-    label: "Quote Templates",
-    href: "/admin/quote-templates",
-    icon: <ClipboardList size={18} />,
-  },
+  // {
+  //   label: "Quote Templates",
+  //   href: "/admin/quote-templates",
+  //   icon: <ClipboardList size={18} />,
+  // },
   {
     label: "Users",
     href: ROUTES.USERS,

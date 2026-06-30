@@ -26,13 +26,22 @@ export interface ApiError {
 
 // ─── User & Auth ─────────────────────────────────────────────────────────────
 
-export type UserRole = "admin" | "user" | "manager";
+export type UserRole = "admin" | "USER" | "manager";
+export type UserStatus = "pending" | "active" | "inactive" | "suspended";
 
 export interface User {
   id: string;
-  name: string;
+  fullName?: string;
+  name?: string;
   email: string;
   role: UserRole;
+  status: UserStatus;
+  isEmailVerified?: boolean;
+  verificationCode?: string | null;
+  verificationCodeExpiry?: string | null;
+  refreshToken?: string | null;
+  fcmTokens?: string[];
+  lastActiveAt?: string;
   avatar?: string;
   bio?: string;
   createdAt: string;

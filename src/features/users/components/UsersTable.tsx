@@ -11,7 +11,7 @@ import type { User } from "@/types";
 const ROLE_BADGE: Record<User["role"], string> = {
   admin: "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300",
   manager: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
-  user: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
+  USER: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
 };
 
 export default function UsersTable() {
@@ -94,10 +94,10 @@ export default function UsersTable() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-sm font-medium text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
-                          {user.name.charAt(0).toUpperCase()}
+                          {(user.fullName || user.name || "U").charAt(0).toUpperCase()}
                         </div>
                         <span className="font-medium text-gray-900 dark:text-white">
-                          {user.name}
+                          {user.fullName || user.name || "Unknown"}
                         </span>
                       </div>
                     </td>

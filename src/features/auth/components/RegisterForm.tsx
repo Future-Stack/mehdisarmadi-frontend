@@ -11,7 +11,7 @@ import Logo from "@/components/Reuseable/Logo";
 import { ArrowLeft } from "lucide-react";
 
 export default function RegisterForm() {
-  const { mutate: registerUser, isPending } = useRegister();
+  const { register: registerUser, isLoading } = useRegister();
 
   const {
     register,
@@ -21,7 +21,9 @@ export default function RegisterForm() {
     resolver: zodResolver(registerSchema),
   });
 
-  const onSubmit = (data: RegisterFormValues) => registerUser(data);
+  const onSubmit = async (data: RegisterFormValues) => {
+    await registerUser(data.fullName, data.email, data.password);
+  };
 
   return (
     <form
@@ -47,10 +49,10 @@ export default function RegisterForm() {
           type="text"
           id="register-name"
           placeholder="Enter your Name"
-          error={errors.name?.message}
+          error={errors.fullName?.message}
           required
           className="h-12 rounded-xl border-gray-200"
-          {...register("name")}
+          {...register("fullName")}
         />
 
         <Input
@@ -82,7 +84,7 @@ export default function RegisterForm() {
         <Button
           type="submit"
           id="register-submit"
-          isLoading={isPending}
+          isLoading={isLoading}
           loadingText="Creating account…"
           className="w-full h-12 rounded-xl font-bold text-base"
         >
