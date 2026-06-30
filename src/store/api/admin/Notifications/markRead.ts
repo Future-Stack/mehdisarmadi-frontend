@@ -6,7 +6,9 @@ export const markReadApi = baseApi.injectEndpoints({
       {
         success: boolean;
         message: string;
-        data: unknown;
+        data: {
+          message: string;
+        };
       },
       string
     >({
