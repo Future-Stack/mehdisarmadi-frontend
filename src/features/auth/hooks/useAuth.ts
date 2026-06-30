@@ -36,7 +36,7 @@ export function useLogin() {
         );
         toast.success(`Welcome back, ${result.data.user.fullName || result.data.user.name}!`);
         const redirectPath =
-          result.data.user.role === "USER" ? "/sub-user" : ROUTES.DASHBOARD;
+          result.data.user.role === "user" ? "/sub-user" : ROUTES.DASHBOARD;
         router.push(redirectPath);
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : "Login failed. Please try again.";
@@ -128,7 +128,7 @@ export function useVerifyEmail() {
         );
         toast.success("Email verified successfully!");
         const redirectPath =
-          result.data.user.role === "USER" ? "/sub-user" : ROUTES.DASHBOARD;
+          result.data.user.role === "user" ? "/sub-user" : ROUTES.DASHBOARD;
         router.push(redirectPath);
       } catch (err) {
         const errorMsg =

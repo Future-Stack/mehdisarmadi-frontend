@@ -10,8 +10,11 @@ export const fetchUsersThunk = createAsyncThunk<
   }
 >("users/fetchUsers", async (params, { rejectWithValue }) => {
   try {
-    const response = await usersService.getUsers(params.page, params.limit);
-    if (!response.success) {
+  const response = await usersService.getUsers({
+    page: params.page,
+    limit: params.limit,
+  });    
+  if (!response.success) {
       return rejectWithValue(response.message || "Failed to fetch users");
     }
     return response.data || [];

@@ -19,7 +19,7 @@ export async function proxy(request: NextRequest) {
   // 1. Already logged-in users should not see auth pages
   if (isAuthenticated && AUTH_ROUTES.some((r) => pathname.startsWith(r))) {
     const role = session?.role;
-    const redirectPath = role === "USER" ? PROTECTED_SUB_USER : PROTECTED_ADMIN;
+    const redirectPath = role === "user" ? PROTECTED_SUB_USER : PROTECTED_ADMIN;
     return NextResponse.redirect(new URL(redirectPath, request.url));
   }
 

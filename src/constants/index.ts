@@ -7,6 +7,11 @@ export const ROUTES = {
   HOME: "/",
   LOGIN: "/login",
   REGISTER: "/register",
+  FORGOT_PASSWORD: "/forgot-password",
+  VERIFY_EMAIL: "/verify-email",
+  RESET_PASSWORD: "/reset-password",
+
+  RESEND_VERIFICATION_EMAIL: "/resend-verification-email",
   DASHBOARD: "/admin",
   USERS: "/admin/users",
   SETTINGS: "/admin/settings",
