@@ -40,3 +40,23 @@ export const verifyEmailSchema = z.object({
 });
 
 export type VerifyEmailFormValues = z.infer<typeof verifyEmailSchema>;
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().email({ message: "Enter a valid email address" }).trim(),
+});
+
+export type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>;
+
+export const resetPasswordSchema = z
+  .object({
+    email: z.string().email({ message: "Enter a valid email address" }).trim(),
+    otp: z.string().min(6, { message: "OTP must be at least 6 characters" }),
+    newPass: z.string().min(6, { message: "Password must be at least 6 characters" }),
+    confirmPass: z.string(),
+  })
+  .refine((data) => data.newPass === data.confirmPass, {
+    message: "Passwords do not match",
+    path: ["confirmPass"],
+  });
+
+export type ResetPasswordValues = z.infer<typeof resetPasswordSchema>;

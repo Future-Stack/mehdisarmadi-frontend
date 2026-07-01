@@ -68,6 +68,30 @@ export const authApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Auth"],
     }),
+
+    passwordResetSendCode: builder.mutation<ApiResponse<any>, { email: string }>({
+      query: (payload) => ({
+        url: "/auth/password-reset/send-code",
+        method: "POST",
+        body: payload,
+      }),
+    }),
+
+    passwordResetVerifyCode: builder.mutation<ApiResponse<{ token: string }>, { email: string; code: string }>({
+      query: (payload) => ({
+        url: "/auth/password-reset/verify-code",
+        method: "POST",
+        body: payload,
+      }),
+    }),
+
+    passwordResetConfirm: builder.mutation<ApiResponse<any>, { token: string; newPassword: string }>({
+      query: (payload) => ({
+        url: "/auth/password-reset/confirm",
+        method: "POST",
+        body: payload,
+      }),
+    }),
   }),
 });
 
@@ -79,4 +103,7 @@ export const {
   useLogoutMutation,
   useGetMeQuery,
   useRefreshTokenMutation,
+  usePasswordResetSendCodeMutation,
+  usePasswordResetVerifyCodeMutation,
+  usePasswordResetConfirmMutation,
 } = authApi;

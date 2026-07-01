@@ -34,13 +34,13 @@ export default function Notifications() {
 
   const handleMarkRead = async (id: string) => {
     try {
-      const res = await markNotificationRead(id).unwrap();
+    const res = await markNotificationRead(id).unwrap() as any;
 
-      toast.success(
-        res?.data?.message ||
-        res?.message ||
-        "Notification marked as read"
-      );
+    toast.success(
+      res?.data?.message ??
+      res?.message ??
+      "Notification marked as read"
+    );
     } catch (err: any) {
       toast.error(
         err?.data?.message ||

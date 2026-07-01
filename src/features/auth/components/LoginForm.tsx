@@ -106,7 +106,7 @@ export default function LoginForm() {
 
         <div className="flex flex-col items-center gap-4">
           <Link
-            href="#"
+            href={ROUTES.FORGOT_PASSWORD}
             className="text-sm text-[#059669] font-semibold hover:underline"
           >
             Forgot Password?
@@ -136,7 +136,7 @@ export default function LoginForm() {
             <div className="grid grid-cols-2 gap-3">
               {!isAdminLogin && (
                 <>
-                  <button 
+                  <button
                     type="button"
                     onClick={() => {
                       const email = document.getElementById('login-email') as HTMLInputElement;
@@ -152,7 +152,7 @@ export default function LoginForm() {
                   >
                     Sub-User
                   </button>
-                  <button 
+                  <button
                     type="button"
                     onClick={() => {
                       setIsAdminLogin(true);
@@ -174,7 +174,7 @@ export default function LoginForm() {
                 </>
               )}
               {isAdminLogin && (
-                <button 
+                <button
                   type="button"
                   onClick={() => {
                     setIsAdminLogin(false);
