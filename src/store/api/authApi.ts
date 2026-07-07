@@ -10,6 +10,7 @@ import type {
 import type { ApiResponse, User } from "@/types";
 
 export const authApi = baseApi.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     register: builder.mutation<ApiResponse<RegisterResponse>, RegisterPayload>({
       query: (payload) => ({
@@ -62,7 +63,7 @@ export const authApi = baseApi.injectEndpoints({
 
     refreshToken: builder.mutation<ApiResponse<{ accessToken: string }>, string>({
       query: (refreshToken) => ({
-        url: "/auth/refresh-token",
+        url: "/auth/refresh",
         method: "POST",
         body: { refreshToken },
       }),

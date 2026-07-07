@@ -22,7 +22,7 @@ export default function SubUserNavbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-30 flex h-20 w-full items-center border-b border-emerald-100 dark:border-gray-800 bg-white dark:bg-[#0B0F1A]/80 dark:backdrop-blur-md shadow-sm shadow-emerald-200 dark:shadow-none transition-all duration-300">
+    <header className="sticky top-0 z-30 flex h-20 w-full items-center border-b border-emerald-200 dark:border-gray-800 bg-white dark:bg-[#0B0F1A]/80 dark:backdrop-blur-md shadow-lg shadow-[#009966]/30 dark:shadow-none transition-all duration-300">
       <div className="max-w-7xl mx-auto w-full flex items-center justify-between px-6 lg:px-8">
         <div className="flex items-center gap-8">
           <Link href={"/sub-user"} className="dark:bg-white dark:rounded-lg dark:px-2 dark:py-1 transition-all">
@@ -35,8 +35,8 @@ export default function SubUserNavbar() {
               onClick={() => dispatch(setTheme("light"))}
               className={cn(
                 "flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all",
-                theme === "light" 
-                  ? "bg-white text-emerald-600 shadow-sm" 
+                theme === "light"
+                  ? "bg-white text-emerald-600 shadow-sm"
                   : "text-gray-400 hover:text-gray-600"
               )}
             >
@@ -47,8 +47,8 @@ export default function SubUserNavbar() {
               onClick={() => dispatch(setTheme("dark"))}
               className={cn(
                 "flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all",
-                theme === "dark" 
-                  ? "bg-gray-800 text-white shadow-sm" 
+                theme === "dark"
+                  ? "bg-gray-800 text-white shadow-sm"
                   : "text-gray-400 hover:text-gray-300"
               )}
             >
@@ -56,51 +56,35 @@ export default function SubUserNavbar() {
               Dark
             </button>
           </div>
-          
-          {/* <nav className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <Link 
-                key={link.href} 
-                href={link.href}
-                className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all",
-                  pathname === link.href || (link.href !== "/sub-user" && pathname.startsWith(link.href))
-                    ? "bg-emerald-50 text-emerald-700"
-                    : "text-gray-500 hover:bg-gray-50 hover:text-emerald-600"
-                )}
-              >
-                {link.icon}
-                {link.label}
-              </Link>
-            ))}
-          </nav> */}
         </div>
 
-        <div className="flex items-center gap-3 lg:gap-4">
+        <div className="flex items-center gap-3">
           <Link href="/sub-user/projects/new">
             <Button
               variant="primary"
-              className="h-10 lg:h-11 px-4 lg:px-5 rounded-xl font-bold shadow-sm shadow-emerald-100"
+              className="h-10 px-4 rounded-xl font-medium shadow-sm shadow-emerald-100 text-sm"
             >
-              <Plus className="w-4 h-4" /> <span className="hidden sm:inline">New Project</span>
-              <span className="sm:hidden">New</span>
+              <Plus className="w-4 h-4 mr-2" />
+              <span>Create New Project</span>
             </Button>
           </Link>
           <Link href="/sub-user/settings">
             <Button
               variant="secondary"
-              className="h-10 lg:h-11 px-4 lg:px-5 rounded-xl font-bold border-gray-100 px-3"
+              className="h-10 px-4 rounded-xl font-medium border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-sm bg-white dark:bg-[#0B0F1A]"
             >
-              <Settings className="w-4 h-4" />
+              <Settings className="w-4 h-4 mr-2" />
+              Settings
             </Button>
           </Link>
           <Button
             variant="secondary"
             onClick={() => logout()}
             isLoading={isLoading}
-            className="h-10 lg:h-11 px-4 lg:px-5 rounded-xl font-bold border-gray-100 hover:bg-red-50 hover:text-red-600 hover:border-red-100 px-3"
+            className="h-10 px-4 rounded-xl font-medium border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-sm hover:bg-red-50 hover:text-red-600 hover:border-red-100 bg-white dark:bg-[#0B0F1A]"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-4 h-4 mr-2" />
+            Logout
           </Button>
         </div>
       </div>

@@ -9,9 +9,9 @@ import { formatDate } from "@/lib/utils";
 import type { User } from "@/types";
 
 const ROLE_BADGE: Record<User["role"], string> = {
-  admin: "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300",
-  manager: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
-  user: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
+  ADMIN: "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300",
+  MANAGER: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
+  USER: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
 };
 
 export default function UsersTable() {
