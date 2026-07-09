@@ -88,6 +88,8 @@ export const PageThree = () => (
             </div>
         </div>
 
-        <DocFooter />
+        <div className="bg-[#00996612] mt-5 pb-5">
+            <DocFooter />
+        </div>
     </div>
 );

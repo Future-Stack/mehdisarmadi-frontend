@@ -8,14 +8,19 @@ import { cn } from "@/lib/utils";
 import { useGetProjectDashboardStatsQuery, useGetProjectDashboardProjectsQuery } from "@/store/api/projectApi";
 import { formatDate } from "@/lib/utils";
 
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+
 export default function SubUserDashboardPage() {
+  const router = useRouter();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [status, setStatus] = useState("all");
   const [timeRange, setTimeRange] = useState("all");
+  const [search, setSearch] = useState("");
 
   const { data: statsData, isLoading: isStatsLoading } = useGetProjectDashboardStatsQuery();
-  const { data: projectsData, isLoading: isProjectsLoading } = useGetProjectDashboardProjectsQuery({ page, limit, status, timeRange });
+  const { data: projectsData, isLoading: isProjectsLoading } = useGetProjectDashboardProjectsQuery({ page, limit, status, timeRange, search });
 
   const stats = statsData?.data;
   const projects = projectsData?.data?.items || [];
@@ -96,6 +101,8 @@ export default function SubUserDashboardPage() {
                 <input
                   type="text"
                   placeholder="Search Projects..........."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
                   className="w-full h-11 pl-10 pr-4 bg-white dark:bg-[#111827] border border-gray-200 dark:border-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm font-medium"
                 />
               </div>
@@ -205,11 +212,23 @@ export default function SubUserDashboardPage() {
                               <Link href={`/sub-user/projects/${row.id}`} className="p-1.5 text-gray-400 hover:text-emerald-600 transition-colors">
                                 <Eye className="w-4 h-4" />
                               </Link>
-                              <button className="p-1.5 text-gray-400 hover:text-blue-600 transition-colors">
+                              <button 
+                                onClick={() => router.push(`/sub-user/projects/${row.id}`)}
+                                className="p-1.5 text-gray-400 hover:text-blue-600 transition-colors"
+                              >
                                 <Edit className="w-4 h-4" />
                               </button>
-                              <button className="p-1.5 text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+                              <button 
+                                onClick={() => toast.success(`Exporting project ${row.name}...`)}
+                                className="p-1.5 text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                              >
                                 <Download className="w-4 h-4" />
+                              </button>
+                              <button 
+                                onClick={() => toast.error(`Delete project endpoint pending.`)}
+                                className="p-1.5 text-red-400 hover:text-red-600 transition-colors"
+                              >
+                                <AlertTriangle className="w-4 h-4" />
                               </button>
                             </div>
                           </td>
@@ -254,8 +273,12 @@ export default function SubUserDashboardPage() {
                 )}
               </div>
 
-              <Button variant="primary" className="w-full h-10 text-sm font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white">
-                View All Activity
+              <Button 
+                onClick={() => router.push('/sub-user/projects')}
+                variant="primary" 
+                className="w-full h-10 text-sm font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white"
+              >
+                View All Projects
               </Button>
             </div>
 

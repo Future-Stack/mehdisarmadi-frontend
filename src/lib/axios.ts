@@ -60,7 +60,8 @@ apiClient.interceptors.response.use(
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
 
-function getAccessTokenFromCookie(): string | null {
+export function getAccessTokenFromCookie(): string | null {
+  if (typeof window === "undefined") return null;
   const match = document.cookie.match(
     new RegExp(`(^| )${COOKIE_NAMES.ACCESS_TOKEN}=([^;]+)`)
   );

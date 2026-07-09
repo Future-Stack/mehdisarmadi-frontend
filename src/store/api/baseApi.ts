@@ -1,10 +1,15 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { RootState } from "@/store";
+import { getAccessTokenFromCookie } from "@/lib/axios";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: process.env.NEXT_PUBLIC_API_URL || "https://mehdisarmadi.duckdns.org/api/v1/",
   prepareHeaders: (headers, { getState }) => {
-    const token = (getState() as RootState).auth.accessToken;
+    let token = (getState() as RootState).auth.accessToken;
+    if (!token && typeof window !== "undefined") {
+      token = getAccessTokenFromCookie();
+    }
+    
     if (token) {
       headers.set("Authorization", `Bearer ${token}`);
     }

@@ -1,0 +1,145 @@
+import React, { useState } from "react";
+import { Edit3, FileText, Trash2, Check, X, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { useGetProjectExclusionsQuery, useUpdateProjectAnalysisSectionMutation } from "@/store/api/projectApi";
+import { SectionSkeleton, SectionError, AIInstructionSection, ProposedChangesReview } from "./shared";
+
+interface Props {
+  projectId: string;
+}
+
+export default function ExclusionsTab({ projectId }: Props) {
+  const { data, isLoading, isError, refetch } = useGetProjectExclusionsQuery(projectId);
+  const [updateSection, { isLoading: isUpdating }] = useUpdateProjectAnalysisSectionMutation();
+  const exclusions = data?.data;
+
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingText, setEditingText] = useState("");
+
+  const handleStartEdit = (item: any) => {
+    setEditingId(item.id);
+    setEditingText(item.text);
+  };
+
+  const handleSaveEdit = async (item: any) => {
+    if (!exclusions?.items) return;
+    const newItems = exclusions.items.map((i: any) =>
+      i.id === item.id ? { ...i, text: editingText } : i
+    );
+    try {
+      await updateSection({ projectId, section: "exclusions", data: { ...exclusions, items: newItems } }).unwrap();
+      toast.success("Exclusion updated.");
+      setEditingId(null);
+    } catch {
+      toast.error("Failed to update exclusion.");
+    }
+  };
+
+  const handleDelete = async (itemId: string) => {
+    if (!exclusions?.items) return;
+    const newItems = exclusions.items.filter((i: any) => i.id !== itemId);
+    try {
+      await updateSection({ projectId, section: "exclusions", data: { ...exclusions, items: newItems } }).unwrap();
+      toast.success("Exclusion deleted.");
+    } catch {
+      toast.error("Failed to delete exclusion.");
+    }
+  };
+
+  if (isLoading) return <SectionSkeleton />;
+  if (isError)
+    return <SectionError message="Failed to load exclusions. Please try again." onRetry={refetch} />;
+
+  return (
+    <div className="space-y-6">
+      <ProposedChangesReview projectId={projectId} section="exclusions" data={data?.data} />
+      <div className="bg-white dark:bg-[#111827] border border-gray-100 dark:border-gray-800 rounded-3xl p-6 md:p-8 shadow-sm">
+
+        <div className="flex justify-between items-center mb-6 border-b border-gray-100 dark:border-gray-800 pb-4">
+          <div>
+            <h2 className="text-[20px] font-bold text-gray-900 dark:text-white mb-1">
+              {exclusions?.title || "Exclusions"}
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+              {exclusions?.subtitle || "Items explicitly excluded from scope."}
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          {exclusions?.items?.length ? (
+            exclusions.items.map((item: any) => (
+              <div
+                key={item.id}
+                className="flex gap-4 p-4 rounded-xl border border-red-100 dark:border-red-900/30 bg-red-50/30 dark:bg-red-900/10 group"
+              >
+                <span className="text-[10px] text-red-500 mt-1 shrink-0">🔴</span>
+                <div className="flex-1">
+                  {editingId === item.id ? (
+                    <textarea
+                      value={editingText}
+                      onChange={e => setEditingText(e.target.value)}
+                      rows={2}
+                      className="w-full p-2 rounded-lg border border-red-300 dark:border-red-700 bg-transparent text-[13px] font-medium resize-none focus:outline-none focus:border-red-500"
+                    />
+                  ) : (
+                    <h4 className="text-[14px] font-bold text-gray-900 dark:text-white mb-1">{item.text}</h4>
+                  )}
+                  {item.reference?.file && (
+                    <div className="flex items-center gap-1.5 text-[11px] font-medium text-gray-400 mt-1">
+                      <FileText className="w-3.5 h-3.5" />
+                      {item.reference.file}
+                      {item.reference.page && ` • p.${item.reference.page}`}
+                      {item.reference.section && ` • ${item.reference.section}`}
+                    </div>
+                  )}
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity self-start">
+                  {editingId === item.id ? (
+                    <>
+                      <button
+                        onClick={() => handleSaveEdit(item)}
+                        disabled={isUpdating}
+                        className="p-1.5 text-emerald-600 hover:text-emerald-700 transition-colors rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
+                      >
+                        {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                      </button>
+                      <button
+                        onClick={() => setEditingId(null)}
+                        className="p-1.5 text-gray-400 hover:text-gray-700 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => handleStartEdit(item)}
+                        className="p-1.5 text-gray-400 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30"
+                      >
+                        <Edit3 className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(item.id)}
+                        disabled={isUpdating}
+                        className="p-1.5 text-gray-400 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 disabled:opacity-50"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-[13px] text-gray-500">No exclusions found.</p>
+          )}
+        </div>
+      </div>
+
+      <AIInstructionSection projectId={projectId} section="exclusions" />
+    </div>
+  );
+}

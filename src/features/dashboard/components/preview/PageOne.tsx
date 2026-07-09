@@ -67,7 +67,9 @@ export const PageOne = () => (
                 <li>Shop drawings approval process will not exceed 14 business days</li>
             </ul>
         </div>
+        <div className="bg-[#00996612] mt-5 pb-5">
+            <DocFooter />
+        </div>
 
-        <DocFooter />
     </div>
 );
