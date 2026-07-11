@@ -26,7 +26,7 @@ export interface ApiError {
 
 // ─── User & Auth ─────────────────────────────────────────────────────────────
 
-export type UserRole = "admin" | "user" | "manager";
+export type UserRole = "ADMIN" | "MANAGER" | "USER";
 export type UserStatus = "pending" | "active" | "inactive" | "suspended";
 
 export interface User {

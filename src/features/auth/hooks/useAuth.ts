@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useAppDispatch } from "@/store/hooks";
 import { setCredentials, clearCredentials, setRegistrationEmail } from "@/store/slices/authSlice";
-import { ROUTES } from "@/constants";
+import { ROUTES, COOKIE_NAMES } from "@/constants";
 import {
   useRegisterMutation,
   useVerifyEmailMutation,
@@ -34,9 +34,10 @@ export function useLogin() {
             refreshToken: result.data.refreshToken,
           })
         );
+        document.cookie = `${COOKIE_NAMES.ACCESS_TOKEN}=${encodeURIComponent(result.data.accessToken)}; path=/; max-age=604800; samesite=lax`;
         toast.success(`Welcome back, ${result.data.user.fullName || result.data.user.name}!`);
         const redirectPath =
-          result.data.user.role === "user" ? "/sub-user" : ROUTES.DASHBOARD;
+          result.data.user.role === "USER" ? "/sub-user" : ROUTES.DASHBOARD;
         router.push(redirectPath);
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : "Login failed. Please try again.";
@@ -68,6 +69,7 @@ export function useAdminLogin() {
             refreshToken: result.data.refreshToken,
           })
         );
+        document.cookie = `${COOKIE_NAMES.ACCESS_TOKEN}=${encodeURIComponent(result.data.accessToken)}; path=/; max-age=604800; samesite=lax`;
         toast.success(`Welcome back, ${result.data.user.fullName || result.data.user.name}!`);
         router.push(ROUTES.DASHBOARD);
       } catch (err) {
@@ -128,7 +130,7 @@ export function useVerifyEmail() {
         );
         toast.success("Email verified successfully!");
         const redirectPath =
-          result.data.user.role === "user" ? "/sub-user" : ROUTES.DASHBOARD;
+          result.data.user.role === "USER" ? "/sub-user" : ROUTES.DASHBOARD;
         router.push(redirectPath);
       } catch (err) {
         const errorMsg =
@@ -158,6 +160,7 @@ export function useLogout() {
         // Ignore API errors for logout, we still want to log them out locally
       } finally {
         // Always clear cookie and local state, even on network failure
+        document.cookie = `${COOKIE_NAMES.ACCESS_TOKEN}=; path=/; max-age=0; samesite=lax`;
         await handleLogoutAction();
         dispatch(clearCredentials());
         router.push(ROUTES.LOGIN);

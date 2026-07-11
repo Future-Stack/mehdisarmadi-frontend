@@ -96,13 +96,13 @@ export default function LoginForm() {
           {isAdminLogin ? "Admin Login" : "Login"}
         </Button>
 
-        <button
+        {/* <button
           type="button"
           onClick={toggleLoginMode}
           className="w-full text-sm font-medium text-gray-500 hover:text-[#059669] transition-colors py-2 rounded-xl hover:bg-gray-50"
         >
           {isAdminLogin ? "← Back to User Login" : "Admin Login →"}
-        </button>
+        </button> */}
 
         <div className="flex flex-col items-center gap-4">
           <Link
@@ -129,7 +129,7 @@ export default function LoginForm() {
             <ArrowLeft className="w-4 h-4" /> Back to Home
           </Link>
 
-          <div className="mt-8 p-4 bg-emerald-50 rounded-2xl border border-emerald-100 w-full">
+          {/* <div className="mt-8 p-4 bg-emerald-50 rounded-2xl border border-emerald-100 w-full">
             <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-3 text-center">
               {isAdminLogin ? "Admin Test Account" : "Default Credentials"}
             </p>
@@ -195,7 +195,7 @@ export default function LoginForm() {
                 </button>
               )}
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </form>
