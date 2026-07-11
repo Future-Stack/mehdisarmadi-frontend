@@ -170,7 +170,7 @@ export default function SubUserDashboardPage() {
                     className="w-full h-10 pl-18 pr-4 bg-white dark:bg-[#111827] text-sm placeholder:text-[#6B7280] shadow-sm shadow-[#00000040] placeholder:font-medium border border-gray-200 dark:border-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm font-medium"
                   />
                 </div>
-                <div className="flex flex-col xs:flex-row gap-3 w-full sm:w-auto">
+                <div className="flex flex-row gap-3 w-full sm:w-auto">
                   <div className="relative w-full sm:w-48">
                     {/* Left Icon */}
                     <Funnel className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] pointer-events-none" />
