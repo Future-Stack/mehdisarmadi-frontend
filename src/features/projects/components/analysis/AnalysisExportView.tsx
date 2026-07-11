@@ -161,8 +161,8 @@ export default function AnalysisExportView({ projectId, onReady }: { projectId: 
         {summary?.key_highlights?.length > 0 && (
           <SectionBlock title="Summary Highlights">
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-              {summary.key_highlights.map((h: any) => (
-                <div key={h.id || h.type} style={{
+              {summary.key_highlights.map((h: any, i: number) => (
+                <div key={h.id || h.type || i} style={{
                   border: "1px solid #e5e7eb", borderRadius: 8, padding: "10px 14px",
                   borderLeftWidth: 4, borderLeftColor: "#10b981",
                 }}>
@@ -200,7 +200,7 @@ export default function AnalysisExportView({ projectId, onReady }: { projectId: 
           <SectionBlock title="Scope of Work">
             {scope.items.map((item: any, i: number) => (
               <ItemRow
-                key={item.id}
+                key={item.id || i}
                 index={i + 1}
                 text={item.scopeItem || item.text || ""}
                 reference={item.reference}
@@ -213,7 +213,7 @@ export default function AnalysisExportView({ projectId, onReady }: { projectId: 
         {assumptions?.items?.length > 0 && (
           <SectionBlock title="Assumptions">
             {assumptions.items.map((item: any, i: number) => (
-              <ItemRow key={item.id} index={i + 1} text={item.text} reference={item.reference} />
+              <ItemRow key={item.id || i} index={i + 1} text={item.text} reference={item.reference} />
             ))}
           </SectionBlock>
         )}
@@ -222,7 +222,7 @@ export default function AnalysisExportView({ projectId, onReady }: { projectId: 
         {exclusions?.items?.length > 0 && (
           <SectionBlock title="Exclusions">
             {exclusions.items.map((item: any, i: number) => (
-              <ItemRow key={item.id} index={i + 1} text={item.text} reference={item.reference} />
+              <ItemRow key={item.id || i} index={i + 1} text={item.text} reference={item.reference} />
             ))}
           </SectionBlock>
         )}
@@ -231,7 +231,7 @@ export default function AnalysisExportView({ projectId, onReady }: { projectId: 
         {risks?.items?.length > 0 && (
           <SectionBlock title="Risks & Coordination Items">
             {risks.items.map((item: any, i: number) => (
-              <div key={item.id} style={{ marginBottom: 12, padding: "10px 14px", borderRadius: 8, border: "1px solid #fee2e2", borderLeft: "4px solid #ef4444", backgroundColor: "#fff5f5" }}>
+              <div key={item.id || i} style={{ marginBottom: 12, padding: "10px 14px", borderRadius: 8, border: "1px solid #fee2e2", borderLeft: "4px solid #ef4444", backgroundColor: "#fff5f5" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
                   <span style={{ fontSize: 11, fontWeight: 700, color: "#111827" }}>{item.title}</span>
                   <span style={{ fontSize: 9, fontWeight: 700, color: "#ef4444", backgroundColor: "#fee2e2", padding: "2px 8px", borderRadius: 4 }}>{item.category}</span>
@@ -251,7 +251,7 @@ export default function AnalysisExportView({ projectId, onReady }: { projectId: 
         {clarifications?.items?.length > 0 && (
           <SectionBlock title="Clarifications Needed">
             {clarifications.items.map((item: any, i: number) => (
-              <ItemRow key={item.id} index={i + 1} text={item.question} reference={item.reference} />
+              <ItemRow key={item.id || i} index={i + 1} text={item.question} reference={item.reference} />
             ))}
           </SectionBlock>
         )}
@@ -291,7 +291,7 @@ export default function AnalysisExportView({ projectId, onReady }: { projectId: 
         {addenda?.items?.length > 0 && (
           <SectionBlock title="Addenda Changes">
             {addenda.items.map((item: any, i: number) => (
-              <div key={item.id} style={{ marginBottom: 12, paddingLeft: 12, borderLeft: "3px solid #10b981" }}>
+              <div key={item.id || i} style={{ marginBottom: 12, paddingLeft: 12, borderLeft: "3px solid #10b981" }}>
                 <div style={{ fontWeight: 700, fontSize: 11, color: "#111827" }}>{item.title || item.text}</div>
                 {item.description && <p style={{ fontSize: 10, color: "#6b7280", margin: "2px 0 0" }}>{item.description}</p>}
                 {item.reference?.file && (
