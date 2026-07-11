@@ -1,7 +1,10 @@
-import { AlertTriangle, AlertCircle, Edit3 } from "lucide-react";
+import { AlertTriangle, AlertCircle, Edit3, Trash2, Check, X } from "lucide-react";
 import { useGetProjectPricingQuery } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, AIInstructionSection, ProposedChangesReview } from "./shared";
+import { SectionSkeleton, SectionError, AIInstructionSection, ProposedChangesReview, DeleteConfirmationModal } from "./shared";
 import { cn } from "@/lib/utils";
+import React, { useState } from "react";
+import { toast } from "sonner";
+import { useUpdateProjectAnalysisSectionMutation } from "@/store/api/projectApi";
 
 interface Props {
   projectId: string;
@@ -9,20 +12,71 @@ interface Props {
 
 export default function PricingTab({ projectId }: Props) {
   const { data, isLoading, isError, refetch } = useGetProjectPricingQuery(projectId);
+  const [updateSection, { isLoading: isUpdating }] = useUpdateProjectAnalysisSectionMutation();
   const pricing = data?.data;
+
+  const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState("");
+  const [editingDescription, setEditingDescription] = useState("");
+
+  const handleStartEdit = (item: any) => {
+    setEditingId(item.id);
+    setEditingName(item.name);
+    setEditingDescription(item.description);
+  };
+
+  const handleSaveEdit = async (item: any) => {
+    if (!pricing?.additionalCostItems) return;
+    const newItems = pricing.additionalCostItems.map((i: any) =>
+      i.id === item.id ? { ...i, name: editingName, description: editingDescription } : i
+    );
+    try {
+      await updateSection({ projectId, section: "pricing", data: { payload: { additionalCostItems: newItems }, note: "Manual edits from estimator" } }).unwrap();
+      toast.success("Cost item updated.");
+      setEditingId(null);
+    } catch {
+      toast.error("Failed to update cost item.");
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!pricing?.additionalCostItems || !deleteItemId) return;
+    const newItems = pricing.additionalCostItems.filter((i: any) => i.id !== deleteItemId);
+    try {
+      await updateSection({ projectId, section: "pricing", data: { payload: { additionalCostItems: newItems }, note: "Manual edits from estimator" } }).unwrap();
+      toast.success("Cost item deleted.");
+      setDeleteItemId(null);
+    } catch {
+      toast.error("Failed to delete cost item.");
+    }
+  };
 
   if (isLoading) return <SectionSkeleton />;
   if (isError)
     return <SectionError message="Failed to load pricing data. Please try again." onRetry={refetch} />;
 
   // Helper for Additional Cost Items border colors
-  const getCostItemStyle = (name: string) => {
-    const lowerName = name.toLowerCase();
-    if (lowerName.includes("night")) return "border-l-orange-400 bg-orange-50/30 dark:bg-orange-900/10";
-    if (lowerName.includes("bond")) return "border-l-blue-400 bg-blue-50/30 dark:bg-blue-900/10";
-    if (lowerName.includes("coordination") || lowerName.includes("contingency")) return "border-l-purple-400 bg-purple-50/30 dark:bg-purple-900/10";
-    return "border-l-gray-400 bg-gray-50 dark:bg-gray-800/50";
-  };
+const getCostItemStyle = (name?: string) => {
+  const lowerName = (name ?? "").toLowerCase();
+
+  if (lowerName.includes("night")) {
+    return "border-l-orange-400 bg-orange-50/30 dark:bg-orange-900/10";
+  }
+
+  if (lowerName.includes("bond")) {
+    return "border-l-blue-400 bg-blue-50/30 dark:bg-blue-900/10";
+  }
+
+  if (
+    lowerName.includes("coordination") ||
+    lowerName.includes("contingency")
+  ) {
+    return "border-l-purple-400 bg-purple-50/30 dark:bg-purple-900/10";
+  }
+
+  return "border-l-gray-400 bg-gray-50 dark:bg-gray-800/50";
+};
 
   return (
     <div className="space-y-6 pb-8">
@@ -43,14 +97,14 @@ export default function PricingTab({ projectId }: Props) {
 
       <div className="space-y-4">
         {/* AI vs Estimator Comparison */}
-        <div className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
+        <div className="bg-gradient-to-r from-[#EFF6FF] to-[#EDFFF3] dark:bg-[#111827] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
           <h3 className="text-[14px] font-bold text-gray-900 dark:text-white mb-1">AI vs Estimator Comparison</h3>
           <p className="text-[12px] text-gray-500 mb-4">Compare AI draft estimate with estimator final price</p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="bg-white dark:bg-gray-800 rounded-xl p-5 border border-blue-100 dark:border-blue-800/50 flex flex-col items-center justify-center shadow-sm">
-              <div className="text-[12px] font-medium text-gray-500 mb-2">AI Draft Estimate</div>
-              <div className="text-2xl font-black text-blue-600 dark:text-blue-400">
+              <div className="text-[14px] font-medium text-gray-500 mb-2">AI Draft Estimate</div>
+              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                 {pricing?.comparison?.aiDraftEstimate != null
                   ? `$${pricing.comparison.aiDraftEstimate.toLocaleString()}`
                   : "$485,000"}
@@ -58,7 +112,7 @@ export default function PricingTab({ projectId }: Props) {
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-xl p-5 border border-emerald-100 dark:border-emerald-800/50 flex flex-col items-center justify-center shadow-sm">
-              <div className="text-[12px] font-medium text-gray-500 mb-2">Estimator Final Price</div>
+              <div className="text-[14px] font-medium text-gray-500 mb-2">Estimator Final Price</div>
               <div className="flex items-center justify-center">
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
@@ -70,6 +124,14 @@ export default function PricingTab({ projectId }: Props) {
                   <Edit3 className="absolute -right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
                 </div>
               </div>
+            </div>
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-5 border border-blue-100 dark:border-blue-800/50 flex flex-col items-center justify-center shadow-sm">
+              <div className="text-[14px] font-medium text-gray-500 mb-2">AI Draft Estimate</div>
+              <div className="text-lg font-black text-gray-400 dark:text-blue-400">
+                --
+              </div>
+              <div className="text-[12px] font-normal text-gray-500 mb-2">Enter estimator price</div>
+              
             </div>
           </div>
         </div>
@@ -103,24 +165,76 @@ export default function PricingTab({ projectId }: Props) {
         {/* Additional Cost Items */}
         <div className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
           <h3 className="text-[15px] font-bold text-gray-900 dark:text-white mb-1">Additional Cost Items</h3>
-          <p className="text-[13px] text-gray-500 mb-4">Bonds, insurance, out-of-hours, and contingency</p>
+          <p className="text-[13px] text-gray-500 mb-4">Bonds, insurance, coordination, and contingency</p>
 
           <div className="space-y-3">
-            {pricing?.additionalCostItems?.map((item: any, i: number) => (
+            {pricing?.additionalCostItems?.map((item: any) => (
               <div
-                key={i}
+                key={item.id}
                 className={cn(
-                  "p-4 rounded-xl border-l-4 border-r border-t border-b border-r-gray-100 border-t-gray-100 border-b-gray-100 dark:border-r-gray-800 dark:border-t-gray-800 dark:border-b-gray-800",
+                  "p-4 rounded-xl border-l-4 border-r border-t border-b border-r-gray-100 border-t-gray-100 border-b-gray-100 dark:border-r-gray-800 dark:border-t-gray-800 dark:border-b-gray-800 group relative",
                   getCostItemStyle(item.name)
                 )}
               >
-                <div className="text-[14px] font-bold text-gray-900 dark:text-gray-100 mb-0.5">{item.name}</div>
-                <div className="text-[12px] text-gray-600 dark:text-gray-400">{item.description}</div>
+                {editingId === item.id ? (
+                  <div className="space-y-2">
+                    <input
+                      value={editingName}
+                      onChange={e => setEditingName(e.target.value)}
+                      className="w-full px-2 py-1 rounded border border-gray-300 dark:border-gray-700 bg-transparent text-[14px] font-bold focus:outline-none focus:border-emerald-500"
+                    />
+                    <textarea
+                      value={editingDescription}
+                      onChange={e => setEditingDescription(e.target.value)}
+                      rows={2}
+                      className="w-full px-2 py-1 rounded border border-gray-300 dark:border-gray-700 bg-transparent text-[12px] resize-none focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+                ) : (
+                  <>
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <div>
+                      <div className="text-[14px] font-bold text-gray-900 dark:text-gray-100 mb-0.5">{item.name}</div>
+                      <div className="text-[12px] text-gray-600 dark:text-gray-400">{item.description}</div>
+                    </div>
+                    {
+                      item.amount > 0 && (
+                        <div className="text-[12px] text-gray-600 dark:text-gray-400">${item.amount}</div>
+                      )
+                    }  
+                  </div>
+                  </>
+                )}
+
+                {item.editable && (
+                  <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {editingId === item.id ? (
+                      <>
+                        <button onClick={() => handleSaveEdit(item)} disabled={isUpdating} className="p-1 text-emerald-600 hover:bg-emerald-100 rounded">
+                          <Check className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => setEditingId(null)} className="p-1 text-gray-500 hover:bg-gray-200 rounded">
+                          <X className="w-4 h-4" />
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button onClick={() => handleStartEdit(item)} className="p-1 text-blue-500 hover:bg-blue-100 rounded">
+                          <Edit3 className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => setDeleteItemId(item.id)} className="p-1 text-red-500 hover:bg-red-100 rounded">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </div>
 
+       
 
         {/* Missing Information */}
         {pricing?.missingInformation?.length > 0 && (
@@ -142,33 +256,81 @@ export default function PricingTab({ projectId }: Props) {
             </div>
           </div>
         )}
+
+        {/* Pricing Basis & Reasoning */}
+        <div className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
+          <h3 className="text-[15px] font-bold text-gray-900 dark:text-white mb-1">Pricing Basis & Reasoning</h3>
+          <p className="text-[13px] text-gray-500 mb-4">How AI arrived at these estimates</p>
+
+          <div className="space-y-3">
+            {pricing?.pricingBasisAndReasoning?.map((item: any) => (
+              <div
+                key={item.id}
+                className={cn(
+                  "p-4 rounded-xl border-gray-500 dark:border-gray-700 border-l-4 border-r border-t border-b border-r-gray-100 border-t-gray-100 border-b-gray-100 dark:border-r-gray-800 dark:border-t-gray-800 dark:border-b-gray-800 group relative",
+                  getCostItemStyle(item.name)
+                )}
+              >
+                {editingId === item.id ? (
+                  <div className="space-y-2">
+                    <input
+                      value={editingName}
+                      onChange={e => setEditingName(e.target.value)}
+                      className="w-full px-2 py-1 rounded border border-gray-300 dark:border-gray-700 bg-transparent text-[14px] font-bold focus:outline-none focus:border-emerald-500"
+                    />
+                    <textarea
+                      value={editingDescription}
+                      onChange={e => setEditingDescription(e.target.value)}
+                      rows={2}
+                      className="w-full px-2 py-1 rounded border border-gray-300 dark:border-gray-700 bg-transparent text-[12px] resize-none focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+                ) : (
+                  <>
+                    <div className="text-[14px] font-bold text-gray-900 dark:text-gray-100 mb-0.5">{item.name}</div>
+                    <div className="text-[12px] text-gray-600 dark:text-gray-400">{item.description}</div>
+                  </>
+                )}
+
+                {item.editable && (
+                  <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {editingId === item.id ? (
+                      <>
+                        <button onClick={() => handleSaveEdit(item)} disabled={isUpdating} className="p-1 text-emerald-600 hover:bg-emerald-100 rounded">
+                          <Check className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => setEditingId(null)} className="p-1 text-gray-500 hover:bg-gray-200 rounded">
+                          <X className="w-4 h-4" />
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button onClick={() => handleStartEdit(item)} className="p-1 text-blue-500 hover:bg-blue-100 rounded">
+                          <Edit3 className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => setDeleteItemId(item.id)} className="p-1 text-red-500 hover:bg-red-100 rounded">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
       </div>
 
-
-      {/* Pricing Basis & Reasoning */}
-      {/* <div className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
-        <h3 className="text-[15px] font-bold text-gray-900 dark:text-white mb-1">Pricing Basis & Reasoning</h3>
-        <p className="text-[13px] text-gray-500 mb-4">Assumptions and reasoning behind AI draft estimates</p>
-        <div className="space-y-3">
-          {pricing?.pricingBasisAndReasoning?.length ? (
-            pricing.pricingBasisAndReasoning.map((reason: any, idx: number) => (
-              <div key={idx} className="bg-gray-50/70 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-800">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 dark:text-emerald-400 dark:bg-emerald-900/30 px-2 py-0.5 rounded">
-                    Assumption {idx + 1}
-                  </span>
-                  <span className="text-[14px] font-bold text-gray-900 dark:text-gray-100">{reason.title || "Basis"}</span>
-                </div>
-                <p className="text-[13px] text-gray-600 dark:text-gray-400">{reason.description}</p>
-              </div>
-            ))
-          ) : (
-            <p className="text-[13px] text-gray-500">No reasoning data available.</p>
-          )}
-        </div>
-      </div> */}
-
       <AIInstructionSection projectId={projectId} section="pricing" />
+      <DeleteConfirmationModal
+        isOpen={!!deleteItemId}
+        onClose={() => setDeleteItemId(null)}
+        onConfirm={handleDeleteConfirm}
+        isDeleting={isUpdating}
+        title="Delete Cost Item"
+        description="Are you sure you want to delete this cost item? This action cannot be undone."
+      />
     </div>
   );
 }

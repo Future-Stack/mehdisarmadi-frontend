@@ -1,12 +1,12 @@
 import { DocFooter } from "./DocFooter";
 import { DocumentHeader } from "./DocumentHeader";
 
-export const PageTwo = () => (
-    <div className="bg-white text-gray-900 shadow-xl border border-gray-200 mx-auto w-full max-w-[850px] min-h-[1100px] p-12 flex flex-col font-sans">
-        <DocumentHeader showFull={false} />
+export const PageTwo = ({ exportMode }: { exportMode?: boolean }) => (
+    <div className={exportMode ? "bg-white text-gray-900 font-sans p-12" : "bg-white text-gray-900 shadow-xl border border-gray-200 mx-auto w-full max-w-[850px] min-h-[1100px] p-12 flex flex-col font-sans"}>
+        {!exportMode && <DocumentHeader showFull={false} />}
 
         {/* Exclusions */}
-        <div className="mb-8">
+        <div className={`mb-8 ${exportMode ? 'export-section' : ''}`}>
             <h3 className="text-[12px] font-bold text-gray-700 mb-3 uppercase tracking-widest">Exclusions</h3>
             <ul className="list-disc list-outside ml-4 text-[11px] leading-relaxed text-gray-600 space-y-1.5">
                 <li>Electrical rough-in and fixture installation</li>
@@ -23,7 +23,7 @@ export const PageTwo = () => (
         </div>
 
         {/* Separate Prices */}
-        <div className="mb-8">
+        <div className={`mb-8 ${exportMode ? 'export-section' : ''}`}>
             <h3 className="text-[12px] font-bold text-gray-700 mb-3 uppercase tracking-widest">SEPARATE PRICES</h3>
             <div className="border border-gray-200 rounded-xl p-5 mb-4 bg-gray-50/40">
                 <div className="flex justify-between items-start mb-3 pb-2.5 border-b border-gray-200">
@@ -71,7 +71,7 @@ export const PageTwo = () => (
         </div>
 
         {/* Alternative Prices */}
-        <div className="flex-1">
+        <div className={`flex-1 ${exportMode ? 'export-section' : ''}`}>
             <h3 className="text-[12px] font-bold text-gray-700 mb-3 uppercase tracking-widest">ALTERNATIVE PRICES</h3>
             <div className="border border-gray-200 rounded-xl p-5 bg-gray-50/40">
                 <div className="flex justify-between items-start mb-3 pb-2.5 border-b border-gray-200">
@@ -118,8 +118,10 @@ export const PageTwo = () => (
             </div>
         </div>
 
-        <div className="bg-[#00996612] mt-5 pb-5">
-            <DocFooter />
-        </div>
+        {!exportMode && (
+            <div className="bg-[#00996612] mt-5 pb-5">
+                <DocFooter />
+            </div>
+        )}
     </div>
 );

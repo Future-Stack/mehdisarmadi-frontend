@@ -2,12 +2,18 @@ import { DocFooter } from "./DocFooter";
 import { DocumentHeader } from "./DocumentHeader";
 
 /* ─── PAGE 1: Tender Info + Scope + Assumptions ─── */
-export const PageOne = () => (
-    <div className="bg-white text-gray-900 shadow-xl border border-gray-200 mx-auto w-full max-w-[850px] min-h-[1100px] p-12 flex flex-col font-sans">
-        <DocumentHeader showFull />
+export const PageOne = ({ exportMode }: { exportMode?: boolean }) => (
+    <div className={exportMode ? "bg-white text-gray-900 font-sans p-12" : "bg-white text-gray-900 shadow-xl border border-gray-200 mx-auto w-full max-w-[850px] min-h-[1100px] p-12 flex flex-col font-sans"}>
+        {exportMode ? (
+            <div id="export-header" className="p-12 pb-0">
+                <DocumentHeader showFull />
+            </div>
+        ) : (
+            <DocumentHeader showFull />
+        )}
 
         {/* Prepared For */}
-        <div className="mb-6 pb-5 border-b border-gray-100">
+        <div className={`mb-6 pb-5 border-b border-gray-100 ${exportMode ? 'export-section' : ''}`}>
             <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">PREPARED FOR</div>
             <div className="text-[13px] font-bold text-gray-900">ABC Construction Ltd.</div>
             <div className="text-[11px] text-gray-500 mt-0.5">Attention: John Smith, Project Manager</div>
@@ -15,7 +21,7 @@ export const PageOne = () => (
         </div>
 
         {/* Tender Information */}
-        <div className="mb-6">
+        <div className={`mb-6 ${exportMode ? 'export-section' : ''}`}>
             <h3 className="text-[12px] font-bold text-gray-700 mb-3 uppercase tracking-widest">TENDER INFORMATION</h3>
             <table className="w-full text-[11px] border-collapse border border-gray-200">
                 <tbody className="divide-y divide-gray-100">
@@ -33,7 +39,7 @@ export const PageOne = () => (
         </div>
 
         {/* Scope of Work */}
-        <div className="mb-6">
+        <div className={`mb-6 ${exportMode ? 'export-section' : ''}`}>
             <h3 className="text-[12px] font-bold text-gray-700 mb-3 uppercase tracking-widest">Scope of Work</h3>
             <div className="text-[11px] text-gray-600 leading-relaxed space-y-3">
                 <div>
@@ -52,7 +58,7 @@ export const PageOne = () => (
         </div>
 
         {/* Assumptions */}
-        <div className="flex-1">
+        <div className={`flex-1 ${exportMode ? 'export-section' : ''}`}>
             <h3 className="text-[12px] font-bold text-gray-700 mb-3 uppercase tracking-widest">Assumptions</h3>
             <ul className="list-disc list-outside ml-4 text-[11px] leading-relaxed text-gray-600 space-y-1.5">
                 <li>Site access provided as per tender specifications (6-11 AM for deliveries)</li>
@@ -67,9 +73,10 @@ export const PageOne = () => (
                 <li>Shop drawings approval process will not exceed 14 business days</li>
             </ul>
         </div>
-        <div className="bg-[#00996612] mt-5 pb-5">
-            <DocFooter />
-        </div>
-
+        {!exportMode && (
+            <div className="bg-[#00996612] mt-5 pb-5">
+                <DocFooter />
+            </div>
+        )}
     </div>
 );

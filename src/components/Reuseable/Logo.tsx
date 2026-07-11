@@ -7,8 +7,7 @@ const Logo = () => {
       alt="logo"
       height={140}
       width={120}
-      style={{ width: "120px", height: "auto" }}
-      className="object-contain"
+      className="w-[120px] h-auto object-contain"
     />
   );
 };

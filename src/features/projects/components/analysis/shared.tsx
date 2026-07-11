@@ -88,7 +88,7 @@ export function AIInstructionSection({ projectId, section }: AIInstructionSectio
   );
 }
 
-import { CheckCircle2, Check, X, AlertTriangle, Edit3 } from "lucide-react";
+import { CheckCircle2, Check, X, AlertTriangle, Edit3, Trash2 } from "lucide-react";
 
 // ─── Proposed Changes Review ──────────────────────────────────────────────────
 export function ProposedChangesReview({ projectId, section, data }: { projectId: string; section: string; data: any }) {
@@ -255,4 +255,46 @@ export function getRiskBadgeColor(category: string) {
     default:
       return "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
   }
+}
+
+// ─── Delete Confirmation Modal ────────────────────────────────────────────────
+import { Modal } from "@/components/ui/Modal";
+
+interface DeleteConfirmationModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  isDeleting?: boolean;
+  title?: string;
+  description?: string;
+}
+
+export function DeleteConfirmationModal({
+  isOpen,
+  onClose,
+  onConfirm,
+  isDeleting,
+  title = "Delete Item",
+  description = "Are you sure you want to delete this item? This action cannot be undone.",
+}: DeleteConfirmationModalProps) {
+  return (
+    <Modal open={isOpen} onClose={onClose} title={title} size="sm">
+      <div className="pt-2">
+        <p className="text-[13px] text-gray-600 dark:text-gray-300 mb-6 font-medium leading-relaxed">{description}</p>
+        <div className="flex justify-end gap-3">
+          <Button variant="secondary" onClick={onClose} disabled={isDeleting} className="h-9 px-4 text-[12px] rounded-xl font-bold">
+            Cancel
+          </Button>
+          <Button 
+            className="h-9 px-4 text-[12px] rounded-xl font-bold bg-red-600 hover:bg-red-700 text-white flex items-center gap-2" 
+            onClick={onConfirm} 
+            disabled={isDeleting}
+          >
+            {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+            Delete
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  );
 }

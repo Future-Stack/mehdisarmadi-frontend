@@ -14,42 +14,113 @@ import {
 } from "docx";
 
 // ─── PDF Export (via jsPDF) ─────────────────────────────────────────────────
+const PAGE_WIDTH_PT = 595.28; // A4
+const PAGE_HEIGHT_PT = 841.89; // A4
+const MARGIN_PT = 36;
+const BOTTOM_PADDING_PT = 40; // safe zone
+
 export async function exportElementToPDF(
   elementId: string,
   filename: string = "quote.pdf"
 ) {
-  // Lazy-load html2canvas-pro to avoid SSR issues and fix color parsing bugs (e.g. lab/oklch)
   const { default: html2canvas } = await import("html2canvas-pro");
-  const element = document.getElementById(elementId);
-  if (!element) {
+  const container = document.getElementById(elementId);
+  if (!container) {
     throw new Error(`Element with id "${elementId}" not found`);
   }
 
-  const canvas = await html2canvas(element, {
+  const headerEl = container.querySelector<HTMLElement>("#export-header");
+  const footerEl = container.querySelector<HTMLElement>("#export-footer");
+  const sectionEls = Array.from(
+    container.querySelectorAll<HTMLElement>(".export-section")
+  );
+
+  const pdf = new jsPDF({ orientation: "portrait", unit: "pt", format: "a4" });
+  const canvasOpts = {
     scale: 2,
     useCORS: true,
     backgroundColor: "#ffffff",
     logging: false,
-  });
+  };
 
-  const imgData = canvas.toDataURL("image/png");
-  const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-  const pageWidth = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
-  const imgWidth = pageWidth;
-  const imgHeight = (canvas.height * imgWidth) / canvas.width;
+  // ── Capture header ──
+  let headerH = 0;
+  if (headerEl) {
+    const c = await html2canvas(headerEl, canvasOpts);
+    headerH = (c.height / c.width) * PAGE_WIDTH_PT;
+    pdf.addImage(c.toDataURL("image/png"), "PNG", 0, 0, PAGE_WIDTH_PT, headerH);
+  }
 
-  let heightLeft = imgHeight;
-  let position = 0;
+  // ── Capture footer ──
+  let footerImgData = "";
+  let footerH = 0;
+  if (footerEl) {
+    const c = await html2canvas(footerEl, canvasOpts);
+    footerH = (c.height / c.width) * PAGE_WIDTH_PT;
+    footerImgData = c.toDataURL("image/png");
+  }
 
-  pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-  heightLeft -= pageHeight;
-
-  while (heightLeft > 0) {
-    position -= pageHeight;
+  const availableH = PAGE_HEIGHT_PT - BOTTOM_PADDING_PT;
+  const contentW = PAGE_WIDTH_PT - MARGIN_PT * 2;
+  let currentY = headerH + MARGIN_PT;
+  
+  const addNewPage = () => {
     pdf.addPage();
-    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
+    currentY = MARGIN_PT;
+  };
+
+  // ── Place sections ──
+  // If there are no sections defined, just capture the whole container as one image and split it mechanically.
+  if (sectionEls.length === 0) {
+    const c = await html2canvas(container, canvasOpts);
+    const imgData = c.toDataURL("image/png");
+    const imgW = PAGE_WIDTH_PT;
+    const imgH = (c.height * imgW) / c.width;
+    
+    let heightLeft = imgH;
+    let position = 0;
+    
+    pdf.addImage(imgData, "PNG", 0, position, imgW, imgH);
+    heightLeft -= PAGE_HEIGHT_PT;
+    
+    while (heightLeft > 0) {
+      position -= PAGE_HEIGHT_PT;
+      pdf.addPage();
+      pdf.addImage(imgData, "PNG", 0, position, imgW, imgH);
+      heightLeft -= PAGE_HEIGHT_PT;
+    }
+    
+    pdf.save(filename);
+    return;
+  }
+
+  // Otherwise, use section-aware logic
+  for (let i = 0; i < sectionEls.length; i++) {
+    const el = sectionEls[i];
+    const c = await html2canvas(el, { ...canvasOpts });
+    const imgH = (c.height / c.width) * contentW;
+    const imgData = c.toDataURL("image/png");
+
+    if (currentY + imgH > availableH) {
+      addNewPage();
+    }
+    pdf.addImage(imgData, "PNG", MARGIN_PT, currentY, contentW, imgH);
+    currentY += imgH + 16;
+  }
+
+  // ── Footer on last page ──
+  if (footerImgData) {
+    if (currentY + footerH + 10 > PAGE_HEIGHT_PT) {
+      addNewPage();
+    }
+    pdf.addImage(
+      footerImgData,
+      "PNG",
+      0,
+      PAGE_HEIGHT_PT - footerH,
+      PAGE_WIDTH_PT,
+      footerH
+    );
   }
 
   pdf.save(filename);

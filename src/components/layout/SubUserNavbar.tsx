@@ -58,14 +58,17 @@ export default function SubUserNavbar() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 pl-3">
           <Link href="/sub-user/projects/new">
             <Button
               variant="primary"
               className="h-10 px-4 rounded-xl font-medium shadow-sm shadow-emerald-100 text-sm"
             >
-              <Plus className="w-4 h-4 mr-2" />
-              <span>Create New Project</span>
+              <div className=" dark:rounded-lg dark:px-1 dark:py-1">
+
+                <Plus className="w-4 h-4 mr-2" />
+              </div>
+              <span className="dark:text-white truncate">Create New Project</span>
             </Button>
           </Link>
           <Link href="/sub-user/settings">

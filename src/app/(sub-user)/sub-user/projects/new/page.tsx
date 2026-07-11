@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import { ArrowLeft, Upload, FileText, X, Check, Building2, User, Calendar as CalendarIcon, ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Upload, FileText, X, Check, Building2, User, Calendar as CalendarIcon, ArrowRight, CheckCircle2, SparklesIcon } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -33,7 +33,7 @@ export default function NewProjectWizard() {
   });
 
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-  
+
   const [aiOptions, setAiOptions] = useState({
     generateScope: true,
     detectRisks: true,
@@ -79,7 +79,7 @@ export default function NewProjectWizard() {
       data.append("instruction", formData.instruction);
 
       selectedDivisions.forEach(id => data.append("divisionIds", id));
-      
+
       const aiOptsArray = Object.keys(aiOptions).filter(k => (aiOptions as any)[k]);
       aiOptsArray.forEach(opt => data.append("aiOptions", opt));
 
@@ -103,9 +103,9 @@ export default function NewProjectWizard() {
   if (currentStep === 4) progress += 25;
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 max-w-7xl mx-auto pb-12">
+    <div className="flex flex-col lg:flex-row  gap-6 max-w-7xl mx-auto pb-12">
       <input type="file" multiple ref={fileInputRef} className="hidden" onChange={handleFileUpload} />
-      
+
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col gap-6">
 
@@ -123,15 +123,15 @@ export default function NewProjectWizard() {
             return (
               <div key={step.id} className="relative z-10 flex flex-col items-center gap-2 bg-white dark:bg-[#111827] px-4">
                 <div className={cn(
-                  "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors",
-                  isActive ? "bg-emerald-600 text-white shadow-md shadow-emerald-200 dark:shadow-none" :
-                    isCompleted ? "bg-emerald-600 text-white" : "bg-gray-100 dark:bg-gray-800 text-gray-400"
+                  "w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-colors",
+                  isActive ? "bg-[#009966] text-white shadow-md shadow-emerald-200 dark:shadow-none" :
+                    isCompleted ? "bg-[#009966] text-white" : "bg-[#D9DBDD] dark:bg-gray-800 text-[#6B6969]"
                 )}>
                   {isCompleted ? <Check className="w-4 h-4" /> : String(step.id).padStart(2, '0')}
                 </div>
                 <div className="text-center">
-                  <div className={cn("text-[13px] font-bold", isActive || isCompleted ? "text-gray-900 dark:text-white" : "text-gray-400")}>{step.title}</div>
-                  <div className="text-[11px] font-medium text-gray-400">{step.subtitle}</div>
+                  <div className={cn("text-[12px] font-bold", isActive || isCompleted ? "text-[#101828] dark:text-white" : "text-[#6B6969]")}>{step.title}</div>
+                  <div className={cn("text-[11px] font-medium", isActive || isCompleted ? "text-[#101828] dark:text-white" : "text-[#6A7282]")}>{step.subtitle}</div>
                 </div>
               </div>
             );
@@ -139,9 +139,9 @@ export default function NewProjectWizard() {
         </div>
 
         {/* Wizard Form Area */}
-        <div className="bg-white dark:bg-[#111827] border border-gray-100 dark:border-gray-800 rounded-[32px] p-8 shadow-sm min-h-[500px] flex flex-col">
+        <div className="bg-white dark:bg-[#111827] border border-gray-100 dark:border-gray-800 rounded-[32px] p-8 lg:px-[108px] lg:py-11 shadow-sm min-h-[500px] flex flex-col">
 
-          <div className="flex items-center gap-2 mb-6">
+          <div className="flex items-center gap-2 mb-6 lg:mb-10">
             <Link href="/sub-user" className="text-sm font-bold text-gray-500 hover:text-gray-900 dark:hover:text-white flex items-center gap-1 transition-colors">
               <ArrowLeft className="w-4 h-4" /> Back to Dashboard
             </Link>
@@ -160,7 +160,7 @@ export default function NewProjectWizard() {
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Project Name *</label>
+                    <label className="block text-[13px] font-medium text-gray-700 dark:text-gray-300 mb-1.5">Project Name *</label>
                     <input
                       type="text"
                       placeholder="e.g., Green Valley Residential Complex"
@@ -170,7 +170,7 @@ export default function NewProjectWizard() {
                     />
                   </div>
                   <div>
-                    <label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Client Name *</label>
+                    <label className="block text-[13px] font-medium text-gray-700 dark:text-gray-300 mb-1.5">Client Name *</label>
                     <input
                       type="text"
                       placeholder="e.g., ABC Developers Inc."
@@ -182,7 +182,7 @@ export default function NewProjectWizard() {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Client Contact *</label>
+                      <label className="block text-[13px] font-medium text-gray-700 dark:text-gray-300 mb-1.5">Client Contact *</label>
                       <input
                         type="email"
                         placeholder="email@example.com"
@@ -192,7 +192,7 @@ export default function NewProjectWizard() {
                       />
                     </div>
                     <div>
-                      <label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">CLOSING DATE</label>
+                      <label className="block text-[13px] font-medium text-gray-700 dark:text-gray-300 mb-1.5">CLOSING DATE</label>
                       <div className="relative">
                         <input
                           type="date"
@@ -204,7 +204,7 @@ export default function NewProjectWizard() {
                       </div>
                     </div>
                     <div>
-                      <label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">QUESTION DATE</label>
+                      <label className="block text-[13px] font-medium text-gray-700 dark:text-gray-300 mb-1.5">QUESTION DATE</label>
                       <div className="relative">
                         <input
                           type="date"
@@ -218,7 +218,7 @@ export default function NewProjectWizard() {
                   </div>
 
                   <div>
-                    <label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Project Address *</label>
+                    <label className="block text-[13px] font-medium text-gray-700 dark:text-gray-300 mb-1.5">Project Address *</label>
                     <input
                       type="text"
                       placeholder="e.g., 123 Main St..."
@@ -228,7 +228,7 @@ export default function NewProjectWizard() {
                     />
                   </div>
                   <div>
-                    <label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Project Description</label>
+                    <label className="block text-[13px] font-medium text-gray-700 dark:text-gray-300 mb-1.5">Project Description</label>
                     <textarea
                       placeholder="Brief description of the project scope...."
                       value={formData.projectDescription}
@@ -237,7 +237,7 @@ export default function NewProjectWizard() {
                     />
                   </div>
                   <div>
-                    <label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Instructions</label>
+                    <label className="block text-[13px] font-medium text-gray-700 dark:text-gray-300 mb-1.5">Instructions</label>
                     <textarea
                       placeholder="Instructions..."
                       value={formData.instruction}
@@ -257,14 +257,14 @@ export default function NewProjectWizard() {
                   <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Tender documents</p>
                 </div>
 
-                <div 
+                <div
                   onClick={() => fileInputRef.current?.click()}
                   className="border-2 border-dashed border-emerald-300 dark:border-emerald-700/50 rounded-[24px] bg-emerald-50/50 dark:bg-emerald-900/10 p-10 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-emerald-50/80 transition-colors"
                 >
                   <div className="w-12 h-12 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center mb-4 shadow-sm">
                     <Upload className="w-5 h-5 text-emerald-600" />
                   </div>
-                  <h3 className="text-[17px] font-bold text-gray-800 dark:text-white mb-2">Drag & Drop Files Here</h3>
+                  <h3 className="text-[17px] font-medium text-gray-800 dark:text-white mb-2">Drag & Drop Files Here</h3>
                   <p className="text-sm text-gray-500 mb-6">or click to browse and select files</p>
 
                   <Button variant="secondary" className="h-10 px-6 rounded-xl font-bold bg-white dark:bg-[#111827] border-gray-200 shadow-sm text-gray-700 pointer-events-none">
@@ -277,13 +277,13 @@ export default function NewProjectWizard() {
 
                 {uploadedFiles.length > 0 && (
                   <div className="space-y-3">
-                    <h4 className="text-sm font-bold text-gray-900 dark:text-white">Uploaded Files</h4>
+                    <h4 className="text-sm font-medium text-gray-900 dark:text-white">Uploaded Files</h4>
                     {uploadedFiles.map((file, idx) => (
                       <div key={idx} className="flex items-center gap-4 p-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
                         <FileText className="w-6 h-6 text-emerald-500" />
                         <div className="flex-1">
                           <div className="flex justify-between mb-1">
-                            <span className="text-[13px] font-bold text-gray-900 dark:text-white">{file.name}</span>
+                            <span className="text-[13px] font-medium text-gray-900 dark:text-white">{file.name}</span>
                             <span className="text-[11px] font-medium text-gray-400">100%</span>
                           </div>
                           <div className="h-1.5 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -291,7 +291,7 @@ export default function NewProjectWizard() {
                           </div>
                           <div className="text-[11px] text-gray-400 mt-1">{(file.size / 1024).toFixed(2)} KB</div>
                         </div>
-                        <button 
+                        <button
                           onClick={(e) => { e.stopPropagation(); setUploadedFiles(prev => prev.filter((_, i) => i !== idx)); }}
                           className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         >
@@ -303,7 +303,7 @@ export default function NewProjectWizard() {
                 )}
 
                 <div>
-                  <h4 className="text-sm font-bold text-gray-900 dark:text-white mt-8 mb-4">Divisions (Optional)</h4>
+                  <h4 className="text-sm font-medium text-gray-900 dark:text-white mt-8 mb-4">Divisions (Optional)</h4>
                   {isDivLoading ? (
                     <p className="text-xs text-gray-500">Loading divisions...</p>
                   ) : (
@@ -311,13 +311,13 @@ export default function NewProjectWizard() {
                       {divisionsData?.data?.map(div => {
                         const isSelected = selectedDivisions.includes(div.id);
                         return (
-                          <div 
+                          <div
                             key={div.id}
                             onClick={() => setSelectedDivisions(prev => prev.includes(div.id) ? prev.filter(id => id !== div.id) : [...prev, div.id])}
                             className={cn(
                               "p-3 rounded-xl border-2 cursor-pointer flex justify-between h-auto transition-all",
-                              isSelected 
-                                ? "border-emerald-500 bg-emerald-50/30 dark:bg-emerald-900/20" 
+                              isSelected
+                                ? "border-emerald-500 bg-emerald-50/30 dark:bg-emerald-900/20"
                                 : "border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-gray-200 dark:hover:border-gray-700"
                             )}
                           >
@@ -342,11 +342,11 @@ export default function NewProjectWizard() {
                   <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Analysis settings</p>
                 </div>
 
-                <div className="bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900 p-4 rounded-xl flex gap-3">
-                  <div className="mt-0.5"><span className="text-blue-500">✨</span></div>
+                <div className="bg-[#EFF6FF] dark:bg-blue-900/10 border border-l-[#2B7FFF] dark:border-blue-900 p-4 rounded-xl flex gap-3 border-l-4 border-t-1 border-t-[#2B7FFF]/30 border-r-1 border-b-1 border-r-[#2B7FFF]/30 border-b-[#2B7FFF]/30">
+                  <div className="mt-0.5"><SparklesIcon className="text-[#155DFC] w-4 h-4" /></div>
                   <div>
-                    <h4 className="text-[13px] font-bold text-blue-800 dark:text-blue-400 mb-1">AI Analysis Options</h4>
-                    <p className="text-[13px] text-blue-600/80 dark:text-blue-300">Select which AI features you want to use for this project. You can change these settings later.</p>
+                    <h4 className="text-[13px] font-bold text-[#1C398E] dark:text-blue-400 mb-1">AI Analysis Options</h4>
+                    <p className="text-[13px] text-[#193CB8] dark:text-blue-300">Select which AI features you want to use for this project. You can change these settings later.</p>
                   </div>
                 </div>
 
@@ -364,7 +364,7 @@ export default function NewProjectWizard() {
                       className={cn(
                         "flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors",
                         option.checked
-                          ? "border-emerald-500 bg-emerald-50/30 dark:bg-emerald-900/10"
+                          ? "shadow-md shadow-[##5EE9B5] border-[#5EE9B5]/40 bg-[#ECFDF5] dark:bg-emerald-900/10"
                           : "border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-gray-200 dark:hover:border-gray-700"
                       )}
                     >
@@ -375,8 +375,8 @@ export default function NewProjectWizard() {
                         {option.checked && <Check className="w-3.5 h-3.5" />}
                       </div>
                       <div>
-                        <h4 className="text-[14px] font-bold text-gray-900 dark:text-white mb-0.5">{option.title}</h4>
-                        <p className="text-[12px] text-gray-500 dark:text-gray-400">{option.desc}</p>
+                        <h4 className="text-[14px] font-bold text-[#101828] dark:text-white mb-0.5">{option.title}</h4>
+                        <p className="text-[12px] text-[#4A5565] dark:text-gray-400">{option.desc}</p>
                       </div>
                     </div>
                   ))}
@@ -426,6 +426,13 @@ export default function NewProjectWizard() {
                   <div>
                     <h3 className="text-[15px] font-bold text-gray-900 dark:text-white mb-4">Uploaded Files</h3>
                     <div className="space-y-2">
+                      {uploadedFiles.length === 0 && (
+                        <div className="flex justify-between items-center p-3 px-4 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800">
+                          <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200">
+                            <FileText className="w-4 h-4 text-emerald-500" /> No files uploaded
+                          </div>
+                        </div>
+                      )}
                       {uploadedFiles.map((f, i) => (
                         <div key={i} className="flex justify-between items-center p-3 px-4 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800">
                           <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200">

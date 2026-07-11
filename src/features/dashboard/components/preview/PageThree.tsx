@@ -6,12 +6,12 @@ export const UNIT_PRICES = [
     { id: "UP-02", description: "Entry and painting", type: "Per Sq.m", estimate: "$0" },
 ];
 
-export const PageThree = () => (
-    <div className="bg-white text-gray-900 shadow-xl border border-gray-200 mx-auto w-full max-w-[850px] min-h-[1100px] p-12 flex flex-col font-sans">
-        <DocumentHeader showFull />
+export const PageThree = ({ exportMode }: { exportMode?: boolean }) => (
+    <div className={exportMode ? "bg-white text-gray-900 font-sans p-12" : "bg-white text-gray-900 shadow-xl border border-gray-200 mx-auto w-full max-w-[850px] min-h-[1100px] p-12 flex flex-col font-sans"}>
+        {!exportMode && <DocumentHeader showFull />}
 
         {/* Unit Prices */}
-        <div className="mb-8">
+        <div className={`mb-8 ${exportMode ? 'export-section' : ''}`}>
             <h3 className="text-[12px] font-bold text-gray-700 mb-3 uppercase tracking-widest">UNIT PRICES</h3>
             <div className="border border-gray-200 rounded-xl overflow-hidden">
                 <table className="w-full text-left text-[11px]">
@@ -38,7 +38,7 @@ export const PageThree = () => (
         </div>
 
         {/* Pricing Summary */}
-        <div className="mb-8">
+        <div className={`mb-8 ${exportMode ? 'export-section' : ''}`}>
             <h3 className="text-[12px] font-bold text-gray-700 mb-3 uppercase tracking-widest">PRICING SUMMARY</h3>
             <div className="border border-gray-200 rounded-xl overflow-hidden">
                 <table className="w-full text-left text-[11px]">
@@ -66,7 +66,7 @@ export const PageThree = () => (
         </div>
 
         {/* Terms & Conditions */}
-        <div className="flex-1">
+        <div className={`flex-1 ${exportMode ? 'export-section' : ''}`}>
             <h3 className="text-[12px] font-bold text-gray-700 mb-3 uppercase tracking-widest">Terms & Conditions</h3>
             <div className="text-[11px] text-gray-600 space-y-3">
                 <div>
@@ -88,8 +88,14 @@ export const PageThree = () => (
             </div>
         </div>
 
-        <div className="bg-[#00996612] mt-5 pb-5">
-            <DocFooter />
-        </div>
+        {exportMode ? (
+            <div id="export-footer" className="bg-[#00996612] mt-5 pb-5">
+                <DocFooter />
+            </div>
+        ) : (
+            <div className="bg-[#00996612] mt-5 pb-5">
+                <DocFooter />
+            </div>
+        )}
     </div>
 );

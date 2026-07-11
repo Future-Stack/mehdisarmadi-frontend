@@ -3,7 +3,7 @@ import { Edit3, FileText, Trash2, Check, X, Plus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { toast } from "sonner";
 import { useGetProjectClarificationsQuery, useUpdateProjectAnalysisSectionMutation } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, AIInstructionSection, ProposedChangesReview } from "./shared";
+import { SectionSkeleton, SectionError, AIInstructionSection, ProposedChangesReview, DeleteConfirmationModal } from "./shared";
 
 interface Props {
   projectId: string;
@@ -15,6 +15,7 @@ export default function ClarificationsTab({ projectId }: Props) {
   const clarifications = data?.data;
 
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
   const [editingText, setEditingText] = useState("");
 
   const handleStartEdit = (item: any) => {
@@ -28,7 +29,7 @@ export default function ClarificationsTab({ projectId }: Props) {
       i.id === item.id ? { ...i, question: editingText } : i
     );
     try {
-      await updateSection({ projectId, section: "clarifications", data: { ...clarifications, items: newItems } }).unwrap();
+      await updateSection({ projectId, section: "clarifications", data: { payload: { items: newItems }, note: "Manual edits from estimator" } }).unwrap();
       toast.success("Clarification updated.");
       setEditingId(null);
     } catch {
@@ -36,12 +37,13 @@ export default function ClarificationsTab({ projectId }: Props) {
     }
   };
 
-  const handleDelete = async (itemId: string) => {
-    if (!clarifications?.items) return;
-    const newItems = clarifications.items.filter((i: any) => i.id !== itemId);
+  const handleDeleteConfirm = async () => {
+    if (!clarifications?.items || !deleteItemId) return;
+    const newItems = clarifications.items.filter((i: any) => i.id !== deleteItemId);
     try {
-      await updateSection({ projectId, section: "clarifications", data: { ...clarifications, items: newItems } }).unwrap();
+      await updateSection({ projectId, section: "clarifications", data: { payload: { items: newItems }, note: "Manual edits from estimator" } }).unwrap();
       toast.success("Clarification deleted.");
+      setDeleteItemId(null);
     } catch {
       toast.error("Failed to delete clarification.");
     }
@@ -125,7 +127,7 @@ export default function ClarificationsTab({ projectId }: Props) {
                         <Edit3 className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete(item.id)}
+                        onClick={() => setDeleteItemId(item.id)}
                         disabled={isUpdating}
                         className="p-1.5 text-gray-400 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 disabled:opacity-50"
                       >
@@ -143,6 +145,14 @@ export default function ClarificationsTab({ projectId }: Props) {
       </div>
 
       <AIInstructionSection projectId={projectId} section="clarifications" />
+      <DeleteConfirmationModal
+        isOpen={!!deleteItemId}
+        onClose={() => setDeleteItemId(null)}
+        onConfirm={handleDeleteConfirm}
+        isDeleting={isUpdating}
+        title="Delete Clarification"
+        description="Are you sure you want to delete this clarification? This action cannot be undone."
+      />
     </div>
   );
 }

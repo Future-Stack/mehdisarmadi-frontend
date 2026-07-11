@@ -2,7 +2,8 @@ import { Edit3, Copy, Trash2, CheckSquare, FileText, Loader2, Square } from "luc
 import { Button } from "@/components/ui/Button";
 import { toast } from "sonner";
 import { useGetProjectAssumptionsQuery, useUpdateProjectAnalysisSectionMutation } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, AIInstructionSection, ProposedChangesReview } from "./shared";
+import { SectionSkeleton, SectionError, AIInstructionSection, ProposedChangesReview, DeleteConfirmationModal } from "./shared";
+import { useState } from "react";
 
 interface Props {
   projectId: string;
@@ -13,33 +14,34 @@ export default function AssumptionsTab({ projectId }: Props) {
   const [updateSection, { isLoading: isUpdating }] = useUpdateProjectAnalysisSectionMutation();
   const assumptions = data?.data;
 
+  const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
+
   const handleToggleInclude = async (itemToToggle: any) => {
     if (!assumptions?.items) return;
-    const newItems = assumptions.items.map((item: any) =>
-      item.id === itemToToggle.id ? { ...item, include: item.include === false ? true : false } : item
-    );
+    const newItems = assumptions.items.filter((item: any) => item.id !== itemToToggle.id);
     try {
       await updateSection({
         projectId,
         section: "assumptions",
-        data: { ...assumptions, items: newItems }
+        data: { payload: { items: newItems }, note: "Manual edits from estimator" }
       }).unwrap();
-      toast.success(`Assumption ${itemToToggle.include === false ? 'included' : 'excluded'}.`);
+      toast.success("Assumption removed.");
     } catch (err: any) {
-      toast.error("Failed to update assumption.");
+      toast.error("Failed to remove assumption.");
     }
   };
 
-  const handleDelete = async (itemId: string) => {
-    if (!assumptions?.items) return;
-    const newItems = assumptions.items.filter((item: any) => item.id !== itemId);
+  const handleDeleteConfirm = async () => {
+    if (!assumptions?.items || !deleteItemId) return;
+    const newItems = assumptions.items.filter((item: any) => item.id !== deleteItemId);
     try {
       await updateSection({
         projectId,
         section: "assumptions",
-        data: { ...assumptions, items: newItems }
+        data: { payload: { items: newItems }, note: "Manual edits from estimator" }
       }).unwrap();
       toast.success("Assumption deleted successfully.");
+      setDeleteItemId(null);
     } catch (err: any) {
       toast.error("Failed to delete assumption.");
     }
@@ -118,7 +120,7 @@ export default function AssumptionsTab({ projectId }: Props) {
                       <Copy className="w-4 h-4" />
                     </button> */}
                     <button
-                      onClick={() => handleDelete(item.id)}
+                      onClick={() => setDeleteItemId(item.id)}
                       disabled={isUpdating}
                       className="p-1.5 text-red-400 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 disabled:opacity-50"
                     >
@@ -137,6 +139,14 @@ export default function AssumptionsTab({ projectId }: Props) {
       </div>
 
       <AIInstructionSection projectId={projectId} section="assumptions" />
+      <DeleteConfirmationModal
+        isOpen={!!deleteItemId}
+        onClose={() => setDeleteItemId(null)}
+        onConfirm={handleDeleteConfirm}
+        isDeleting={isUpdating}
+        title="Delete Assumption"
+        description="Are you sure you want to delete this assumption? This action cannot be undone."
+      />
     </div>
   );
 }

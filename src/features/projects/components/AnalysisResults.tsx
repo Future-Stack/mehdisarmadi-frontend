@@ -127,6 +127,7 @@ export default function AnalysisResults({ dashboardPath = "/admin" }: { dashboar
         </div>
 
         {/* Navigation Tabs (Single Line Grid) */}
+
         <div className="grid grid-cols-10 gap-1 p-1 bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-sm min-w-[1000px] overflow-hidden transition-colors">
           {TABS.map((tab) => {
             const isActive = activeTab === tab.id;

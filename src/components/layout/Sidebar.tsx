@@ -111,8 +111,7 @@ export default function Sidebar() {
               width={157}
               height={38}
               priority
-              style={{ width: "100%", height: "auto" }}
-              className="object-contain"
+              className="w-full h-auto object-contain"
             />
           </div>
           {isOpen && (

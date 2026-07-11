@@ -4,7 +4,7 @@ import { CheckSquare, Edit3, Copy, Trash2, FileText, Loader2, Check, X, Square }
 import { Button } from "@/components/ui/Button";
 import { toast } from "sonner";
 import { useGetProjectScopeQuery, useUpdateProjectAnalysisSectionMutation } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, AIInstructionSection, ProposedChangesReview } from "./shared";
+import { SectionSkeleton, SectionError, AIInstructionSection, ProposedChangesReview, DeleteConfirmationModal } from "./shared";
 
 interface Props {
   projectId: string;
@@ -36,6 +36,7 @@ export default function ScopeTab({ projectId }: Props) {
   }, [scope?.items, searchQuery, activeFilterCode]);
 
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
   const [editingScopeItem, setEditingScopeItem] = useState("");
   const [editingNotes, setEditingNotes] = useState("");
 
@@ -51,7 +52,7 @@ export default function ScopeTab({ projectId }: Props) {
       item.id === rowId ? { ...item, scopeItem: editingScopeItem, notes: editingNotes } : item
     );
     try {
-      await updateSection({ projectId, section: "scope", data: { ...scope, items: newItems } }).unwrap();
+      await updateSection({ projectId, section: "scope", data: { payload: { items: newItems }, note: "Manual edits from estimator" } }).unwrap();
       toast.success("Scope item updated.");
       setEditingId(null);
     } catch {
@@ -61,31 +62,30 @@ export default function ScopeTab({ projectId }: Props) {
 
   const handleToggleInclude = async (itemToToggle: any) => {
     if (!scope?.items) return;
-    const newItems = scope.items.map((item: any) => 
-      item.id === itemToToggle.id ? { ...item, include: item.include === false ? true : false } : item
-    );
+    const newItems = scope.items.filter((item: any) => item.id !== itemToToggle.id);
     try {
       await updateSection({
         projectId,
         section: "scope",
-        data: { ...scope, items: newItems }
+        data: { payload: { items: newItems }, note: "Manual edits from estimator" }
       }).unwrap();
-      toast.success(`Scope item ${itemToToggle.include === false ? 'included' : 'excluded'}.`);
+      toast.success(`Scope item removed.`);
     } catch (err: any) {
-      toast.error("Failed to update scope item.");
+      toast.error("Failed to remove scope item.");
     }
   };
 
-  const handleDelete = async (itemId: string) => {
-    if (!scope?.items) return;
-    const newItems = scope.items.filter((item: any) => item.id !== itemId);
+  const handleDeleteConfirm = async () => {
+    if (!scope?.items || !deleteItemId) return;
+    const newItems = scope.items.filter((item: any) => item.id !== deleteItemId);
     try {
       await updateSection({
         projectId,
         section: "scope",
-        data: { ...scope, items: newItems }
+        data: { payload: { items: newItems }, note: "Manual edits from estimator" }
       }).unwrap();
       toast.success("Scope item deleted successfully.");
+      setDeleteItemId(null);
     } catch (err: any) {
       toast.error("Failed to delete scope item.");
     }
@@ -221,7 +221,7 @@ export default function ScopeTab({ projectId }: Props) {
                               <button
                                 className="text-gray-400 hover:text-red-600 transition-colors disabled:opacity-40"
                                 disabled={isUpdating}
-                                onClick={() => handleDelete(row.id)}
+                                onClick={() => setDeleteItemId(row.id)}
                               >
                                 {isUpdating ? (
                                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -253,6 +253,14 @@ export default function ScopeTab({ projectId }: Props) {
       </div>
 
       <AIInstructionSection projectId={projectId} section="scope" />
+      <DeleteConfirmationModal
+        isOpen={!!deleteItemId}
+        onClose={() => setDeleteItemId(null)}
+        onConfirm={handleDeleteConfirm}
+        isDeleting={isUpdating}
+        title="Delete Scope Item"
+        description="Are you sure you want to delete this scope item? This action cannot be undone."
+      />
     </div>
   );
 }

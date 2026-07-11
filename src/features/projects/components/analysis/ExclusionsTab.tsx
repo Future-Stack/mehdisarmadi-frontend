@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Edit3, FileText, Trash2, Check, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useGetProjectExclusionsQuery, useUpdateProjectAnalysisSectionMutation } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, AIInstructionSection, ProposedChangesReview } from "./shared";
+import { SectionSkeleton, SectionError, AIInstructionSection, ProposedChangesReview, DeleteConfirmationModal } from "./shared";
 
 interface Props {
   projectId: string;
@@ -14,6 +14,7 @@ export default function ExclusionsTab({ projectId }: Props) {
   const exclusions = data?.data;
 
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
   const [editingText, setEditingText] = useState("");
 
   const handleStartEdit = (item: any) => {
@@ -27,7 +28,7 @@ export default function ExclusionsTab({ projectId }: Props) {
       i.id === item.id ? { ...i, text: editingText } : i
     );
     try {
-      await updateSection({ projectId, section: "exclusions", data: { ...exclusions, items: newItems } }).unwrap();
+      await updateSection({ projectId, section: "exclusions", data: { payload: { items: newItems }, note: "Manual edits from estimator" } }).unwrap();
       toast.success("Exclusion updated.");
       setEditingId(null);
     } catch {
@@ -35,12 +36,13 @@ export default function ExclusionsTab({ projectId }: Props) {
     }
   };
 
-  const handleDelete = async (itemId: string) => {
-    if (!exclusions?.items) return;
-    const newItems = exclusions.items.filter((i: any) => i.id !== itemId);
+  const handleDeleteConfirm = async () => {
+    if (!exclusions?.items || !deleteItemId) return;
+    const newItems = exclusions.items.filter((i: any) => i.id !== deleteItemId);
     try {
-      await updateSection({ projectId, section: "exclusions", data: { ...exclusions, items: newItems } }).unwrap();
+      await updateSection({ projectId, section: "exclusions", data: { payload: { items: newItems }, note: "Manual edits from estimator" } }).unwrap();
       toast.success("Exclusion deleted.");
+      setDeleteItemId(null);
     } catch {
       toast.error("Failed to delete exclusion.");
     }
@@ -122,7 +124,7 @@ export default function ExclusionsTab({ projectId }: Props) {
                         <Edit3 className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete(item.id)}
+                        onClick={() => setDeleteItemId(item.id)}
                         disabled={isUpdating}
                         className="p-1.5 text-gray-400 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 disabled:opacity-50"
                       >
@@ -140,6 +142,14 @@ export default function ExclusionsTab({ projectId }: Props) {
       </div>
 
       <AIInstructionSection projectId={projectId} section="exclusions" />
+      <DeleteConfirmationModal
+        isOpen={!!deleteItemId}
+        onClose={() => setDeleteItemId(null)}
+        onConfirm={handleDeleteConfirm}
+        isDeleting={isUpdating}
+        title="Delete Exclusion"
+        description="Are you sure you want to delete this exclusion? This action cannot be undone."
+      />
     </div>
   );
 }

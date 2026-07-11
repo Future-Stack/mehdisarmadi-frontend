@@ -154,6 +154,17 @@ export const projectApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Project"],
     }),
+    updateProject: builder.mutation<ApiResponse<any>, { projectId: string; data: FormData }>({
+      query: ({ projectId, data }) => ({
+        url: `/project/${projectId}`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: (result, error, { projectId }) => [
+        { type: "Project", id: projectId },
+        "Project", // Invalidate list
+      ],
+    }),
     getProjectById: builder.query<ApiResponse<ProjectDetail>, string>({
       query: (id) => `/project/${id}`,
       providesTags: (result, error, id) => [{ type: "Project", id }],
@@ -293,6 +304,7 @@ export const {
   useGetProjectsQuery,
   useGetDivisionsQuery,
   useCreateProjectMutation,
+  useUpdateProjectMutation,
   useGetProjectByIdQuery,
   useGetProjectReviewQuery,
   useDeleteProjectFileMutation,

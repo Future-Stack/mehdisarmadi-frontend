@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { FileText, Edit3, Trash2, Check, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useGetProjectRisksQuery, useUpdateProjectAnalysisSectionMutation } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, AIInstructionSection, getRiskBadgeColor, ProposedChangesReview } from "./shared";
+import { SectionSkeleton, SectionError, AIInstructionSection, getRiskBadgeColor, ProposedChangesReview, DeleteConfirmationModal } from "./shared";
 
 interface Props {
   projectId: string;
@@ -15,6 +15,7 @@ export default function RisksTab({ projectId }: Props) {
   const risks = data?.data;
 
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
   const [editingDesc, setEditingDesc] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
@@ -31,7 +32,7 @@ export default function RisksTab({ projectId }: Props) {
       i.id === risk.id ? { ...i, title: editingTitle, description: editingDesc } : i
     );
     try {
-      await updateSection({ projectId, section: "risks", data: { ...risks, items: newItems } }).unwrap();
+      await updateSection({ projectId, section: "risks", data: { payload: { items: newItems }, note: "Manual edits from estimator" } }).unwrap();
       toast.success("Risk updated.");
       setEditingId(null);
     } catch {
@@ -39,12 +40,13 @@ export default function RisksTab({ projectId }: Props) {
     }
   };
 
-  const handleDelete = async (riskId: string) => {
-    if (!risks?.items) return;
-    const newItems = risks.items.filter((i: any) => i.id !== riskId);
+  const handleDeleteConfirm = async () => {
+    if (!risks?.items || !deleteItemId) return;
+    const newItems = risks.items.filter((i: any) => i.id !== deleteItemId);
     try {
-      await updateSection({ projectId, section: "risks", data: { ...risks, items: newItems } }).unwrap();
+      await updateSection({ projectId, section: "risks", data: { payload: { items: newItems }, note: "Manual edits from estimator" } }).unwrap();
       toast.success("Risk deleted.");
+      setDeleteItemId(null);
     } catch {
       toast.error("Failed to delete risk.");
     }
@@ -164,7 +166,7 @@ export default function RisksTab({ projectId }: Props) {
                             <Edit3 className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => handleDelete(risk.id)}
+                            onClick={() => setDeleteItemId(risk.id)}
                             disabled={isUpdating}
                             className="p-1.5 text-gray-400 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 disabled:opacity-50"
                           >
@@ -206,6 +208,14 @@ export default function RisksTab({ projectId }: Props) {
       </div>
 
       <AIInstructionSection projectId={projectId} section="risks" />
+      <DeleteConfirmationModal
+        isOpen={!!deleteItemId}
+        onClose={() => setDeleteItemId(null)}
+        onConfirm={handleDeleteConfirm}
+        isDeleting={isUpdating}
+        title="Delete Risk"
+        description="Are you sure you want to delete this risk? This action cannot be undone."
+      />
     </div>
   );
 }

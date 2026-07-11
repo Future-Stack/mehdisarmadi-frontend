@@ -98,9 +98,9 @@ export default function QuotePreviewPage({ params }: { params: Promise<{ id: str
       {/* Hidden Document canvas for export (all pages) */}
       <div className="fixed top-full left-0 opacity-0 pointer-events-none -z-50">
         <div id="quote-preview-doc-all" className="flex flex-col gap-0 w-[850px] bg-white">
-          <PageOne />
-          <PageTwo />
-          <PageThree />
+          <PageOne exportMode={true} />
+          <PageTwo exportMode={true} />
+          <PageThree exportMode={true} />
         </div>
       </div>
 
