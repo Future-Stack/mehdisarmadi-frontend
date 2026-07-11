@@ -20,16 +20,17 @@ export interface GetNotificationsResponse {
 }
 
 export const notificationApi = baseApi.injectEndpoints({
-  endpoints: (builder) => ({
-    getNotifications: builder.query<
-      GetNotificationsResponse,
-      { unreadOnly?: boolean } | undefined
-    >({
-      query: (params) => ({
-        url: "notifications",
-        ...(params ? { params } : {}),
-      }),
-      providesTags: ["Notifications"],
+    endpoints: (builder) => ({
+        getNotifications: builder.query<
+            GetNotificationsResponse,
+            { unreadOnly?: boolean } | undefined
+        >({
+            query: (params) => ({
+                url: "notifications",
+                params,
+            }),
+            providesTags: ["Notifications"],
+        })
     }),
   }),
 });
