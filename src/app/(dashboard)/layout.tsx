@@ -5,9 +5,10 @@ import { Toaster } from "sonner";
 // Sidebar is client-only (reads Redux); lazy-load it
 const Sidebar = dynamic(() => import("@/components/layout/Sidebar"), {
   loading: () => (
-    <div className="hidden w-64 shrink-0 bg-gray-900 lg:block" />
+    <div className="hidden md:flex w-20 shrink-0 bg-white dark:bg-gray-950 border-r border-gray-100 dark:border-gray-800" />
   ),
 });
+
 
 export default function DashboardLayout({
   children,

@@ -5,11 +5,9 @@ import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import Image from "next/image";
 import Link from "next/link";
 import { useLogout } from "@/features/auth/hooks/useAuth";
-import { Bell, Sun, Moon, LogOut, User, Settings, Plus } from "lucide-react";
-import { setTheme } from "@/store/slices/uiSlice";
+import { Bell, Sun, Moon, LogOut, User, Settings, Menu } from "lucide-react";
+import { setTheme, toggleSidebar } from "@/store/slices/uiSlice";
 import { cn } from "@/lib/utils";
-import Logo from "@/components/Reuseable/Logo";
-import { Button } from "@/components/ui/Button";
 
 export default function Navbar() {
   const dispatch = useAppDispatch();
@@ -31,10 +29,22 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-gray-100 bg-white px-8 dark:bg-gray-900 dark:border-gray-800 transition-colors duration-300">
-      <div className="flex items-center gap-6">
-        {/* Search bar */}
-        <div className="relative hidden lg:block ml-4">
+    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-gray-100 bg-white px-4 md:px-8 dark:bg-gray-900 dark:border-gray-800 transition-colors duration-300 gap-4">
+
+      {/* Left: Hamburger (mobile) + Search */}
+      <div className="flex items-center gap-3 flex-1 min-w-0">
+        {/* Mobile hamburger — toggles sidebar drawer */}
+        <button
+          type="button"
+          aria-label="Toggle sidebar"
+          onClick={() => dispatch(toggleSidebar())}
+          className="md:hidden flex-shrink-0 flex h-9 w-9 items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+        >
+          <Menu size={20} className="text-gray-600 dark:text-gray-300" />
+        </button>
+
+        {/* Search bar — hidden on mobile, visible md+ */}
+        <div className="relative hidden md:block flex-1 max-w-lg">
           <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
             <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -43,12 +53,13 @@ export default function Navbar() {
           <input
             type="text"
             placeholder="Search projects, files or users..."
-            className="w-[589px] h-[42px] rounded-xl border border-[#99A1AF] bg-gray-50/30 pl-11 pr-4 text-sm focus:border-secondary focus:outline-none transition-all placeholder:text-[#968C8C] dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 text-gray-900 focus:bg-white dark:focus:bg-gray-700"
+            className="w-full h-[42px] rounded-xl border border-[#99A1AF] bg-gray-50/30 pl-11 pr-4 text-sm focus:border-secondary focus:outline-none transition-all placeholder:text-[#968C8C] dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 text-gray-900 focus:bg-white dark:focus:bg-gray-700"
           />
         </div>
       </div>
 
-      <div className="flex items-center gap-6 justify-end pr-8">
+      {/* Right: Bell + User */}
+      <div className="flex items-center gap-3 flex-shrink-0">
         {/* Notification bell */}
         <button
           type="button"
@@ -60,9 +71,9 @@ export default function Navbar() {
 
         {/* User profile dropdown */}
         <div className="relative" ref={dropdownRef}>
-          <button 
+          <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center gap-3 p-1 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 group"
+            className="flex items-center gap-2 p-1 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 group"
           >
             <div className="text-right hidden sm:block">
               <p className="text-xs font-bold text-black dark:text-white transition-colors">Admin User</p>
@@ -70,12 +81,12 @@ export default function Navbar() {
                 Akash Abrrar
               </p>
             </div>
-            <div className="relative h-10 w-10 overflow-hidden rounded-full ring-2 ring-gray-100 dark:ring-gray-700 transition-all group-hover:ring-secondary/50">
-               <Image 
-                 src={`https://api.dicebear.com/7.x/avataaars/svg?seed=Akash`} 
-                 alt="Avatar" 
-                 width={40}
-                 height={40}
+            <div className="relative h-9 w-9 overflow-hidden rounded-full ring-2 ring-gray-100 dark:ring-gray-700 transition-all group-hover:ring-secondary/50">
+               <Image
+                 src={`https://api.dicebear.com/7.x/avataaars/svg?seed=Akash`}
+                 alt="Avatar"
+                 width={36}
+                 height={36}
                  unoptimized
                  className="h-full w-full object-cover bg-gray-200"
                />
@@ -84,7 +95,7 @@ export default function Navbar() {
 
           {/* Dropdown Menu */}
           {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-2xl bg-white p-2 shadow-xl ring-1 ring-black/5 focus:outline-none dark:bg-gray-900 dark:ring-white/10 animate-in fade-in zoom-in-95 duration-200">
+            <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-2xl bg-white p-2 shadow-xl ring-1 ring-black/5 focus:outline-none dark:bg-gray-900 dark:ring-white/10 animate-in fade-in zoom-in-95 duration-200 z-50">
               <div className="px-3 py-2 border-b border-gray-100 dark:border-gray-800 mb-1">
                 <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Appearance</p>
                 <div className="flex items-center gap-1 mt-2 p-1 bg-gray-50 dark:bg-gray-800 rounded-xl">

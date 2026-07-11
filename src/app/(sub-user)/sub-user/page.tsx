@@ -157,7 +157,7 @@ export default function SubUserDashboardPage() {
           <div className="space-y-8 flex-1">
             {/* Search & Filters */}
             <div className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden p-6">
-              <div className="flex flex-col sm:flex-row gap-4 items-center">
+              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
                 <div className="relative flex-1 w-full">
                   <div className="absolute inset-y-0 left-12 flex items-center pointer-events-none">
                     <Search className="w-3.5 h-3.5 text-[#6B7280]" />
@@ -170,8 +170,8 @@ export default function SubUserDashboardPage() {
                     className="w-full h-10 pl-18 pr-4 bg-white dark:bg-[#111827] text-sm placeholder:text-[#6B7280] shadow-sm shadow-[#00000040] placeholder:font-medium border border-gray-200 dark:border-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm font-medium"
                   />
                 </div>
-                <div className="flex gap-3 w-full sm:w-auto">
-                  <div className="relative w-48">
+                <div className="flex flex-col xs:flex-row gap-3 w-full sm:w-auto">
+                  <div className="relative w-full sm:w-48">
                     {/* Left Icon */}
                     <Funnel className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] pointer-events-none" />
 
@@ -191,7 +191,7 @@ export default function SubUserDashboardPage() {
                     {/* Right Icon */}
                     <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] pointer-events-none" />
                   </div>
-                  <div className="relative w-48">
+                  <div className="relative w-full sm:w-48">
                     {/* Left Icon */}
                     <Calendar1 className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] pointer-events-none" />
 
@@ -221,13 +221,13 @@ export default function SubUserDashboardPage() {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-[#F8F8F8] dark:bg-gray-800  border-b border-gray-100 dark:border-gray-800">
-                      <th className="px-6 py-4 text-[11px] font-bold text-[#364153] dark:text-gray-400 uppercase tracking-wider">Tender</th>
-                      <th className="px-6 py-4 text-[11px] font-bold text-[#364153] dark:text-gray-400 uppercase tracking-wider">Client</th>
-                      <th className="px-6 py-4 text-[11px] font-bold text-[#364153] dark:text-gray-400 uppercase tracking-wider">Status</th>
-                      <th className="px-6 py-4 text-[11px] font-bold text-[#364153] dark:text-gray-400 uppercase tracking-wider">Question Date</th>
-                      <th className="px-6 py-4 text-[11px] font-bold text-[#364153] dark:text-gray-400 uppercase tracking-wider">Closing Date</th>
-                      <th className="px-6 py-4 text-[11px] font-bold text-[#364153] dark:text-gray-400 uppercase tracking-wider">Value</th>
-                      <th className="px-6 py-4 text-[11px] font-bold text-[#364153] dark:text-gray-400 uppercase tracking-wider text-right">Actions</th>
+                      <th className="px-4 sm:px-6 py-4 text-[11px] font-bold text-[#364153] dark:text-gray-400 uppercase tracking-wider">Tender</th>
+                      <th className="px-4 sm:px-6 py-4 text-[11px] font-bold text-[#364153] dark:text-gray-400 uppercase tracking-wider hidden sm:table-cell">Client</th>
+                      <th className="px-4 sm:px-6 py-4 text-[11px] font-bold text-[#364153] dark:text-gray-400 uppercase tracking-wider">Status</th>
+                      <th className="px-4 sm:px-6 py-4 text-[11px] font-bold text-[#364153] dark:text-gray-400 uppercase tracking-wider hidden lg:table-cell">Question Date</th>
+                      <th className="px-4 sm:px-6 py-4 text-[11px] font-bold text-[#364153] dark:text-gray-400 uppercase tracking-wider hidden lg:table-cell">Closing Date</th>
+                      <th className="px-4 sm:px-6 py-4 text-[11px] font-bold text-[#364153] dark:text-gray-400 uppercase tracking-wider hidden md:table-cell">Value</th>
+                      <th className="px-4 sm:px-6 py-4 text-[11px] font-bold text-[#364153] dark:text-gray-400 uppercase tracking-wider text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -246,7 +246,7 @@ export default function SubUserDashboardPage() {
                     ) : (
                       projects.map((row) => (
                         <tr key={row.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors group">
-                          <td className="px-6 py-5">
+                          <td className="px-4 sm:px-6 py-4">
                             <Link href={`/sub-user/projects/${row.id}`} className="block">
                               <div className="text-xs font-semibold text-gray-900 dark:text-white mb-1 group-hover:text-emerald-600 transition-colors line-clamp-1">{row.name}</div>
                               <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
@@ -259,10 +259,10 @@ export default function SubUserDashboardPage() {
                               </div>
                             </Link>
                           </td>
-                          <td className="px-6 py-5">
+                          <td className="px-4 sm:px-6 py-4 hidden sm:table-cell">
                             <div className="text-sm text-gray-600 dark:text-gray-300 font-medium line-clamp-2">{row.clientName}</div>
                           </td>
-                          <td className="px-6 py-5">
+                          <td className="px-4 sm:px-6 py-4">
                             <span className={cn(
                               "inline-flex items-center px-2.5 py-1 rounded-full text-[10px]",
                               row.status === "completed"
@@ -274,7 +274,7 @@ export default function SubUserDashboardPage() {
                               {row.statusLabel}
                             </span>
                           </td>
-                          <td className="px-6 py-5 text-sm text-gray-600 dark:text-gray-300 font-medium whitespace-nowrap">
+                          <td className="px-4 sm:px-6 py-4 text-sm text-gray-600 dark:text-gray-300 font-medium whitespace-nowrap hidden lg:table-cell">
                             <div className="flex items-center gap-1.5">
                               <Calendar className="w-3.5 h-3.5 text-gray-400" />
                               {new Date(row.questionDate).toLocaleDateString("en-US", {
@@ -283,7 +283,7 @@ export default function SubUserDashboardPage() {
                               })}
                             </div>
                           </td>
-                          <td className="px-6 py-5 text-sm text-gray-600 dark:text-gray-300 font-medium whitespace-nowrap">
+                          <td className="px-4 sm:px-6 py-4 text-sm text-gray-600 dark:text-gray-300 font-medium whitespace-nowrap hidden lg:table-cell">
                             <div className="flex items-center gap-1.5">
                               <Calendar className="w-3.5 h-3.5 text-gray-400" />
                               {new Date(row.closingDate).toLocaleDateString("en-US", {
@@ -292,10 +292,10 @@ export default function SubUserDashboardPage() {
                               })}
                             </div>
                           </td>
-                          <td className="px-6 py-5 text-sm font-bold text-[#364153] dark:text-white">
+                          <td className="px-4 sm:px-6 py-4 text-sm font-bold text-[#364153] dark:text-white hidden md:table-cell">
                             {row.valueFormatted}
                           </td>
-                          <td className="px-6 py-5 text-right whitespace-nowrap">
+                          <td className="px-4 sm:px-6 py-4 text-right whitespace-nowrap">
                             <div className="flex items-center justify-end gap-2">
                               <Link href={`/sub-user/projects/${row.id}`} className="p-1.5 text-[#364153] hover:text-emerald-600 transition-colors">
                                 <Eye className="w-4 h-4" />

@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
-import React, { type InputHTMLAttributes, forwardRef } from "react";
+import React, { type InputHTMLAttributes, forwardRef, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "prefix"> {
   label?: string;
@@ -9,8 +10,12 @@ interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "prefix
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, hint, prefix, className, id, ...props }, ref) => {
+  ({ label, error, hint, prefix, className, id, type, ...props }, ref) => {
     const inputId = id ?? label?.toLowerCase().replace(/\s+/g, "-");
+    const [showPassword, setShowPassword] = useState(false);
+    
+    const isPasswordType = type === "password";
+    const currentType = isPasswordType ? (showPassword ? "text" : "password") : type;
 
     return (
       <div className="flex flex-col gap-1.5">
@@ -36,6 +41,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           <input
             ref={ref}
             id={inputId}
+            type={currentType}
             className={cn(
               "w-full rounded-lg border px-3 py-2 text-sm shadow-sm transition-all",
               "border-gray-200 bg-white text-gray-900 placeholder:text-gray-400",
@@ -43,6 +49,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               "dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500",
               "disabled:cursor-not-allowed disabled:opacity-60",
               prefix ? "pl-8" : undefined,
+              isPasswordType ? "pr-10" : undefined,
               error ? "border-red-500 focus:border-red-500 focus:ring-red-500/10" : undefined,
               className
             )}
@@ -52,6 +59,16 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             }
             {...props}
           />
+          {isPasswordType && (
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none transition-colors"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          )}
         </div>
         {hint && !error && (
           <p id={`${inputId}-hint`} className="text-xs text-gray-500">

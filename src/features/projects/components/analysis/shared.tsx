@@ -95,10 +95,18 @@ export function ProposedChangesReview({ projectId, section, data }: { projectId:
   const [accept, { isLoading: isAccepting }] = useAcceptProposedChangesMutation();
   const [reject, { isLoading: isRejecting }] = useRejectProposedChangesMutation();
 
-  // If there's no data from backend, we show nothing (or mock for summary if needed, but let's rely on backend payload or mock payload)
-  const payload = data?.proposedPayload;
-  
-  if (!payload) return null;
+  // API returns: data.proposedPayload.proposed_changes.{ changes, pricing_impact, affected_tabs }
+  // and data.proposedInstruction for the AI instruction that triggered this
+  const proposedPayload = data?.proposedPayload;
+
+  if (!proposedPayload) return null;
+
+  // Map snake_case API fields to local variables
+  const proposedChanges = proposedPayload?.proposed_changes;
+  const changes: string[] = proposedChanges?.changes ?? [];
+  const pricingImpact: string | null = proposedChanges?.pricing_impact ?? null;
+  const affectedTabs: string[] = proposedChanges?.affected_tabs ?? [];
+  const aiInstruction: string | null = data?.proposedInstruction ?? null;
 
   const handleAccept = async () => {
     try {
@@ -127,16 +135,26 @@ export function ProposedChangesReview({ projectId, section, data }: { projectId:
       </div>
 
       <div className="px-6 py-6 space-y-5">
+        {/* AI Instruction badge */}
+        {aiInstruction && (
+          <div className="flex items-start gap-2 bg-blue-50/80 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/30 rounded-xl px-4 py-3">
+            <Sparkles className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+            <p className="text-[12px] font-medium text-blue-700 dark:text-blue-300 leading-snug">
+              <span className="font-bold">AI Instruction: </span>{aiInstruction}
+            </p>
+          </div>
+        )}
+
         {/* Change list */}
-        {payload?.changes?.length > 0 && (
+        {changes.length > 0 && (
           <div>
             <p className="text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-3">
               {section.charAt(0).toUpperCase() + section.slice(1)} Changes:
             </p>
             <ul className="space-y-2">
-              {payload.changes.map((change: string, i: number) => (
+              {changes.map((change: string, i: number) => (
                 <li key={i} className="flex items-start gap-2 text-[13px] font-medium text-gray-700 dark:text-gray-300">
-                  <span className="text-emerald-500 mt-1.5 w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0"></span>
+                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0"></span>
                   {change}
                 </li>
               ))}
@@ -145,16 +163,16 @@ export function ProposedChangesReview({ projectId, section, data }: { projectId:
         )}
 
         {/* Pricing Impact */}
-        {payload?.pricingImpact && (
+        {pricingImpact && (
           <div className="bg-orange-50/70 dark:bg-orange-900/10 rounded-xl px-5 py-4 relative overflow-hidden">
             <div className="absolute inset-y-0 left-0 w-1 bg-orange-500" />
             <p className="text-[13px] font-bold text-orange-700 dark:text-orange-400 mb-1">Pricing Impact:</p>
-            <p className="text-[13px] font-medium text-orange-600 dark:text-orange-300">{payload.pricingImpact}</p>
+            <p className="text-[13px] font-medium text-orange-600 dark:text-orange-300">{pricingImpact}</p>
           </div>
         )}
 
-        {/* Affected sections */}
-        {payload?.affectedSections?.length > 0 && (
+        {/* Affected tabs */}
+        {affectedTabs.length > 0 && (
           <div className="bg-[#fffdf0] dark:bg-yellow-900/10 rounded-xl px-5 py-4 relative overflow-hidden">
             <div className="absolute inset-y-0 left-0 w-1 bg-yellow-400" />
             <div className="flex items-center gap-2 mb-2">
@@ -162,7 +180,7 @@ export function ProposedChangesReview({ projectId, section, data }: { projectId:
               <p className="text-[13px] font-bold text-yellow-800 dark:text-yellow-300">This change may affect:</p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              {payload.affectedSections.map((s: string) => (
+              {affectedTabs.map((s: string) => (
                 <span key={s} className="text-[11px] font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md px-2.5 py-1 shadow-sm">
                   {s}
                 </span>

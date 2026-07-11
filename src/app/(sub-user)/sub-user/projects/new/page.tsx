@@ -110,7 +110,7 @@ export default function NewProjectWizard() {
       <div className="flex-1 flex flex-col gap-6">
 
         {/* Step Indicator */}
-        <div className="bg-white dark:bg-[#111827] border border-gray-100 dark:border-gray-800 rounded-2xl p-6 shadow-sm flex items-center justify-between relative">
+        <div className="bg-white dark:bg-[#111827] border border-gray-100 dark:border-gray-800 rounded-2xl p-4 sm:p-6 shadow-sm flex items-center justify-between relative">
           <div className="absolute top-1/2 left-[10%] right-[10%] h-1 bg-gray-100 dark:bg-gray-800 -translate-y-1/2 z-0"></div>
           <div
             className="absolute top-1/2 left-[10%] h-1 bg-emerald-500 transition-all duration-500 -translate-y-1/2 z-0"
@@ -121,17 +121,17 @@ export default function NewProjectWizard() {
             const isActive = currentStep === step.id;
             const isCompleted = currentStep > step.id;
             return (
-              <div key={step.id} className="relative z-10 flex flex-col items-center gap-2 bg-white dark:bg-[#111827] px-4">
+              <div key={step.id} className="relative z-10 flex flex-col items-center gap-1 sm:gap-2 bg-white dark:bg-[#111827] px-1 sm:px-4">
                 <div className={cn(
-                  "w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-colors",
+                  "w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold transition-colors",
                   isActive ? "bg-[#009966] text-white shadow-md shadow-emerald-200 dark:shadow-none" :
                     isCompleted ? "bg-[#009966] text-white" : "bg-[#D9DBDD] dark:bg-gray-800 text-[#6B6969]"
                 )}>
-                  {isCompleted ? <Check className="w-4 h-4" /> : String(step.id).padStart(2, '0')}
+                  {isCompleted ? <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : String(step.id).padStart(2, '0')}
                 </div>
-                <div className="text-center">
-                  <div className={cn("text-[12px] font-bold", isActive || isCompleted ? "text-[#101828] dark:text-white" : "text-[#6B6969]")}>{step.title}</div>
-                  <div className={cn("text-[11px] font-medium", isActive || isCompleted ? "text-[#101828] dark:text-white" : "text-[#6A7282]")}>{step.subtitle}</div>
+                <div className="text-center hidden xs:block">
+                  <div className={cn("text-[10px] sm:text-[12px] font-bold", isActive || isCompleted ? "text-[#101828] dark:text-white" : "text-[#6B6969]")}>{step.title}</div>
+                  <div className={cn("text-[9px] sm:text-[11px] font-medium hidden sm:block", isActive || isCompleted ? "text-[#101828] dark:text-white" : "text-[#6A7282]")}>{step.subtitle}</div>
                 </div>
               </div>
             );
@@ -139,7 +139,7 @@ export default function NewProjectWizard() {
         </div>
 
         {/* Wizard Form Area */}
-        <div className="bg-white dark:bg-[#111827] border border-gray-100 dark:border-gray-800 rounded-[32px] p-8 lg:px-[108px] lg:py-11 shadow-sm min-h-[500px] flex flex-col">
+        <div className="bg-white dark:bg-[#111827] border border-gray-100 dark:border-gray-800 rounded-[24px] sm:rounded-[32px] p-5 sm:p-8 lg:px-16 lg:py-11 shadow-sm min-h-[500px] flex flex-col">
 
           <div className="flex items-center gap-2 mb-6 lg:mb-10">
             <Link href="/sub-user" className="text-sm font-bold text-gray-500 hover:text-gray-900 dark:hover:text-white flex items-center gap-1 transition-colors">
@@ -468,7 +468,7 @@ export default function NewProjectWizard() {
           </div>
 
           {/* Footer Actions */}
-          <div className="mt-8 flex items-center justify-between pt-6 border-t border-gray-100 dark:border-gray-800">
+          <div className="mt-8 flex flex-col sm:flex-row gap-3 items-center justify-between pt-6 border-t border-gray-100 dark:border-gray-800">
             <Button
               variant="secondary"
               className={cn("h-11 px-6 rounded-xl font-bold bg-white dark:bg-gray-800 border-gray-200 shadow-sm", currentStep === 1 && "invisible")}
@@ -502,7 +502,7 @@ export default function NewProjectWizard() {
 
       {/* Right Sidebar - Project Summary */}
       <div className="w-full lg:w-[320px] flex-shrink-0">
-        <div className="bg-white dark:bg-[#111827] border border-gray-100 dark:border-gray-800 rounded-3xl p-6 shadow-sm sticky top-28">
+        <div className="bg-white dark:bg-[#111827] border border-gray-100 dark:border-gray-800 rounded-3xl p-6 shadow-sm lg:sticky lg:top-28">
           <h3 className="text-base font-bold text-gray-900 dark:text-white mb-5">Project Summary</h3>
 
           <div className="space-y-3">

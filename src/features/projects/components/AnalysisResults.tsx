@@ -98,10 +98,10 @@ export default function AnalysisResults({ dashboardPath = "/admin" }: { dashboar
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#ECFDF5] to-white dark:from-emerald-950/20 dark:to-[#0B0F1A] transition-colors duration-300">
-      <div className="max-w-7xl mx-auto py-8 px-4 space-y-8 animate-in fade-in duration-500 pb-20">
+      <div className="max-w-7xl mx-auto py-6 px-4 space-y-6 animate-in fade-in duration-500 pb-20">
         {/* Header */}
-        <div className="flex items-start justify-between">
-          <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-start gap-4 justify-between">
+          <div className="space-y-3">
             <Link
               href={dashboardPath}
               className="flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-[#059669] transition-colors"
@@ -109,42 +109,43 @@ export default function AnalysisResults({ dashboardPath = "/admin" }: { dashboar
               <ArrowLeft className="w-4 h-4" /> Back to Project
             </Link>
             <div className="space-y-1">
-              <h1 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight">
                 AI Analysis Results
               </h1>
-              <p className="text-gray-400 dark:text-gray-500 font-bold text-sm uppercase tracking-widest flex items-center gap-2">
+              <p className="text-gray-400 dark:text-gray-500 font-bold text-xs sm:text-sm uppercase tracking-widest flex items-center gap-2">
                 Residential Complex <span className="text-gray-200 dark:text-gray-800">•</span>{" "}
                 united states
               </p>
             </div>
           </div>
-          <button 
+          <button
             onClick={handleBuildQuote}
-            className="bg-[#059669] h-12 px-8 rounded-xl font-black text-white text-sm shadow-lg shadow-emerald-100 dark:shadow-none hover:bg-[#047857] transition-all active:scale-95"
+            className="w-full sm:w-auto bg-[#059669] h-11 sm:h-12 px-6 sm:px-8 rounded-xl font-black text-white text-sm shadow-lg shadow-emerald-100 dark:shadow-none hover:bg-[#047857] transition-all active:scale-95 flex-shrink-0"
           >
             Build Quote
           </button>
         </div>
 
-        {/* Navigation Tabs (Single Line Grid) */}
-
-        <div className="grid grid-cols-10 gap-1 p-1 bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-sm min-w-[1000px] overflow-hidden transition-colors">
-          {TABS.map((tab) => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`px-1 py-3 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all text-center whitespace-nowrap ${
-                  isActive
-                    ? "bg-[#059669] text-white shadow-md scale-[1.02]"
-                    : "bg-transparent text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-white dark:hover:bg-gray-800"
-                }`}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
+        {/* Navigation Tabs — horizontally scrollable on mobile */}
+        <div className="overflow-x-auto -mx-4 px-4">
+          <div className="flex gap-1 p-1 bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-sm transition-colors min-w-max">
+            {TABS.map((tab) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`px-3 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all text-center whitespace-nowrap ${
+                    isActive
+                      ? "bg-[#059669] text-white shadow-md scale-[1.02]"
+                      : "bg-transparent text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-white dark:hover:bg-gray-800"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* CONDITIONAL HEADER FOR SCOPE TAB (OUTSIDE WHITE BOX) */}

@@ -56,12 +56,12 @@ export const PageThree = ({ exportMode }: { exportMode?: boolean }) => (
             </div>
 
             {/* Total bar */}
-            <div className="mt-4 bg-emerald-600 text-white rounded-xl px-6 py-4 flex justify-between items-center">
+            <div className="mt-4 bg-[#ECFDF5] border border-[#009966]/30 shadow-sm shadow-[#009966]/10 text-[#004F3B] rounded-xl px-6 py-4 flex justify-between items-center">
                 <div>
                     <div className="text-[10px] font-bold opacity-80 uppercase tracking-widest">TOTAL QUOTED PRICE</div>
                     <div className="text-[11px] opacity-70">All divisions included</div>
                 </div>
-                <div className="text-[22px] font-black tracking-tight">CAD $548,050</div>
+                <div className="text-[22px] font-black tracking-tight text-[#004F3B]">CAD $548,050</div>
             </div>
         </div>
 
