@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { useGetProjectSummaryQuery } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, getHighlightStyle, AIInstructionSection, ProposedChangesReview, DeleteConfirmationModal } from "./shared";
+import { SectionSkeleton, SectionError, getHighlightStyle, ReanalyzeBlock, DeleteConfirmationModal } from "./shared";
 import { Edit3, Trash2, Check, X, Loader2 } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "sonner";
@@ -184,27 +184,7 @@ export default function SummaryTab({ projectId }: Props) {
         </div>
       </div>
 
-      <AIInstructionSection projectId={projectId} section="summary" />
-
-      <ProposedChangesReview
-        projectId={projectId}
-        section="summary"
-        data={{
-          ...data?.data,
-          // Inject mock payload if not present so UI design can be reviewed
-          proposedPayload: data?.data?.proposedPayload || {
-            changes: [
-              "Remove painting scope items (2 items affected)",
-              "Exclude lift work from Division 01",
-              "Focus analysis on door installation only",
-              "Update quantity calculations for door hardware"
-            ],
-            pricingImpact: "Estimated reduction: $145,500 (Division 09 painting)",
-            affectedSections: ["Pricing", "Exclusions", "Quote Builder"]
-          }
-        }}
-      />
-      
+      {/* <ReanalyzeBlock projectId={projectId} section="summary" data={data?.data} /> */}
       <DeleteConfirmationModal
         isOpen={!!deleteItemId}
         onClose={() => setDeleteItemId(null)}

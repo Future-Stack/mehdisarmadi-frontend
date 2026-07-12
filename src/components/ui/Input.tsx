@@ -22,7 +22,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="text-sm font-medium text-gray-700 dark:text-gray-300"
+            className="text-sm font-medium !text-[#000000] dark:text-gray-300"
           >
             {label}
             {props.required && (
@@ -44,7 +44,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             type={currentType}
             className={cn(
               "w-full rounded-lg border px-3 py-2 text-sm shadow-sm transition-all",
-              "border-gray-200 bg-white text-gray-900 placeholder:text-gray-400",
+              "!border-[#0000001A] !bg-white !text-gray-700 placeholder:text-gray-400",
               "focus:border-[#059669] focus:outline-none focus:ring-4 focus:ring-[#059669]/10",
               "dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500",
               "disabled:cursor-not-allowed disabled:opacity-60",

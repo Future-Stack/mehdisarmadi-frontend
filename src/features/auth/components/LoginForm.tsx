@@ -8,8 +8,9 @@ import { useLogin, useAdminLogin } from "@/features/auth/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { ROUTES } from "@/constants";
-import Logo from "@/components/Reuseable/Logo";
+import Logo from "../../../../public/Images/Renofield.png";
 import { ArrowLeft, Shield } from "lucide-react";
+import Image from "next/image";
 
 export default function LoginForm() {
   const [isAdminLogin, setIsAdminLogin] = useState(false);
@@ -41,19 +42,27 @@ export default function LoginForm() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-8"
+      className="flex flex-col gap-8 "
       noValidate
     >
       <div className="flex flex-col items-center gap-6 text-center">
-        <Logo />
-        <div className="space-y-1">
+        {/* <Logo /> */}
+        <Image
+          src={Logo}
+          alt="logo"
+          // height={195}
+          // width={390}
+          className="w-[120px] md:w-[240px] h-auto object-contain"
+          style={{ width: "auto", height: "auto" }}
+        />
+        <div className="space-y-1 -mt-8">
           <div className="flex items-center justify-center gap-2">
             {isAdminLogin && <Shield size={24} className="text-purple-600" />}
-            <h1 className="text-3xl font-bold text-[#059669]">
+            <h1 className="text-[32px] font-bold text-[#000000]">
               {isAdminLogin ? "Admin Login" : "Welcome Back"}
             </h1>
           </div>
-          <p className="text-[15px] text-gray-500 font-medium">
+          <p className="text-[16px] text-[#4A5565] font-medium">
             {isAdminLogin ? "Access admin dashboard" : "Login to manage your tender projects"}
           </p>
         </div>
@@ -85,7 +94,7 @@ export default function LoginForm() {
         />
       </div>
 
-      <div className="space-y-4">
+      <div className="">
         <Button
           type="submit"
           id="login-submit"
@@ -104,10 +113,10 @@ export default function LoginForm() {
           {isAdminLogin ? "← Back to User Login" : "Admin Login →"}
         </button> */}
 
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex flex-col items-center gap-4 mt-5">
           <Link
             href={ROUTES.FORGOT_PASSWORD}
-            className="text-sm text-[#059669] font-semibold hover:underline"
+            className="text-sm text-[#009966] font-semibold hover:underline"
           >
             Forgot Password?
           </Link>
@@ -116,7 +125,7 @@ export default function LoginForm() {
             Don&apos;t have an account?{" "}
             <Link
               href={ROUTES.REGISTER}
-              className="font-bold text-[#059669] hover:underline ml-1"
+              className="font-bold text-[#009966] hover:underline ml-1"
             >
               Sign Up
             </Link>
@@ -124,7 +133,7 @@ export default function LoginForm() {
 
           <Link
             href="/"
-            className="flex items-center gap-2 text-sm text-gray-400 hover:text-[#059669] font-medium transition-colors mt-2"
+            className="flex items-center gap-2 text-sm text-gray-400 hover:text-[#059669] font-medium transition-colors mt-2 mt-7"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Home
           </Link>

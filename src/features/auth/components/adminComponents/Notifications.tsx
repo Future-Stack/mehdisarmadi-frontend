@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, Check, Trash2, AlertCircle, CheckCircle, Info, Trash } from "lucide-react";
+import { Bell, Check, Trash2, AlertCircle, CheckCircle, Info, Trash, CheckCheck } from "lucide-react";
 import StaticPage from "@/components/layout/StaticDemoPage";
 import { useGetNotificationsQuery } from "@/store/api/admin/Notifications/getNotification";
 import { useMarkAllNotificationsReadMutation, useMarkNotificationReadMutation } from "@/store/api/admin/Notifications/markRead";
@@ -138,28 +138,28 @@ export default function Notifications() {
             disabled={isClearing}
             className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-white px-4 py-2.5 text-sm font-semibold text-red-600 shadow-sm transition-colors hover:bg-red-50 disabled:opacity-50"
           >
-            <Trash size={16} />
+            <Trash2 size={16} />
             {isClearing ? "Clearing..." : "Clear All"}
           </button>
         </div>
       </div>
 
       {/* ── Tabs ── */}
-      <div className="flex items-center gap-2 border-b border-gray-100 dark:border-gray-800 pb-2">
+      <div className="flex items-center gap-3 pb-2">
         <button
           onClick={() => setActiveTab("all")}
-          className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === "all"
-            ? "bg-secondary text-white shadow-sm"
-            : "text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800"
+          className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all ${activeTab === "all"
+            ? "bg-[#009966] text-white shadow-sm border border-[#009966]"
+            : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 dark:bg-gray-900 dark:border-gray-800 dark:text-gray-300"
             }`}
         >
           All ({totalCount})
         </button>
         <button
           onClick={() => setActiveTab("unread")}
-          className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === "unread"
-            ? "bg-secondary text-white shadow-sm"
-            : "text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800"
+          className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all ${activeTab === "unread"
+            ? "bg-[#009966] text-white shadow-sm border border-[#009966]"
+            : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 dark:bg-gray-900 dark:border-gray-800 dark:text-gray-300"
             }`}
         >
           Unread ({unreadCount})
@@ -174,49 +174,69 @@ export default function Notifications() {
             No notifications found.
           </div>
         ) :
-          (notifications.map((notification) => {
+          (notifications.map((notification, idx) => {
+            const getStyles = (title: string) => {
+              const t = title.toLowerCase();
+              if (t.includes("fail") || t.includes("error")) {
+                return { bg: "bg-[#FFF9F9] dark:bg-red-900/10", border: "border-red-200 dark:border-red-800", icon: "text-red-500" };
+              }
+              if (t.includes("delay") || t.includes("warn")) {
+                return { bg: "bg-[#FFFEF5] dark:bg-yellow-900/10", border: "border-yellow-200 dark:border-yellow-800", icon: "text-yellow-500" };
+              }
+              if (t.includes("register") || t.includes("user")) {
+                return { bg: "bg-[#F8FAFC] dark:bg-purple-900/10", border: "border-purple-200 dark:border-purple-800", icon: "text-purple-500" };
+              }
+              return { bg: "bg-[#F5FFF9] dark:bg-green-900/10", border: "border-green-200 dark:border-green-800", icon: "text-green-500" };
+            };
+            const styles = getStyles(notification.title);
+            
+            const d = new Date(notification.createdAt);
+            const pad = (n: number) => n.toString().padStart(2, '0');
+            const formattedDate = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 
             return (
               <div
-                key={notification._id}
-                className={`group flex items-start justify-between p-4 rounded-xl border-2  transition-all hover:shadow-md bg-white dark:bg-gray-900`}
+                key={notification._id ?? idx}
+                className={`flex items-start justify-between p-4 rounded-xl border border-l-4 ${styles.border} ${styles.bg} transition-all hover:shadow-md`}
               >
                 <div className="flex gap-4">
-
+                  <div className="mt-0.5">
+                    <AlertCircle className={`w-5 h-5 ${styles.icon}`} strokeWidth={2} />
+                  </div>
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-bold text-gray-900 dark:text-white">
+                      <h3 className="text-[15px] font-bold text-gray-900 dark:text-white">
                         {notification.title}
                       </h3>
-                      {notification.isRead && (
-                        <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                      {!notification.isRead && (
+                        <span className="w-2 h-2 rounded-full bg-[#0066FF]" />
                       )}
                     </div>
                     <p className="text-[13px] text-gray-500 dark:text-gray-400 font-medium">
                       {notification.message}
                     </p>
-                    <p className="text-[12px] text-gray-400 dark:text-gray-500 font-medium">
-                      {new Date(notification.createdAt).toLocaleString()}
+                    <p className="text-[12px] text-gray-400 dark:text-gray-500 mt-1 font-medium">
+                      {formattedDate}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex items-center gap-3">
                   {!notification.isRead && (
                     <button
                       title="Mark as read"
                       onClick={() => handleMarkRead(notification._id)}
                       disabled={isMarking}
-                      className="p-2 rounded-lg text-blue-500 hover:bg-blue-50 transition-colors disabled:opacity-50"
+                      className="text-blue-500 hover:text-blue-600 transition-colors disabled:opacity-50"
                     >
-                      <Check size={18} strokeWidth={2.5} />
+                      <CheckCheck size={18} strokeWidth={2.5} />
                     </button>
                   )}
                   <button
                     title="Delete notification"
                     onClick={() => handleDelete(notification._id)}
                     disabled={isDeleting}
-                    className="p-2 rounded-lg text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
+                    className="text-red-500 hover:text-red-600 transition-colors disabled:opacity-50"
                   >
                     <Trash2 size={18} strokeWidth={2.5} />
                   </button>

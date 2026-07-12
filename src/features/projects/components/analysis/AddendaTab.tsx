@@ -1,6 +1,6 @@
 import { FileText, Edit3, Trash2, Check, X, Loader2 } from "lucide-react";
 import { useGetProjectAddendaQuery, useUpdateProjectAnalysisSectionMutation } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, AIInstructionSection, ProposedChangesReview, DeleteConfirmationModal } from "./shared";
+import { SectionSkeleton, SectionError, ReanalyzeBlock, DeleteConfirmationModal } from "./shared";
 import React, { useState } from "react";
 import { toast } from "sonner";
 
@@ -56,7 +56,6 @@ export default function AddendaTab({ projectId }: Props) {
 
   return (
     <div className="space-y-6">
-      <ProposedChangesReview projectId={projectId} section="addenda" data={data?.data} />
       <div className="bg-white dark:bg-[#111827] border border-gray-100 dark:border-gray-800 rounded-3xl p-6 md:p-8 shadow-sm">
 
         <div className="mb-6 border-b border-gray-100 dark:border-gray-800 pb-4">
@@ -194,7 +193,7 @@ export default function AddendaTab({ projectId }: Props) {
         )}
       </div>
 
-      <AIInstructionSection projectId={projectId} section="addenda" />
+      <ReanalyzeBlock projectId={projectId} section="addenda" data={data?.data} />
       <DeleteConfirmationModal
         isOpen={!!deleteItemId}
         onClose={() => setDeleteItemId(null)}

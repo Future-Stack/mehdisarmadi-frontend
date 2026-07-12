@@ -4,7 +4,7 @@ import { CheckSquare, Edit3, Copy, Trash2, FileText, Loader2, Check, X, Square }
 import { Button } from "@/components/ui/Button";
 import { toast } from "sonner";
 import { useGetProjectScopeQuery, useUpdateProjectAnalysisSectionMutation } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, AIInstructionSection, ProposedChangesReview, DeleteConfirmationModal } from "./shared";
+import { SectionSkeleton, SectionError, getHighlightStyle, ReanalyzeBlock, DeleteConfirmationModal } from "./shared";
 
 interface Props {
   projectId: string;
@@ -97,7 +97,6 @@ export default function ScopeTab({ projectId }: Props) {
 
   return (
     <div className="space-y-6">
-      <ProposedChangesReview projectId={projectId} section="scope" data={data?.data} />
       <div className="bg-white dark:bg-[#111827] border border-gray-100 dark:border-gray-800 rounded-3xl p-6 md:p-8 shadow-sm">
 
         {/* Filters + Add Row */}
@@ -252,7 +251,7 @@ export default function ScopeTab({ projectId }: Props) {
         </div>
       </div>
 
-      <AIInstructionSection projectId={projectId} section="scope" />
+      <ReanalyzeBlock projectId={projectId} section="scope" data={data?.data} />
       <DeleteConfirmationModal
         isOpen={!!deleteItemId}
         onClose={() => setDeleteItemId(null)}

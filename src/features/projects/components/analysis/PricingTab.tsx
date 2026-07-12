@@ -1,6 +1,6 @@
 import { AlertTriangle, AlertCircle, Edit3, Trash2, Check, X } from "lucide-react";
 import { useGetProjectPricingQuery } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, AIInstructionSection, ProposedChangesReview, DeleteConfirmationModal } from "./shared";
+import { SectionSkeleton, SectionError, AIInstructionSection, ProposedChangesReview, DeleteConfirmationModal, ReanalyzeBlock } from "./shared";
 import { cn } from "@/lib/utils";
 import React, { useState } from "react";
 import { toast } from "sonner";
@@ -322,7 +322,8 @@ const getCostItemStyle = (name?: string) => {
 
       </div>
 
-      <AIInstructionSection projectId={projectId} section="pricing" />
+      {/* <AIInstructionSection projectId={projectId} section="pricing" /> */}
+      <ReanalyzeBlock projectId={projectId} section="pricing" data={data?.data} />    
       <DeleteConfirmationModal
         isOpen={!!deleteItemId}
         onClose={() => setDeleteItemId(null)}

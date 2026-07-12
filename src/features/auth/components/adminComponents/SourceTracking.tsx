@@ -97,13 +97,13 @@ export default function SourceTracking() {
       {/* ── Document List ── */}
       <div className="space-y-4">
         {SOURCE_DOCUMENTS.map((doc) => (
-          <div key={doc.id} className="card-premium overflow-hidden bg-white dark:bg-gray-900 p-6 transition-colors border border-gray-100 dark:border-gray-800">
+          <div key={doc.id} className="card-premium border border-[#E5E7EB] overflow-hidden bg-white dark:bg-gray-900 p-6 transition-colors border border-gray-100 dark:border-gray-800">
             <div className="flex items-start gap-4">
-              <FileText className="w-6 h-6 text-secondary mt-1 shrink-0" />
+              <FileText className="w-6 h-6 text-[#008236] mt-1 shrink-0" />
               <div className="flex-1">
                 <h2 className="text-lg font-bold text-gray-900 dark:text-white tracking-tight transition-colors">{doc.fileName}</h2>
                 <div className="flex flex-wrap items-center gap-2 mt-2 text-[13px] text-gray-500 dark:text-gray-400 transition-colors">
-                  <span className={`px-2 py-0.5 rounded text-[11px] font-bold transition-colors ${doc.typeColor.includes('bg-[#DCFCE7]') ? 'dark:bg-green-900/30 dark:text-green-400' : doc.typeColor.includes('bg-[#DBEAFE]') ? 'dark:bg-blue-900/30 dark:text-blue-400' : 'dark:bg-purple-900/30 dark:text-purple-400'} ${doc.typeColor}`}>
+                  <span className={`px-2 py-0.5 rounded text-[11px] font-bold transition-colors ${doc.typeColor.includes('bg-[#008236]') ? 'dark:bg-green-900/30 dark:text-green-400' : doc.typeColor.includes('bg-[#1447E6]') ? 'dark:bg-blue-900/30 dark:text-blue-400' : 'dark:bg-purple-900/30 dark:text-purple-400'} ${doc.typeColor}`}>
                     {doc.type}
                   </span>
                   <span>{doc.projectName}</span>
@@ -116,7 +116,7 @@ export default function SourceTracking() {
                     <p className="text-[13px] text-gray-500 dark:text-gray-400 font-medium mb-3 transition-colors">Mapped Sections:</p>
                     <div className="space-y-1.5">
                       {doc.mappedSections.map((section, idx) => (
-                        <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-lg bg-gray-50/80 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                        <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-lg bg-[#F9FAFB] dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                           <span className="font-medium text-gray-700 dark:text-gray-200 text-sm transition-colors">{section.title}</span>
                           <span className="text-[13px] font-medium text-gray-500 dark:text-gray-400 transition-colors">{section.pages}</span>
                         </div>

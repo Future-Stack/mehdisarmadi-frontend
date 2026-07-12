@@ -343,12 +343,12 @@ export default function SubUserDashboardPage() {
                   <p className="text-sm text-gray-500">No recent activity.</p>
                 ) : (
                   recentActivity.map((activity, idx) => {
-                    const { icon: Icon, bg, color } = getActivityIcon(activity.type);
+                    const { icon: Icon, color } = getActivityIcon(activity.type);
 
                     return (
                       <div
                         key={activity.id}
-                        className="flex gap-3 p-3 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30"
+                        className="flex gap-3 p-3 rounded-xl border border-[#E8E8E8] dark:border-gray-800 bg-[#F9FAFB] dark:bg-gray-800/30"
                       >
                         <div
                           className={cn(

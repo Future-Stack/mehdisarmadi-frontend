@@ -2,7 +2,7 @@ import { Edit3, Copy, Trash2, CheckSquare, FileText, Loader2, Square } from "luc
 import { Button } from "@/components/ui/Button";
 import { toast } from "sonner";
 import { useGetProjectAssumptionsQuery, useUpdateProjectAnalysisSectionMutation } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, AIInstructionSection, ProposedChangesReview, DeleteConfirmationModal } from "./shared";
+import { SectionSkeleton, SectionError, ReanalyzeBlock, DeleteConfirmationModal } from "./shared";
 import { useState } from "react";
 
 interface Props {
@@ -53,7 +53,6 @@ export default function AssumptionsTab({ projectId }: Props) {
 
   return (
     <div className="space-y-6">
-      <ProposedChangesReview projectId={projectId} section="assumptions" data={data?.data} />
       <div className="bg-white dark:bg-[#111827] border border-gray-100 dark:border-gray-800 rounded-3xl p-6 md:p-8 shadow-sm">
 
         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-8 border-b border-gray-100 dark:border-gray-800 pb-6">
@@ -138,7 +137,7 @@ export default function AssumptionsTab({ projectId }: Props) {
         </div>
       </div>
 
-      <AIInstructionSection projectId={projectId} section="assumptions" />
+      <ReanalyzeBlock projectId={projectId} section="assumptions" data={data?.data} />
       <DeleteConfirmationModal
         isOpen={!!deleteItemId}
         onClose={() => setDeleteItemId(null)}

@@ -255,32 +255,7 @@ export const projectApi = baseApi.injectEndpoints({
         { type: "Project", id: `${projectId}_${section}` },
       ],
     }),
-    acceptProposedChanges: builder.mutation<
-      ApiResponse<any>,
-      { projectId: string; section: string }
-    >({
-      query: ({ projectId, section }) => ({
-        url: `/project/${projectId}/analysis/${section}/proposed/accept`,
-        method: "POST",
-      }),
-      invalidatesTags: (result, error, { projectId, section }) => [
-        { type: "Project", id: `${projectId}_analysis_${section}` },
-        { type: "Project", id: `${projectId}_${section}` },
-      ],
-    }),
-    rejectProposedChanges: builder.mutation<
-      ApiResponse<any>,
-      { projectId: string; section: string }
-    >({
-      query: ({ projectId, section }) => ({
-        url: `/project/${projectId}/analysis/${section}/proposed`,
-        method: "DELETE",
-      }),
-      invalidatesTags: (result, error, { projectId, section }) => [
-        { type: "Project", id: `${projectId}_analysis_${section}` },
-        { type: "Project", id: `${projectId}_${section}` },
-      ],
-    }),
+
     saveProjectQuote: builder.mutation<
       ApiResponse<any>,
       { projectId: string; data: SaveProjectQuoteDto }
@@ -293,6 +268,19 @@ export const projectApi = baseApi.injectEndpoints({
       invalidatesTags: (result, error, { projectId }) => [
         { type: "Project", id: `${projectId}_quote` },
         { type: "Project", id: projectId },
+      ],
+    }),
+    updateProjectInstructions: builder.mutation<
+      ApiResponse<any>,
+      { projectId: string; section: string; data: { instruction: string } }
+    >({
+      query: ({ projectId, section, data }) => ({
+        url: `/project/${projectId}/instructions/${section}`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: (result, error, { projectId, section }) => [
+        { type: "Project", id: `${projectId}_${section}` },
       ],
     }),
   }),
@@ -321,7 +309,5 @@ export const {
   useGetProjectQuoteQuery,
   useDeleteProjectAnalysisItemMutation,
   useReanalyzeProjectSectionMutation,
-  useAcceptProposedChangesMutation,
-  useRejectProposedChangesMutation,
   useSaveProjectQuoteMutation,
 } = projectApi;

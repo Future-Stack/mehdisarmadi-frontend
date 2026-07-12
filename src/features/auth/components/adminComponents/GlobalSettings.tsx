@@ -77,7 +77,7 @@ export default function GlobalSettings() {
 
       <div className="space-y-6 pt-2">
         {/* ── Company Information ── */}
-        <div className="card-premium p-6 bg-white dark:bg-gray-900">
+        <div className="card-premium border border-[#E5E7EB] dark:border-gray-700 p-6 bg-white dark:bg-gray-900">
           <div className="flex items-center gap-2 mb-6">
             <Building2 className="w-5 h-5 text-secondary" />
             <h3 className="text-[17px] font-bold text-gray-900 dark:text-white">Company Information</h3>
@@ -98,7 +98,7 @@ export default function GlobalSettings() {
         </div>
 
         {/* ── Pricing Defaults ── */}
-        <div className="card-premium p-6 bg-white dark:bg-gray-900">
+        <div className="card-premium border border-[#E5E7EB] dark:border-gray-700 p-6 bg-white dark:bg-gray-900">
           <h3 className="text-[17px] font-bold text-gray-900 dark:text-white mb-6">Pricing Defaults</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-2">
@@ -146,7 +146,7 @@ export default function GlobalSettings() {
         </div>
 
         {/* ── Standard Exclusions ── */}
-        <div className="card-premium p-6 bg-white dark:bg-gray-900">
+        <div className="card-premium border border-[#E5E7EB] dark:border-gray-700 p-6 bg-white dark:bg-gray-900">
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-2">
               <FileText className="w-4 h-4 text-secondary" />
@@ -178,7 +178,7 @@ export default function GlobalSettings() {
         </div>
 
         {/* ── Standard Assumptions ── */}
-        <div className="card-premium p-6 bg-white dark:bg-gray-900">
+        <div className="card-premium border border-[#E5E7EB] dark:border-gray-700 p-6 bg-white dark:bg-gray-900">
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-2">
               <FileText className="w-4 h-4 text-secondary" />

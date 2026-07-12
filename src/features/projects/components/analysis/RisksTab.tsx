@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { FileText, Edit3, Trash2, Check, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useGetProjectRisksQuery, useUpdateProjectAnalysisSectionMutation } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, AIInstructionSection, getRiskBadgeColor, ProposedChangesReview, DeleteConfirmationModal } from "./shared";
+import { SectionSkeleton, SectionError, getRiskBadgeColor, ReanalyzeBlock, DeleteConfirmationModal } from "./shared";
 
 interface Props {
   projectId: string;
@@ -63,7 +63,6 @@ export default function RisksTab({ projectId }: Props) {
 
   return (
     <div className="space-y-6">
-      <ProposedChangesReview projectId={projectId} section="risks" data={data?.data} />
       <div className="bg-white dark:bg-[#111827] border border-gray-100 dark:border-gray-800 rounded-3xl p-6 md:p-8 shadow-sm">
 
         <div className="mb-6 border-b border-gray-100 dark:border-gray-800 pb-4">
@@ -207,7 +206,7 @@ export default function RisksTab({ projectId }: Props) {
         </div>
       </div>
 
-      <AIInstructionSection projectId={projectId} section="risks" />
+      <ReanalyzeBlock projectId={projectId} section="risks" data={data?.data} />
       <DeleteConfirmationModal
         isOpen={!!deleteItemId}
         onClose={() => setDeleteItemId(null)}

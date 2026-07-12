@@ -16,13 +16,13 @@ import { useSuspendUserMutation } from "@/store/api/admin/Users/suspendUser";
 function RoleBadge({ role }: { role: AdminUser["role"] }) {
   if (role === "ADMIN") {
     return (
-      <span className="inline-flex items-center px-3 py-1 rounded-md text-[13px] font-semibold whitespace-nowrap bg-[#F3E8FF] text-[#6B21A8] dark:bg-purple-900/30 dark:text-purple-400">
+      <span className="inline-flex items-center px-3 py-1 rounded-md text-[13px] font-semibold whitespace-nowrap bg-[#8200DB1A] text-[#8200DB] dark:bg-purple-900/30 dark:text-purple-400">
         Admin
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center px-3 py-1 rounded-md text-[13px] font-semibold whitespace-nowrap bg-[#E5E7EB] text-[#374151] dark:bg-gray-800 dark:text-gray-300">
+    <span className="inline-flex items-center px-3 py-1 rounded-md text-[13px] font-semibold whitespace-nowrap bg-[#E0E0E0] text-[#616161] dark:bg-gray-800 dark:text-gray-300">
       User
     </span>
   );
@@ -31,13 +31,13 @@ function RoleBadge({ role }: { role: AdminUser["role"] }) {
 function StatusBadge({ status }: { status: AdminUser["status"] }) {
   if (status === "active") {
     return (
-      <span className="inline-flex items-center px-3 py-1 rounded-md text-[13px] font-semibold whitespace-nowrap bg-[#DCFCE7] text-[#166534] dark:bg-green-900/30 dark:text-green-400">
+      <span className="inline-flex items-center px-3 py-1 rounded-md text-[13px] font-semibold whitespace-nowrap bg-[#DDFFEB] text-[#008236] dark:bg-green-900/30 dark:text-green-400">
         Active
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center px-3 py-1 rounded-md text-[13px] font-semibold whitespace-nowrap bg-[#FEE2E2] text-[#991B1B] dark:bg-red-900/30 dark:text-red-400">
+    <span className="inline-flex items-center px-3 py-1 rounded-md text-[13px] font-semibold whitespace-nowrap bg-[#E7000B30] text-[#E7000B] dark:bg-red-900/30 dark:text-red-400">
       Suspended
     </span>
   );
@@ -197,12 +197,12 @@ export default function UsersManagement() {
 
       {/* ── Stats ── */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-2">
-        <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 px-5 py-4 transition-colors">
-          <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Total Users</p>
+        <div className="rounded-xl border border-[#E5E7EB] dark:border-gray-800 bg-white dark:bg-gray-900 px-5 py-4 transition-colors">
+          <p className="text-xs font-semibold text-[#000000] dark:text-white">Total Users</p>
           <p className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{totalUsers}</p>
         </div>
-        <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 px-5 py-4 transition-colors">
-          <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Active Users</p>
+        <div className="rounded-xl border border-[#E5E7EB] dark:border-gray-800 bg-white dark:bg-gray-900 px-5 py-4 transition-colors">
+          <p className="text-xs font-semibold text-[#000000] dark:text-white">Active Users</p>
           <p className="mt-1 text-2xl font-bold text-green-600 dark:text-green-400">{activeUsers}</p>
         </div>
       </div>
@@ -226,12 +226,12 @@ export default function UsersManagement() {
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="border-b border-gray-100 bg-white dark:bg-gray-900 dark:border-gray-800">
+              <tr className="border-b border-[#E5E7EB] bg-white dark:bg-gray-900 dark:border-gray-800">
                 {["#", "Name", "Email", "Role", "Status", "Joined Date", "Actions"].map((heading) => (
                   <th
                     key={heading}
                     scope="col"
-                    className="whitespace-nowrap px-6 py-4 text-left text-[14px] font-bold text-gray-600 dark:text-gray-400"
+                    className="whitespace-nowrap px-6 py-4 text-left text-[14px] font-bold text-[#4A5565] dark:text-gray-400"
                   >
                     {heading}
                   </th>
@@ -239,7 +239,7 @@ export default function UsersManagement() {
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-gray-100 bg-white dark:bg-gray-950 dark:divide-gray-800 transition-colors">
+            <tbody className="divide-y divide-[#E5E7EB] bg-white dark:bg-gray-950 dark:divide-gray-800 transition-colors">
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i}>

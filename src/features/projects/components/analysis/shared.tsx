@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { toast } from "sonner";
 import {
   useReanalyzeProjectSectionMutation,
-  useAcceptProposedChangesMutation,
-  useRejectProposedChangesMutation,
+  useUpdateProjectAnalysisSectionMutation,
 } from "@/store/api/projectApi";
 
 // ─── Loading Skeleton ─────────────────────────────────────────────────────────
@@ -38,14 +37,29 @@ export function SectionError({ message, onRetry }: { message: string; onRetry?: 
 }
 
 // ─── AI Instruction Section ───────────────────────────────────────────────────
+// Used standalone OR controlled externally (via defaultInstruction + onReanalyzed)
 interface AIInstructionSectionProps {
   projectId: string;
   section: string;
+  /** Pre-fill instruction (e.g. when user clicks Edit on proposed changes) */
+  defaultInstruction?: string;
+  /** Called after successful reanalyze so parent can clear the prefill */
+  onReanalyzed?: () => void;
 }
 
-export function AIInstructionSection({ projectId, section }: AIInstructionSectionProps) {
-  const [instruction, setInstruction] = React.useState("");
+export function AIInstructionSection({
+  projectId,
+  section,
+  defaultInstruction,
+  onReanalyzed,
+}: AIInstructionSectionProps) {
+  const [instruction, setInstruction] = React.useState(defaultInstruction ?? "");
   const [reanalyze, { isLoading }] = useReanalyzeProjectSectionMutation();
+
+  // Sync if parent pushes a new defaultInstruction
+  React.useEffect(() => {
+    if (defaultInstruction !== undefined) setInstruction(defaultInstruction);
+  }, [defaultInstruction]);
 
   const handleReanalyze = async () => {
     if (!instruction.trim()) {
@@ -54,15 +68,16 @@ export function AIInstructionSection({ projectId, section }: AIInstructionSectio
     }
     try {
       await reanalyze({ projectId, section, data: { instruction } }).unwrap();
-      toast.success(`${section} section re-analyzed successfully! Please review the proposed changes.`);
+      toast.success(`${section} section re-analyzed! Review the proposed changes below.`);
       setInstruction("");
+      onReanalyzed?.();
     } catch (err: any) {
       toast.error(err?.data?.message || `Failed to re-analyze ${section} section.`);
     }
   };
 
   return (
-    <div className="bg-white dark:bg-[#111827] border border-gray-100 dark:border-gray-800 rounded-2xl p-6 shadow-sm mt-6">
+    <div className="bg-white dark:bg-[#111827] border border-gray-100 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
       <div className="flex items-center gap-2 mb-4">
         <Sparkles className="w-4 h-4 text-blue-500" />
         <h3 className="text-[14px] font-bold text-gray-900 dark:text-white">AI Instruction for This Section</h3>
@@ -72,7 +87,8 @@ export function AIInstructionSection({ projectId, section }: AIInstructionSectio
           type="text"
           value={instruction}
           onChange={(e) => setInstruction(e.target.value)}
-          placeholder="Add instruction for this section...."
+          onKeyDown={(e) => e.key === "Enter" && handleReanalyze()}
+          placeholder="Add instruction for this section…"
           className="w-full h-11 px-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-transparent text-[13px] focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
         />
         <Button
@@ -81,7 +97,8 @@ export function AIInstructionSection({ projectId, section }: AIInstructionSectio
           onClick={handleReanalyze}
           disabled={isLoading}
         >
-          {isLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />} Re-analyze Section
+          {isLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+          Re-analyze Section
         </Button>
       </div>
     </div>
@@ -91,17 +108,20 @@ export function AIInstructionSection({ projectId, section }: AIInstructionSectio
 import { CheckCircle2, Check, X, AlertTriangle, Edit3, Trash2 } from "lucide-react";
 
 // ─── Proposed Changes Review ──────────────────────────────────────────────────
-export function ProposedChangesReview({ projectId, section, data }: { projectId: string; section: string; data: any }) {
-  const [accept, { isLoading: isAccepting }] = useAcceptProposedChangesMutation();
-  const [reject, { isLoading: isRejecting }] = useRejectProposedChangesMutation();
+interface ProposedChangesReviewProps {
+  projectId: string;
+  section: string;
+  data: any;
+  /** Called when user clicks Edit — receives the original AI instruction */
+  onEdit?: (instruction: string) => void;
+}
 
-  // API returns: data.proposedPayload.proposed_changes.{ changes, pricing_impact, affected_tabs }
-  // and data.proposedInstruction for the AI instruction that triggered this
+export function ProposedChangesReview({ projectId, section, data, onEdit }: ProposedChangesReviewProps) {
+  const [updateSection, { isLoading: isUpdating }] = useUpdateProjectAnalysisSectionMutation();
+
   const proposedPayload = data?.proposedPayload;
-
   if (!proposedPayload) return null;
 
-  // Map snake_case API fields to local variables
   const proposedChanges = proposedPayload?.proposed_changes;
   const changes: string[] = proposedChanges?.changes ?? [];
   const pricingImpact: string | null = proposedChanges?.pricing_impact ?? null;
@@ -110,7 +130,7 @@ export function ProposedChangesReview({ projectId, section, data }: { projectId:
 
   const handleAccept = async () => {
     try {
-      await accept({ projectId, section }).unwrap();
+      await updateSection({ projectId, section, data: { payload: { action: "accept" } } }).unwrap();
       toast.success("Proposed changes accepted!");
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to accept proposed changes.");
@@ -119,15 +139,29 @@ export function ProposedChangesReview({ projectId, section, data }: { projectId:
 
   const handleReject = async () => {
     try {
-      await reject({ projectId, section }).unwrap();
+      await updateSection({ projectId, section, data: { payload: { action: "delete" } } }).unwrap();
       toast.success("Proposed changes rejected.");
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to reject proposed changes.");
     }
   };
 
+  /**
+   * Edit = reject current proposal (clean slate) then open the
+   * AI Instruction input pre-filled with the old instruction.
+   */
+  const handleEdit = async () => {
+    try {
+      await updateSection({ projectId, section, data: { payload: { action: "delete" } } }).unwrap();
+      // Notify parent so it can pre-fill the instruction input
+      onEdit?.(aiInstruction ?? "");
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to clear proposed changes.");
+    }
+  };
+
   return (
-    <div className="bg-[#f0fbf5] dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800/30 rounded-2xl shadow-sm mb-6 overflow-hidden animate-in fade-in slide-in-from-top-2">
+    <div className="bg-[#f0fbf5] dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800/30 rounded-2xl shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-2">
       {/* Header */}
       <div className="flex items-center gap-2 px-6 py-5 border-b border-emerald-100 dark:border-emerald-800/30">
         <CheckCircle2 className="w-5 h-5 text-emerald-600" />
@@ -154,7 +188,7 @@ export function ProposedChangesReview({ projectId, section, data }: { projectId:
             <ul className="space-y-2">
               {changes.map((change: string, i: number) => (
                 <li key={i} className="flex items-start gap-2 text-[13px] font-medium text-gray-700 dark:text-gray-300">
-                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0"></span>
+                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0" />
                   {change}
                 </li>
               ))}
@@ -196,27 +230,63 @@ export function ProposedChangesReview({ projectId, section, data }: { projectId:
           variant="primary"
           className="h-9 px-4 rounded-xl text-[12px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5 shadow-sm"
           onClick={handleAccept}
-          disabled={isAccepting || isRejecting}
+          disabled={isUpdating}
         >
-          {isAccepting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />} Accept Changes
+          {isUpdating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+          Accept Changes
         </Button>
         <Button
           variant="secondary"
           className="h-9 px-4 rounded-xl text-[12px] font-bold bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 flex items-center gap-1.5 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700"
-          disabled={isAccepting || isRejecting}
+          onClick={handleEdit}
+          disabled={isUpdating}
         >
-          <Edit3 className="w-3.5 h-3.5" /> Edit
+          {isUpdating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Edit3 className="w-3.5 h-3.5" />}
+          Edit
         </Button>
         <Button
           variant="secondary"
           className="h-9 px-4 rounded-xl text-[12px] font-bold bg-white dark:bg-gray-800 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-900/30 flex items-center gap-1.5 shadow-sm"
           onClick={handleReject}
-          disabled={isAccepting || isRejecting}
+          disabled={isUpdating}
         >
-          {isRejecting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <X className="w-3.5 h-3.5" />} Reject
+          {isUpdating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <X className="w-3.5 h-3.5" />}
+          Reject
         </Button>
       </div>
     </div>
+  );
+}
+
+// ─── Unified Reanalyze Block ──────────────────────────────────────────────────
+interface ReanalyzeBlockProps {
+  projectId: string;
+  section: string;
+  data: any;
+}
+
+export function ReanalyzeBlock({ projectId, section, data }: ReanalyzeBlockProps) {
+  const [editInstruction, setEditInstruction] = React.useState<string | undefined>();
+
+  return (
+    <>
+      <AIInstructionSection
+        projectId={projectId}
+        section={section}
+        defaultInstruction={editInstruction}
+        onReanalyzed={() => setEditInstruction(undefined)}
+      />
+      {data && (
+        <div className="mt-6">
+          <ProposedChangesReview
+            projectId={projectId}
+            section={section}
+            data={data}
+            onEdit={(instruction) => setEditInstruction(instruction)}
+          />
+        </div>
+      )}
+    </>
   );
 }
 

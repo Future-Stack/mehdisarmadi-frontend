@@ -5,7 +5,7 @@ import Onboarding from "@/components/onBoarding/OnBoarding";
 export default function RootPage() {
   return (
     <div>
-      <Onboarding/>;
+      <Onboarding/>
     </div>
   )
 }

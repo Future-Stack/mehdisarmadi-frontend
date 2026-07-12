@@ -295,7 +295,7 @@ export default function ProjectDetailsPage() {
           </div>
         </div>
         
-        <Button variant="primary" className="h-14 px-12 rounded-2xl font-black text-base shadow-xl shadow-emerald-200 flex items-center gap-3 active:scale-95 transition-all">
+        <Button  variant="primary" className="h-14 px-12 rounded-2xl font-black text-base shadow-xl shadow-emerald-200 flex items-center gap-3 active:scale-95 transition-all">
           <FileText className="w-5 h-5" /> Analyze Tender
         </Button>
       </section>

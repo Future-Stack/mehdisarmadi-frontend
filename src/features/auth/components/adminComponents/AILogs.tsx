@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Filter, ChevronDown, Eye, RotateCw, CheckCircle2 } from "lucide-react";
+import { Filter, ChevronDown, Eye, RotateCw, CheckCircle2, Search } from "lucide-react";
 import StaticPage from "@/components/layout/StaticDemoPage";
 import { Modal } from "@/components/ui/Modal";
 
@@ -132,7 +132,7 @@ const AI_LOGS: AILog[] = [
 
 function StageBadge({ stage }: { stage: LogStage }) {
   return (
-    <span className="inline-flex items-center px-3 py-1 rounded-lg text-[13px] font-semibold whitespace-nowrap bg-[#DCFCE7] text-[#166534]">
+    <span className="inline-flex items-center px-3 py-1 rounded-lg text-[13px] font-semibold whitespace-nowrap bg-[#DCFCE7] dark:bg-[#0082361A] text-[#008236]">
       {stage}
     </span>
   );
@@ -141,13 +141,13 @@ function StageBadge({ stage }: { stage: LogStage }) {
 function StatusBadge({ status }: { status: LogStatus }) {
   if (status === "Success") {
     return (
-      <span className="inline-flex items-center px-3 py-1 rounded-lg text-[13px] font-semibold whitespace-nowrap bg-[#DCFCE7] text-[#166534]">
+      <span className="inline-flex items-center px-3 py-1 rounded-lg text-[13px] font-semibold whitespace-nowrap bg-[#DCFCE7] dark:bg-[#0082361A] text-[#008236]">
         {status}
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center px-3 py-1 rounded-lg text-[13px] font-semibold whitespace-nowrap bg-[#FEE2E2] text-[#991B1B]">
+    <span className="inline-flex items-center px-3 py-1 rounded-lg text-[13px] font-semibold whitespace-nowrap bg-[#FEE2E2] dark:bg-[#E7000B1A] text-[#991B1B]">
       {status}
     </span>
   );
@@ -157,6 +157,22 @@ function StatusBadge({ status }: { status: LogStatus }) {
 
 export default function AILogs() {
   const [selectedLog, setSelectedLog] = useState<AILog | null>(null);
+  
+  // Search and filter states
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All Status");
+  const [projectFilter, setProjectFilter] = useState("All Projects");
+
+  const filteredLogs = AI_LOGS.filter(log => {
+    const matchesSearch = search === "" || 
+      log.fileName.toLowerCase().includes(search.toLowerCase()) || 
+      log.projectName.toLowerCase().includes(search.toLowerCase());
+    
+    const matchesStatus = statusFilter === "All Status" || log.status === statusFilter;
+    const matchesProject = projectFilter === "All Projects" || log.projectName === projectFilter;
+    
+    return matchesSearch && matchesStatus && matchesProject;
+  });
 
   return (
     <div className="space-y-6">
@@ -167,38 +183,62 @@ export default function AILogs() {
       />
 
       {/* ── Filter Bar ── */}
-      <div className="flex items-center gap-3 p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm w-fit min-w-[320px] transition-colors">
-        <Filter className="w-5 h-5 text-gray-500 dark:text-gray-400 shrink-0" />
-        <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap transition-colors">Filters:</span>
-        <div className="relative">
-          <select className="appearance-none pl-3 pr-8 py-1.5 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary text-sm text-gray-700 dark:text-gray-200 transition-colors cursor-pointer">
-            <option>All Status</option>
-            <option>Success</option>
-            <option>Failed</option>
-          </select>
-          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
+      <div className="flex flex-wrap items-center gap-3 p-4 dark:bg-[#101828] bg-white rounded-2xl border border-[#E4E4E7] dark:border-gray-800 shadow-sm w-full transition-colors">
+        <div className="relative flex-1 min-w-[200px]">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+            <Search size={16} />
+          </span>
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by file or project..."
+            className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary shadow-sm transition-colors"
+          />
         </div>
-        <div className="relative">
-          <select className="appearance-none pl-3 pr-8 py-1.5 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary text-sm text-gray-700 dark:text-gray-200 transition-colors cursor-pointer">
-            <option>All Projects</option>
-            <option>City Mall Tender</option>
-            <option>Office Fitout</option>
-          </select>
-          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
+        
+        <div className="flex items-center gap-3">
+            <Filter className="w-5 h-5 text-gray-500 dark:text-gray-400 shrink-0" />
+            <span className="text-sm font-semibold text-[#364153] dark:text-gray-300 whitespace-nowrap transition-colors">Filters:</span>
+            <div className="relative">
+            <select 
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary text-sm text-gray-700 dark:text-gray-200 transition-colors cursor-pointer"
+            >
+                <option value="All Status">All Status</option>
+                <option value="Success">Success</option>
+                <option value="Failed">Failed</option>
+            </select>
+            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
+            </div>
+            <div className="relative">
+            <select 
+                value={projectFilter}
+                onChange={(e) => setProjectFilter(e.target.value)}
+                className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary text-sm text-gray-700 dark:text-gray-200 transition-colors cursor-pointer"
+            >
+                <option value="All Projects">All Projects</option>
+                {Array.from(new Set(AI_LOGS.map(log => log.projectName))).map(project => (
+                    <option key={project} value={project}>{project}</option>
+                ))}
+            </select>
+            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
+            </div>
         </div>
       </div>
 
       {/* ── Table Card ── */}
-      <div className="card-premium overflow-hidden">
+      <div className="card-premium overflow-hidden bg-white dark:bg-[#101828]">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 transition-colors">
+              <tr className="border-b border-[#E5E7EB] dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 transition-colors">
                 {["File Name", "Project Name", "Stage", "Status", "Error Message", "Timestamp", "Duration", "Actions"].map((heading) => (
                   <th
                     key={heading}
                     scope="col"
-                    className="whitespace-nowrap px-6 py-4 text-left text-[12px] font-bold uppercase tracking-tight text-[#968C8C] dark:text-gray-500 transition-colors"
+                    className="whitespace-nowrap px-6 py-4 text-left text-[12px] font-bold uppercase tracking-tight text-[#4A5565] dark:text-gray-500 transition-colors"
                   >
                     {heading}
                   </th>
@@ -206,8 +246,14 @@ export default function AILogs() {
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-gray-50 dark:divide-gray-800 transition-colors">
-              {AI_LOGS.map((log) => (
+            <tbody className="divide-y divide-[#E5E7EB] dark:divide-gray-800 transition-colors">
+              {filteredLogs.length === 0 ? (
+                <tr>
+                    <td colSpan={8} className="text-center py-16 text-slate-400 dark:text-gray-500 text-sm">
+                        No logs match your filters.
+                    </td>
+                </tr>
+              ) : filteredLogs.map((log) => (
                 <tr
                   key={log.id}
                   className="hover:bg-gray-50/50 dark:hover:bg-gray-900/50 transition-colors"
@@ -215,7 +261,7 @@ export default function AILogs() {
                   <td className="px-6 py-5 text-sm font-medium text-gray-900 dark:text-white whitespace-normal max-w-[180px] transition-colors">
                     {log.fileName}
                   </td>
-                  <td className="whitespace-nowrap px-6 py-5 text-sm font-semibold text-gray-600 dark:text-gray-400 transition-colors">
+                  <td className="whitespace-nowrap px-6 py-5 text-sm font-medium text-gray-600 dark:text-gray-400 transition-colors">
                     {log.projectName}
                   </td>
                   <td className="whitespace-nowrap px-6 py-5">
@@ -246,7 +292,7 @@ export default function AILogs() {
                         type="button"
                         aria-label="View log"
                         onClick={() => setSelectedLog(log)}
-                        className="rounded-md p-1 text-secondary transition-colors hover:bg-secondary/10 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:ring-offset-1"
+                        className="rounded-md p-1 text-[#008236] transition-colors hover:bg-secondary/10 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:ring-offset-1"
                       >
                         <Eye size={18} strokeWidth={2.5} />
                       </button>

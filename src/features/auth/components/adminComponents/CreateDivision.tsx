@@ -56,20 +56,20 @@ export default function DivisionCreateModal({ onClose }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 ">
       <div
         onClick={onClose}
         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
       />
 
-      <div className="relative w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-slate-200">
+      <div className="relative w-full max-w-md overflow-hidden rounded-2xl bg-white border border-[#E5E7EB] dark:border-[#4A5565] dark:bg-[#101828] shadow-2xl ring-1 ring-slate-200">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+        <div className="flex items-center justify-between border-b border-[#E5E7EB] dark:border-[#4A5565] px-6 py-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-indigo-500">
               Division
             </p>
-            <h2 className="mt-0.5 text-lg font-bold text-slate-800">
+            <h2 className="mt-0.5 text-lg font-bold text-slate-800 dark:text-white">
               Create Division
             </h2>
           </div>
@@ -91,7 +91,7 @@ export default function DivisionCreateModal({ onClose }: Props) {
             <input
               value={form.code}
               onChange={(e) => handleChange("code", e.target.value)}
-              className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="w-full rounded-lg border border-[#E5E7EB] dark:border-[#4A5565] bg-slate-50 dark:bg-gray-800 px-3 py-2 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-400"
               placeholder="DIV-001"
             />
           </div>
@@ -103,7 +103,7 @@ export default function DivisionCreateModal({ onClose }: Props) {
             <input
               value={form.name}
               onChange={(e) => handleChange("name", e.target.value)}
-              className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="w-full rounded-lg border border-[#E5E7EB] dark:border-[#4A5565] bg-slate-50 dark:bg-gray-800 px-3 py-2 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-400"
               placeholder="Commercial"
             />
           </div>
@@ -116,14 +116,14 @@ export default function DivisionCreateModal({ onClose }: Props) {
               rows={3}
               value={form.description}
               onChange={(e) => handleChange("description", e.target.value)}
-              className="w-full resize-none rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="w-full resize-none rounded-lg border border-[#E5E7EB] dark:border-[#4A5565] bg-slate-50 dark:bg-gray-800 px-3 py-2 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-400"
               placeholder="Enter description..."
             />
           </div>
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-2 border-t border-slate-100 px-6 py-4">
+        <div className="flex justify-end gap-2 border-t border-slate-100 dark:border-gray-800 px-6 py-4">
           <button
             onClick={onClose}
             className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-200"
@@ -134,7 +134,7 @@ export default function DivisionCreateModal({ onClose }: Props) {
           <button
             disabled={isLoading}
             onClick={handleSubmit}
-            className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-lg bg-[#008236] px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-60"
           >
             {isLoading ? (
               <Loader className="h-4 w-4 animate-spin" />

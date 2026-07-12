@@ -5,7 +5,7 @@ import { Toaster } from "sonner";
 // Sidebar is client-only (reads Redux); lazy-load it
 const Sidebar = dynamic(() => import("@/components/layout/Sidebar"), {
   loading: () => (
-    <div className="hidden md:flex w-20 shrink-0 bg-white dark:bg-gray-950 border-r border-gray-100 dark:border-gray-800" />
+    <div className="hidden md:flex w-20 shrink-0 bg-white dark:bg-gray-950 border-r border-gray-100 dark:border-gray-800 shadow-lg shadow-[#00000015]" />
   ),
 });
 
