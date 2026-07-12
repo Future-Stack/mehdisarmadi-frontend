@@ -12,7 +12,9 @@ import { cn } from "@/lib/utils";
 export default function Navbar() {
   const dispatch = useAppDispatch();
   const theme = useAppSelector((s) => s.ui.theme);
-  const user = useAppSelector((s) => s.auth.user);
+  const user = useAppSelector((s) => s.auth.user
+);
+  console.log(user, 'user') ;  
   const { logout, isLoading } = useLogout();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -78,7 +80,7 @@ export default function Navbar() {
             <div className="text-right hidden sm:block">
               <p className="text-sm font-bold text-black dark:text-white transition-colors">Admin User</p>
               <p className="text-[11px] font-medium text-[#968C8C] dark:text-gray-400 transition-colors">
-                Akash Abrrar
+                {user?.fullName}
               </p>
             </div>
             <div className="relative h-9 w-9 overflow-hidden rounded-full ring-2 ring-gray-100 dark:ring-gray-700 transition-all group-hover:ring-secondary/50 border border-[#008236]">
