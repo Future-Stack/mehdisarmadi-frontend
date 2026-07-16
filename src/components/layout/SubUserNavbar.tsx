@@ -27,7 +27,7 @@ export default function SubUserNavbar() {
 
         {/* Left: Logo + Theme Toggle */}
         <div className="flex items-center gap-3 sm:gap-6">
-          <Link href="/sub-user" className="dark:bg-white dark:rounded-lg dark:px-2 dark:py-1 transition-all flex-shrink-0">
+          <Link href="/sub-user" prefetch={false} className="dark:bg-white dark:rounded-lg dark:px-2 dark:py-1 transition-all flex-shrink-0">
             <Logo />
           </Link>
 

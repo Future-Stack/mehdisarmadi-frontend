@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Search, Eye, Edit, Download, AlertTriangle, Calendar, Plus, Funnel, ChevronDown, Calendar1 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
@@ -30,7 +30,7 @@ export default function ProjectsPage() {
     toast.info(`Preparing export for ${projectName}...`);
   };
 
-  const handleExportReady = async () => {
+  const handleExportReady = useCallback(async () => {
     if (!exportingId) return;
     try {
       await exportAnalysisPDF(`Analysis-${exportingId}`);
@@ -40,7 +40,7 @@ export default function ProjectsPage() {
     } finally {
       setExportingId(null);
     }
-  };
+  }, [exportingId]);
 
   return (
     <div className="flex flex-col gap-6 pb-12 max-w-7xl mx-auto">

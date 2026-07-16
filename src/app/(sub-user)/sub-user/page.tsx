@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Search, FileText, Share2, Clock, Filter, Calendar, ChevronDown, CheckCircle2, Download, AlertTriangle, Eye, Edit, Funnel, Calendar1, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
@@ -34,7 +34,7 @@ export default function SubUserDashboardPage() {
     toast.info(`Preparing export for ${projectName}...`);
   };
 
-  const handleExportReady = async () => {
+  const handleExportReady = useCallback(async () => {
     if (!exportingId) return;
     try {
       await exportAnalysisPDF(`Analysis-${exportingId}`);
@@ -44,7 +44,7 @@ export default function SubUserDashboardPage() {
     } finally {
       setExportingId(null);
     }
-  };
+  }, [exportingId]);
 
   const STATS_CARDS = [
     {
