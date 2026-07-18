@@ -18,7 +18,7 @@ export function ProfileForm() {
   } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: profile?.name || "",
+      fullName: profile?.fullName || "",
       email: profile?.email || "",
       bio: profile?.bio || "",
       avatar: profile?.avatar || "",
@@ -28,7 +28,7 @@ export function ProfileForm() {
   useEffect(() => {
     if (profile) {
       reset({
-        name: profile.name,
+        fullName: profile.fullName,
         email: profile.email,
         bio: profile.bio || "",
         avatar: profile.avatar || "",
@@ -46,8 +46,8 @@ export function ProfileForm() {
         <Input
           label="Full Name"
           placeholder="John Doe"
-          error={errors.name?.message}
-          {...register("name")}
+          error={errors.fullName?.message}
+          {...register("fullName")}
         />
         <Input
           label="Email Address"

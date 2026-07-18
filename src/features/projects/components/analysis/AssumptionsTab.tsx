@@ -12,7 +12,7 @@ interface Props {
 export default function AssumptionsTab({ projectId }: Props) {
   const { data, isLoading, isError, refetch } = useGetProjectAssumptionsQuery(projectId);
   const [updateSection, { isLoading: isUpdating }] = useUpdateProjectAnalysisSectionMutation();
-  const assumptions = data?.data;
+  const assumptions = data?.data?.payload || data?.data;
 
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
 

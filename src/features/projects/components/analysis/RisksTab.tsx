@@ -12,7 +12,7 @@ interface Props {
 export default function RisksTab({ projectId }: Props) {
   const { data, isLoading, isError, refetch } = useGetProjectRisksQuery(projectId);
   const [updateSection, { isLoading: isUpdating }] = useUpdateProjectAnalysisSectionMutation();
-  const risks = data?.data;
+  const risks = data?.data?.payload || data?.data;
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);

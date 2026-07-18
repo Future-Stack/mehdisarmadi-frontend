@@ -58,32 +58,41 @@ export default function ProjectDetailsPage({
   const tenderInputRef = useRef<HTMLInputElement>(null);
   const addendaInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (project) {
-      setSelectedDivisions(project.divisions?.map((d) => d.id) || []);
-      setInstruction(project.instruction || "");
-    }
-  }, [project]);
+useEffect(() => {
+  if (project) {
+    setSelectedDivisions(project.divisions?.map((d) => d.id) || []);
+    setInstruction(project.instruction || "");
+  }
+}, [project]);
 
-  if (isLoading)
-    return (
-      <div className="p-8 text-center text-gray-500">Loading project details...</div>
-    );
-  if (error || !project)
-    return (
-      <div className="p-8 text-center text-red-500">Failed to load project details.</div>
-    );
-
-  // ── File validation helper ────────────────────────────────
-  const processFiles = useCallback((files: File[]): { valid: NewFile[]; invalid: string[] } => {
+// ── File validation helper ────────────────────────────────
+// Moved ABOVE the early returns so it always runs
+const processFiles = useCallback(
+  (files: File[]): { valid: NewFile[]; invalid: string[] } => {
     const valid: NewFile[] = [];
     const invalid: string[] = [];
+
     files.forEach((f) => {
-      if (isValidFile(f.name)) valid.push({ file: f, name: f.name });
-      else invalid.push(f.name);
+      if (isValidFile(f.name)) {
+        valid.push({ file: f, name: f.name });
+      } else {
+        invalid.push(f.name);
+      }
     });
+
     return { valid, invalid };
-  }, []);
+  },
+  []
+);
+
+if (isLoading)
+  return (
+    <div className="p-8 text-center text-gray-500">Loading project details...</div>
+  );
+if (error || !project)
+  return (
+    <div className="p-8 text-center text-red-500">Failed to load project details.</div>
+  );
 
   const addTenderFiles = (files: File[]) => {
     const { valid, invalid } = processFiles(files);
@@ -173,13 +182,19 @@ export default function ProjectDetailsPage({
     }
   };
 
-  const existingTenderFiles = project.files?.filter((f: any) => f.kind === "tender") || [];
-  const existingAddendaFiles = project.files?.filter((f: any) => f.kind === "addendum") || [];
+  const existingTenderFiles =
+  project?.files?.filter((f: any) => f.kind === "tender") ?? [];
+
+const existingAddendaFiles =
+  project?.files?.filter((f: any) => f.kind === "addendum") ?? [];
+
   const totalFiles =
     existingTenderFiles.length +
     existingAddendaFiles.length +
     uploadedTenderFiles.length +
     uploadedAddendaFiles.length;
+
+
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-12">

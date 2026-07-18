@@ -62,7 +62,7 @@ export default function Step3({ onBack, onLogin, onRegister, onSkip }: Step3Prop
                           alt="logo"
                           // height={195}
                           className="w-[120px] md:w-[240px] h-auto object-contain"
-                          style={{ width: "auto", height: "auto" }}
+                          // style={{ width: "auto", height: "auto" }}
                         />
 
           <div className="space-y-11">

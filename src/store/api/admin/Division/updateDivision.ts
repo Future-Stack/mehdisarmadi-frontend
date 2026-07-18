@@ -1,12 +1,15 @@
 import { baseApi } from "@/store/api/baseApi";
-import { Division } from "./getDivision";
-
+import { Division, FocusLevel } from "./getDivision";
 
 export interface UpdateDivisionPayload {
   id: string;
-  code: string;
-  name: string;
-  description: string;
+  code?: string;
+  name?: string;
+  description?: string;
+  isEnabled?: boolean;
+  focusLevel?: FocusLevel;
+  keywords?: string[];
+  tradeMappings?: string[];
 }
 
 interface UpdateDivisionResponse {
@@ -17,10 +20,7 @@ interface UpdateDivisionResponse {
 
 export const updateDivisionApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    updateDivision: builder.mutation<
-      UpdateDivisionResponse,
-      UpdateDivisionPayload
-    >({
+    updateDivision: builder.mutation<UpdateDivisionResponse, UpdateDivisionPayload>({
       query: ({ id, ...body }) => ({
         url: `admin/divisions/${id}`,
         method: "PUT",
@@ -35,3 +35,42 @@ export const updateDivisionApi = baseApi.injectEndpoints({
 });
 
 export const { useUpdateDivisionMutation } = updateDivisionApi;
+
+
+// import { baseApi } from "@/store/api/baseApi";
+// import { Division } from "./getDivision";
+
+
+// export interface UpdateDivisionPayload {
+//   id: string;
+//   code: string;
+//   name: string;
+//   description: string;
+// }
+
+// interface UpdateDivisionResponse {
+//   success: boolean;
+//   message: string;
+//   data: Division;
+// }
+
+// export const updateDivisionApi = baseApi.injectEndpoints({
+//   endpoints: (builder) => ({
+//     updateDivision: builder.mutation<
+//       UpdateDivisionResponse,
+//       UpdateDivisionPayload
+//     >({
+//       query: ({ id, ...body }) => ({
+//         url: `admin/divisions/${id}`,
+//         method: "PUT",
+//         body,
+//       }),
+//       invalidatesTags: (_result, _error, { id }) => [
+//         "Division",
+//         { type: "Division", id },
+//       ],
+//     }),
+//   }),
+// });
+
+// export const { useUpdateDivisionMutation } = updateDivisionApi;

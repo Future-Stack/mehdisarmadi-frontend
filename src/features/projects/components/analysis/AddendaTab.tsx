@@ -11,7 +11,7 @@ interface Props {
 export default function AddendaTab({ projectId }: Props) {
   const { data, isLoading, isError, refetch } = useGetProjectAddendaQuery(projectId);
   const [updateSection, { isLoading: isUpdating }] = useUpdateProjectAnalysisSectionMutation();
-  const addenda = data?.data;
+  const addenda = data?.data?.payload || data?.data;
 
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);

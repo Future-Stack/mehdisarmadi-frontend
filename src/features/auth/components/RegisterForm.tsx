@@ -41,7 +41,7 @@ export default function RegisterForm() {
                                 // height={195}
                                 // width={390}
                                 className="w-[120px] md:w-[240px] h-auto object-contain"
-                                style={{ width: "auto", height: "auto" }}
+                                // style={{ width: "auto", height: "auto" }}
                               />
         <div className="space-y-1 -mt-8">
           <h1 className="text-[32px] font-bold text-[#000000]">

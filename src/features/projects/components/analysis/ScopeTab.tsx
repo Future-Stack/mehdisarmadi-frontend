@@ -13,7 +13,7 @@ interface Props {
 export default function ScopeTab({ projectId }: Props) {
   const { data, isLoading, isError, refetch } = useGetProjectScopeQuery(projectId);
   const [updateSection, { isLoading: isUpdating }] = useUpdateProjectAnalysisSectionMutation();
-  const scope = data?.data;
+  const scope = data?.data?.payload || data?.data;
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilterCode, setActiveFilterCode] = useState("all");

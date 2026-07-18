@@ -129,9 +129,9 @@ export default function NewProjectWizard() {
                 )}>
                   {isCompleted ? <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : String(step.id).padStart(2, '0')}
                 </div>
-                <div className="text-center hidden xs:block">
+                <div className="text-center ">
                   <div className={cn("text-[10px] sm:text-[12px] font-bold", isActive || isCompleted ? "text-[#101828] dark:text-white" : "text-[#6B6969]")}>{step.title}</div>
-                  <div className={cn("text-[9px] sm:text-[11px] font-medium hidden sm:block", isActive || isCompleted ? "text-[#101828] dark:text-white" : "text-[#6A7282]")}>{step.subtitle}</div>
+                  <div className={cn("text-[9px] sm:text-[11px] font-medium ", isActive || isCompleted ? "text-[#101828] dark:text-white" : "text-[#6A7282]")}>{step.subtitle}</div>
                 </div>
               </div>
             );
@@ -197,19 +197,35 @@ export default function NewProjectWizard() {
                         <input
                           type="date"
                           value={formData.closingDate}
-                          onChange={(e) => setFormData({ ...formData, closingDate: e.target.value })}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setFormData((prev) => ({
+                              ...prev,
+                              closingDate: value,
+                              // reset questionDate if it's now invalid relative to the new closing date
+                              questionDate: prev.questionDate && value && prev.questionDate > value ? "" : prev.questionDate,
+                            }));
+                          }}
                           className="w-full h-11 pl-10 pr-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                         />
                         <CalendarIcon className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-[13px] font-medium text-gray-700 dark:text-gray-300 mb-1.5">QUESTION DATE</label>
+                      <label className="block text-[13px] font-medium text-gray-700 dark:text-gray-300 mb-1.5">QUESTION DUE DATE</label>
                       <div className="relative">
                         <input
                           type="date"
                           value={formData.questionDate}
-                          onChange={(e) => setFormData({ ...formData, questionDate: e.target.value })}
+                          max={formData.closingDate || undefined}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (formData.closingDate && value > formData.closingDate) {
+                              toast.error("Question due date cannot be after the closing date.");
+                              return;
+                            }
+                            setFormData({ ...formData, questionDate: value });
+                          }}
                           className="w-full h-11 pl-10 pr-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                         />
                         <CalendarIcon className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />

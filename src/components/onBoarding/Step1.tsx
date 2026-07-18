@@ -51,13 +51,13 @@ const Step1 = ({ onNext, onSkip }: Step1Props) => {
         {/* Logo + Heading */}
         <div className="flex flex-col items-center space-y-6">
           {/* <Logo /> */}
-           <Image
-                src={Logo}
-                alt="logo"
-                // height={195}
-                className="w-[120px] md:w-[240px] h-auto object-contain"
-                style={{ width: "auto", height: "auto" }}
-              />
+          <Image
+            src={Logo}
+            alt="logo"
+            // height={195}
+            className="w-[120px] md:w-[240px]  h-auto object-contain"
+          // style={{ width: "auto", height: "auto" }}
+          />
 
           <div className="space-y-11">
             <h1 className="text-4xl md:text-5xl font-bold text-[#0A0A0A] -mt-5">
@@ -69,7 +69,7 @@ const Step1 = ({ onNext, onSkip }: Step1Props) => {
           </div>
 
           <p className="text-base text-[#4A5565] max-w-[841px] leading-relaxed -mt-2">
-            Transform the way you manage construction tenders with AI-powered automation. 
+            Transform the way you manage construction tenders with AI-powered automation.
             Analyze documents, identify risks, and generate professional quotes in minutes.
           </p>
         </div>
@@ -108,7 +108,7 @@ const Step1 = ({ onNext, onSkip }: Step1Props) => {
           >
             Next <ChevronRight className="w-5 h-5" />
           </button>
-          
+
           <button
             onClick={onSkip}
             className="flex justify-end text-[#0A0A0A] font-medium hover:text-gray-800 transition-colors"

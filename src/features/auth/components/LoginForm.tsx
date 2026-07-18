@@ -53,7 +53,7 @@ export default function LoginForm() {
           // height={195}
           // width={390}
           className="w-[120px] md:w-[240px] h-auto object-contain"
-          style={{ width: "auto", height: "auto" }}
+          // style={{ width: "auto", height: "auto" }}
         />
         <div className="space-y-1 -mt-8">
           <div className="flex items-center justify-center gap-2">

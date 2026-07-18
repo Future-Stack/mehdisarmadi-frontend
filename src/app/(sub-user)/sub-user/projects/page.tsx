@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import { Search, Eye, Edit, Download, AlertTriangle, Calendar, Plus, Funnel, ChevronDown, Calendar1 } from "lucide-react";
+import { Search, Eye, Edit, Download, AlertTriangle, Calendar, Plus, Funnel, ChevronDown, Calendar1, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { DeleteModal } from "@/components/ui/DeleteModal";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { useGetProjectsQuery } from "@/store/api/projectApi";
+import { useDeleteProjectMutation, useGetProjectsQuery } from "@/store/api/projectApi";
 import AnalysisExportView from "@/features/projects/components/analysis/AnalysisExportView";
 import { exportAnalysisPDF } from "@/features/projects/utils/exportUtils";
 import { Loader2 } from "lucide-react";
@@ -19,6 +20,10 @@ export default function ProjectsPage() {
   const [status, setStatus] = useState("all");
   const [timeRange, setTimeRange] = useState("all");
   const [search, setSearch] = useState("");
+  const [deleteProject] = useDeleteProjectMutation();
+  const [deletingProject, setDeletingProject] = useState<{ id: string; name: string } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
 
   const { data, isLoading } = useGetProjectsQuery({ page, limit, status, timeRange, search });
   const projects = data?.data?.items || [];
@@ -41,6 +46,24 @@ export default function ProjectsPage() {
       setExportingId(null);
     }
   }, [exportingId]);
+
+
+
+const handleDelete = async () => {
+    if (!deletingProject) return;
+
+    setIsDeleting(true);
+    const toastId = toast.loading(`Deleting ${deletingProject.name}…`);
+    try {
+        await deleteProject(deletingProject.id).unwrap();
+        toast.success("Project deleted", { id: toastId, description: `"${deletingProject.name}" was removed.` });
+        setDeletingProject(null);
+    } catch {
+        toast.error("Delete failed", { id: toastId, description: "Something went wrong. Please try again." });
+    } finally {
+        setIsDeleting(false);
+    }
+};
 
   return (
     <div className="flex flex-col gap-6 pb-12 max-w-7xl mx-auto">
@@ -226,6 +249,18 @@ export default function ProjectsPage() {
                                <Download className="w-4 h-4" />
                             )}
                           </button>
+                          <button
+                            onClick={() => setDeletingProject({ id: row.id, name: row.name })}
+                            disabled={isDeleting && deletingProject?.id === row.id}
+                            className="p-1.5 text-red-400 hover:text-red-600 transition-colors disabled:opacity-40"
+                            title="Delete project"
+                        >
+                            {isDeleting && deletingProject?.id === row.id ? (
+                                <Loader2 className="w-4 h-4 animate-spin text-red-600" />
+                            ) : (
+                                <Trash2 className="w-4 h-4" />
+                            )}
+                        </button>
                           {/* <button 
                             onClick={() => toast.error(`Delete project endpoint pending.`)}
                             className="p-1.5 text-red-400 hover:text-red-600 transition-colors"
@@ -258,6 +293,14 @@ export default function ProjectsPage() {
         </div>
       )}
 
+      <DeleteModal
+        open={!!deletingProject}
+        onClose={() => setDeletingProject(null)}
+        onConfirm={handleDelete}
+        title="Delete Project"
+        description={`Are you sure you want to delete "${deletingProject?.name}"? This action cannot be undone.`}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 }

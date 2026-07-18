@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useGetProfileQuery, useUpdateProfileMutation, useUpdatePasswordMutation } from "@/store/api/profileApi";
+import { useGetProfileQuery, useUpdateProfileMutation, useUpdatePasswordMutation, useDeleteAccountMutation } from "@/store/api/profileApi";
 import { toast } from "sonner";
 import { useAppDispatch } from "@/store/hooks";
 import { setUser } from "@/store/slices/authSlice";
@@ -13,6 +13,7 @@ export function useProfile() {
 
   const [updateProfileApi, updateProfileState] = useUpdateProfileMutation();
   const [updatePasswordApi, updatePasswordState] = useUpdatePasswordMutation();
+  const [deleteAccountApi, deleteAccountState] = useDeleteAccountMutation();
 
   const updateProfile = async (payload: any) => {
     try {
@@ -44,5 +45,7 @@ export function useProfile() {
     isUpdating: updateProfileState.isLoading,
     updatePassword,
     isUpdatingPassword: updatePasswordState.isLoading,
+    deleteAccount: deleteAccountApi,
+    isDeletingAccount: deleteAccountState.isLoading,
   };
 }

@@ -44,3 +44,7 @@ html {
 .dark ::-webkit-scrollbar-thumb {
   background: #4b5563;
 }
+
+button {
+  cursor: pointer;
+}

@@ -1,6 +1,61 @@
+import { number, string } from "zod";
 import { baseApi } from "./baseApi";
 import type { ApiResponse } from "@/types";
 
+export interface Division {
+  id: string;
+  code: string;
+  name: string;
+  description: string;
+  isEnabled: boolean;
+  focusLevel: string;
+  keywords: string[];
+  tradeMappings: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface AdminProjectListItem {
+  id: string;
+  name: string;
+  clientName: string;
+  clientContact: string;
+  address: string;
+  description: string;
+  status: string;
+  statusLabel: string;
+  questionDate: string;
+  closingDate: string;
+  value: number;
+  valueFormatted: string;
+  fileCount: number;
+  analysisSectionCount: number;
+  createdAt: string;
+  updatedAt: string;
+  owner: {
+    id: string;
+    fullName: string;
+    email: string;
+  };
+}
+
+export interface AdminProjectListResponse {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  filters: any;
+  items: AdminProjectListItem[];
+}
+
+export interface AdminProjectDetail extends ProjectDetail {
+  owner: {
+    id: string;
+    fullName: string;
+    email: string;
+  };
+  divisions: Division[];
+}
 export interface DashboardStats {
   cards: {
     totalTender: { value: number };
@@ -132,6 +187,7 @@ export const projectApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Project"],
     }),
+    
     getProjects: builder.query<
       ApiResponse<ProjectListResponse>,
       { page?: number; limit?: number; status?: string; timeRange?: string; search?: string }
@@ -163,6 +219,16 @@ export const projectApi = baseApi.injectEndpoints({
       invalidatesTags: (result, error, { projectId }) => [
         { type: "Project", id: projectId },
         "Project", // Invalidate list
+      ],
+    }),
+    deleteProject: builder.mutation<ApiResponse<any>, string>({
+      query: (projectId) => ({
+        url: `/project/${projectId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (result, error, projectId) => [
+        { type: "Project", id: projectId },
+        "Project",
       ],
     }),
     getProjectById: builder.query<ApiResponse<ProjectDetail>, string>({
@@ -283,6 +349,20 @@ export const projectApi = baseApi.injectEndpoints({
         { type: "Project", id: `${projectId}_${section}` },
       ],
     }),
+    getAdminProjects: builder.query<
+      ApiResponse<AdminProjectListResponse>,
+      { page?: number; limit?: number; status?: string; timeRange?: string; search?: string }
+    >({
+      query: (params) => ({
+        url: "/admin/projects",
+        params,
+      }),
+      providesTags: ["Project"],
+    }),
+    getAdminProjectById: builder.query<ApiResponse<AdminProjectDetail>, string>({
+      query: (id) => `/admin/projects/${id}`,
+      providesTags: (result, error, id) => [{ type: "Project", id }],
+    }),
   }),
 });
 
@@ -294,6 +374,7 @@ export const {
   useCreateProjectMutation,
   useUpdateProjectMutation,
   useGetProjectByIdQuery,
+  useDeleteProjectMutation,
   useGetProjectReviewQuery,
   useDeleteProjectFileMutation,
   useGetProjectAnalysisSectionQuery,
@@ -310,4 +391,6 @@ export const {
   useDeleteProjectAnalysisItemMutation,
   useReanalyzeProjectSectionMutation,
   useSaveProjectQuoteMutation,
+  useGetAdminProjectsQuery,
+  useGetAdminProjectByIdQuery,
 } = projectApi;

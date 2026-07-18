@@ -11,7 +11,7 @@ interface Props {
 export default function ExclusionsTab({ projectId }: Props) {
   const { data, isLoading, isError, refetch } = useGetProjectExclusionsQuery(projectId);
   const [updateSection, { isLoading: isUpdating }] = useUpdateProjectAnalysisSectionMutation();
-  const exclusions = data?.data;
+  const exclusions = data?.data?.payload || data?.data;
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);

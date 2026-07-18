@@ -1,10 +1,16 @@
 import { baseApi } from "@/store/api/baseApi";
 
+export type FocusLevel = "LOW" | "NORMAL" | "HIGH";
+
 export interface Division {
   id: string;
   code: string;
   name: string;
   description: string;
+  isEnabled: boolean;
+  focusLevel: FocusLevel;
+  keywords: string[];
+  tradeMappings: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -28,26 +34,16 @@ interface GetDivisionsResponse {
 }
 
 export const getDivisionsApi = baseApi.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
-    getDivisions: builder.query<
-      GetDivisionsResponse,
-      GetDivisionsParams | undefined
-    >({
+    getDivisions: builder.query<GetDivisionsResponse, GetDivisionsParams | undefined>({
       query: (params) => {
         const queryParams: Record<string, any> = {};
-
         if (params?.page) queryParams.page = params.page;
         if (params?.limit) queryParams.limit = params.limit;
+        if (params?.search?.trim()) queryParams.search = params.search.trim();
 
-        if (params?.search?.trim()) {
-          queryParams.search = params.search.trim();
-        }
-
-        return {
-          url: "admin/divisions",
-          method: "GET",
-          params: queryParams,
-        };
+        return { url: "admin/divisions", method: "GET", params: queryParams };
       },
       providesTags: ["Division"],
     }),
@@ -55,3 +51,76 @@ export const getDivisionsApi = baseApi.injectEndpoints({
 });
 
 export const { useGetDivisionsQuery } = getDivisionsApi;
+
+
+
+// import { baseApi } from "@/store/api/baseApi";
+
+// // export interface Division {
+// //   id: string;
+// //   code: string;
+// //   name: string;
+// //   description: string;
+// //   createdAt: string;
+// //   updatedAt: string;
+// // }
+
+// export interface Division {
+//   id: string;
+//   code: string;
+//   name: string;
+//   description: string;
+//   isEnabled: boolean;
+//   focusLevel: "NORMAL" | "HIGH" | "LOW";
+//   keywords: string[];
+//   tradeMappings: string[];
+//   createdAt: string;
+//   updatedAt: string;
+// }
+
+// export interface GetDivisionsParams {
+//   page?: number;
+//   limit?: number;
+//   search?: string;
+// }
+
+// interface GetDivisionsResponse {
+//   success: boolean;
+//   message: string;
+//   data: {
+//     items: Division[];
+//     total: number;
+//     page: number;
+//     limit: number;
+//     totalPages: number;
+//   };
+// }
+
+// export const getDivisionsApi = baseApi.injectEndpoints({
+//   endpoints: (builder) => ({
+//     getDivisions: builder.query<
+//       GetDivisionsResponse,
+//       GetDivisionsParams | undefined
+//     >({
+//       query: (params) => {
+//         const queryParams: Record<string, any> = {};
+
+//         if (params?.page) queryParams.page = params.page;
+//         if (params?.limit) queryParams.limit = params.limit;
+
+//         if (params?.search?.trim()) {
+//           queryParams.search = params.search.trim();
+//         }
+
+//         return {
+//           url: "admin/divisions",
+//           method: "GET",
+//           params: queryParams,
+//         };
+//       },
+//       providesTags: ["Division"],
+//     }),
+//   }),
+// });
+
+// export const { useGetDivisionsQuery } = getDivisionsApi;

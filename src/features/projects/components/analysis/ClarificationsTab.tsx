@@ -12,7 +12,7 @@ interface Props {
 export default function ClarificationsTab({ projectId }: Props) {
   const { data, isLoading, isError, refetch } = useGetProjectClarificationsQuery(projectId);
   const [updateSection, { isLoading: isUpdating }] = useUpdateProjectAnalysisSectionMutation();
-  const clarifications = data?.data;
+  const clarifications = data?.data?.payload || data?.data;
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);

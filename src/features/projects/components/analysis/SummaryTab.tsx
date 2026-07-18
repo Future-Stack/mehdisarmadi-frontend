@@ -13,7 +13,7 @@ interface Props {
 export default function SummaryTab({ projectId }: Props) {
   const { data, isLoading, isError, refetch } = useGetProjectSummaryQuery(projectId);
   const [updateSection, { isLoading: isUpdating }] = useUpdateProjectAnalysisSectionMutation();
-  const summary = data?.data;
+  const summary = data?.data?.payload || data?.data;
 
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);

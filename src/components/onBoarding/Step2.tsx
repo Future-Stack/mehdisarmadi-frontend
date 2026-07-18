@@ -54,7 +54,7 @@ export default function Step2({ onNext, onBack, onSkip }: Step2Props) {
                           alt="logo"
                           // height={195}
                           className="w-[120px] md:w-[240px] h-auto object-contain"
-                          style={{ width: "auto", height: "auto" }}
+                          // style={{ width: "auto", height: "auto" }}
                         />
 
           <div className="space-y-11">

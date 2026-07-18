@@ -41,6 +41,10 @@ export default function DivisionCreateModal({ onClose }: Props) {
         code: form.code.trim(),
         name: form.name.trim(),
         description: form.description.trim(),
+        isEnabled: true,
+        focusLevel: "NORMAL",
+        keywords: [],
+        tradeMappings: [],
       }).unwrap();
 
       toast.success("Division created successfully.", {
