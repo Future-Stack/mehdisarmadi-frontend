@@ -609,7 +609,7 @@ export default function DivisionsPage() {
                                                 key={p}
                                                 onClick={() => setPage(p as number)}
                                                 className={`w-7 h-7 rounded-lg text-xs font-medium transition ${page === p
-                                                    ? "bg-indigo-600 text-white shadow-sm"
+                                                    ? "bg-[#008236] text-white shadow-sm"
                                                     : "text-slate-600 hover:bg-white hover:shadow-sm border border-transparent hover:border-slate-200"
                                                     }`}
                                             >
