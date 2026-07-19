@@ -78,6 +78,7 @@ export default function UsersManagement() {
   const [isSuspendModalOpen, setIsSuspendModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
+  console.log(selectedUser);
 
   // Add user form state
   const [form, setForm] = useState<CreateUserPayload>(emptyForm);
@@ -504,24 +505,47 @@ export default function UsersManagement() {
             >
               Cancel
             </button>
-            <button
+            {/* <button
               onClick={handleSuspendUser}
-              disabled={suspending || selectedUser?.status === "suspended"}
+              disabled={suspending || selectedUser?.status === "suspend" || selectedUser?.status === "active"}
               className={`flex-1 inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors
-    ${selectedUser?.status === "suspended"
+    ${selectedUser?.status === "suspend"
                   ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-orange-500 hover:bg-orange-600"
+                  : selectedUser?.status === "active"
+                    ? "bg-green-500 hover:bg-green-600"
+                    : "bg-orange-500 hover:bg-orange-600"
                 }`}
             >
               {suspending && (
                 <Loader size={14} className="animate-spin" />
               )}
 
-              {selectedUser?.status === "suspended"
+              {selectedUser?.status === "suspend"
                 ? "Already Suspended"
-                : "Suspend"}
-            </button>
-          </div>
+                : selectedUser?.status === "pending"
+                  ? "Activate"
+                  : "Suspend"}
+            </button> */}
+            <button
+  onClick={handleSuspendUser}
+  disabled={suspending || selectedUser?.status === "suspend"}
+  className={`flex-1 inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors
+    ${selectedUser?.status === "suspend"
+      ? "bg-gray-400 cursor-not-allowed"
+      : selectedUser?.status === "pending"
+        ? "bg-blue-500 hover:bg-blue-600"
+        : "bg-red-500 hover:bg-red-600"
+    }`}
+>
+  {suspending && <Loader size={14} className="animate-spin" />}
+
+  {selectedUser?.status === "suspend"
+    ? "Already Suspended"
+    : selectedUser?.status === "pending"
+      ? "Activate"
+      : "Suspend"}
+</button>          </div>
+
         </div>
       </Modal>
       {/* view modal */}

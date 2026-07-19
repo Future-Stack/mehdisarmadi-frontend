@@ -5,7 +5,7 @@ export interface AdminUser {
   fullName: string;
   email: string;
   role: "ADMIN" | "USER";
-  status: "active" | "suspended";
+  status: "active" | "pending" | "suspend";
   isEmailVerified: boolean;
   lastActiveAt: string;
   createdAt: string;
