@@ -36,7 +36,7 @@ const navItems: NavItem[] = [
     icon: <LayoutDashboard size={18} />,
   },
   {
-    label: "Projects",
+    label: "Tenders",
     href: "/admin/projects",
     icon: <FolderKanban size={18} />,
   },

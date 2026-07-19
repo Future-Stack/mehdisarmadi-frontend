@@ -37,7 +37,7 @@ export default function ProjectSetup({ dashboardPath = "/admin" }: { dashboardPa
     if (draft) {
       setDraftProject(JSON.parse(draft));
     } else {
-      toast.error("Project details missing, returning to start.");
+      toast.error("Tender details missing, returning to start.");
       router.push(`${dashboardPath}/projects/new`);
     }
   }, [router, dashboardPath]);
@@ -75,7 +75,7 @@ export default function ProjectSetup({ dashboardPath = "/admin" }: { dashboardPa
 
   const handleAnalyze = async () => {
     if (!draftProject) {
-      toast.error("Missing project info.");
+      toast.error("Missing tender info.");
       return;
     }
     if (selectedDivs.length === 0) {
@@ -112,12 +112,12 @@ export default function ProjectSetup({ dashboardPath = "/admin" }: { dashboardPa
       // formData.append("aiOptions", "Generate Scope of Work");
 
       const response = await createProject(formData).unwrap();
-      toast.success("Project created successfully!");
+      toast.success("Tender created successfully!");
       sessionStorage.removeItem("draftProject");
       router.push(`/sub-user/projects/${response.data.project.id}`);
     } catch (error: any) {
       console.error(error);
-      toast.error(error?.data?.message || "Failed to create project");
+      toast.error(error?.data?.message || "Failed to create tender");
     }
   };
 
@@ -133,7 +133,7 @@ export default function ProjectSetup({ dashboardPath = "/admin" }: { dashboardPa
           <ArrowLeft className="w-4 h-4" /> Back to Dashboard
         </Link>
         <div className="space-y-1">
-          <h1 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">{draftProject?.name || "Project Name"}</h1>
+          <h1 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">{draftProject?.name || "Tender Name"}</h1>
           <p className="text-gray-400 dark:text-gray-500 font-bold text-sm uppercase tracking-widest">{draftProject?.address || "Location"}</p>
         </div>
       </div>

@@ -63,7 +63,7 @@ export default function LoginForm() {
             </h1>
           </div>
           <p className="text-[16px] text-[#4A5565] font-medium">
-            {isAdminLogin ? "Access admin dashboard" : "Login to manage your tender projects"}
+            {isAdminLogin ? "Access admin dashboard" : "Login to manage your tenders"}
           </p>
         </div>
       </div>

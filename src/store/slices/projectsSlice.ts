@@ -55,7 +55,7 @@ const projectsSlice = createSlice({
       })
       .addCase(fetchProjectsThunk.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload || "Failed to fetch projects";
+        state.error = action.payload || "Failed to fetch tenders";
       });
 
     // Fetch Project By ID
@@ -71,7 +71,7 @@ const projectsSlice = createSlice({
       })
       .addCase(fetchProjectByIdThunk.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload || "Failed to fetch project";
+        state.error = action.payload || "Failed to fetch tender";
       });
 
     // Create Project
@@ -87,7 +87,7 @@ const projectsSlice = createSlice({
       })
       .addCase(createProjectThunk.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload || "Failed to create project";
+        state.error = action.payload || "Failed to create tender";
       });
 
     // Update Project
@@ -107,7 +107,7 @@ const projectsSlice = createSlice({
       })
       .addCase(updateProjectThunk.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload || "Failed to update project";
+        state.error = action.payload || "Failed to update tender";
       });
 
     // Delete Project
@@ -123,7 +123,7 @@ const projectsSlice = createSlice({
       })
       .addCase(deleteProjectThunk.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload || "Failed to delete project";
+        state.error = action.payload || "Failed to delete tender";
       });
   },
 });

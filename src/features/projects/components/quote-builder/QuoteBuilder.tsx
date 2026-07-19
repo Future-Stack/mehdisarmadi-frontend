@@ -373,15 +373,15 @@ export default function QuoteBuilder() {
         {/* Project & Quote Details */}
         <section className="bg-white dark:bg-[#111827] rounded-[32px] border border-gray-100 dark:border-gray-800 p-8 shadow-sm space-y-8 transition-colors duration-300">
           <h2 className="text-lg font-black text-[#1F2937] dark:text-gray-100">
-            Project & Quote Details
+            Tender & Quote Details
           </h2>
           <div className="grid grid-cols-2 gap-x-8 gap-y-6">
             <FigmaInput label="Quote Number" value={formData.quoteNumber} />
             <FigmaInput
-              label="Project Location"
+              label="Tender Location"
               value={formData.projectLocation}
             />
-            <FigmaInput label="Project Name" value={formData.projectName} />
+            <FigmaInput label="Tender Name" value={formData.projectName} />
             <FigmaInput label="Stat Date" value={formData.startDate} />
             <FigmaInput label="Client Name" value={formData.clientName} />
             <FigmaInput

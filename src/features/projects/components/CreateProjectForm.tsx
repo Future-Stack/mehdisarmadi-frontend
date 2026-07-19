@@ -46,7 +46,7 @@ export default function CreateProjectForm({ dashboardPath = "/admin" }: { dashbo
           
           <div className="space-y-2">
             <h1 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight transition-colors">
-              Create New Project
+              Create New Tender
             </h1>
             <p className="text-gray-500 dark:text-gray-400 font-medium transition-colors">
               Transform the way you manage construction tenders with AI-powered automation.
@@ -59,7 +59,7 @@ export default function CreateProjectForm({ dashboardPath = "/admin" }: { dashbo
           <div className="space-y-5">
             <div className="grid grid-cols-2 gap-4">
               <Input
-                label="Project Name"
+                label="Tender Name"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
@@ -69,7 +69,7 @@ export default function CreateProjectForm({ dashboardPath = "/admin" }: { dashbo
               />
               
               <Input
-                label="Project Address"
+                label="Tender Address"
                 name="address"
                 value={formData.address}
                 onChange={handleChange}
@@ -124,7 +124,7 @@ export default function CreateProjectForm({ dashboardPath = "/admin" }: { dashbo
                 value={formData.description}
                 onChange={handleChange}
                 className="w-full min-h-[100px] p-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-[#111827] focus:outline-none focus:border-emerald-200 dark:focus:border-emerald-800 focus:ring-4 focus:ring-emerald-500/5 transition-all text-sm font-medium resize-y"
-                placeholder="Brief description of the project"
+                placeholder="Brief description of the tender"
               />
             </div>
 
@@ -145,7 +145,7 @@ export default function CreateProjectForm({ dashboardPath = "/admin" }: { dashbo
             variant="primary" 
             className="w-full h-14 rounded-2xl font-black text-base shadow-lg shadow-emerald-100 dark:shadow-none active:scale-[0.98] transition-all mt-4"
           >
-            Continue to Project Setup
+            Continue to Tender Setup
           </Button>
         </form>
       </div>

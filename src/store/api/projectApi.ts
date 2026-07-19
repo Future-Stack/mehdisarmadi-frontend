@@ -353,10 +353,19 @@ export const projectApi = baseApi.injectEndpoints({
       ApiResponse<AdminProjectListResponse>,
       { page?: number; limit?: number; status?: string; timeRange?: string; search?: string }
     >({
-      query: (params) => ({
-        url: "/admin/projects",
-        params,
-      }),
+      query: (params) => {
+        const cleanParams: Record<string, any> = {};
+        if (params.page) cleanParams.page = params.page;
+        if (params.limit) cleanParams.limit = params.limit;
+        if (params.status) cleanParams.status = params.status;
+        if (params.timeRange) cleanParams.timeRange = params.timeRange;
+        if (params.search?.trim()) cleanParams.search = params.search.trim();
+
+        return {
+          url: "/admin/projects",
+          params: cleanParams,
+        };
+      },
       providesTags: ["Project"],
     }),
     getAdminProjectById: builder.query<ApiResponse<AdminProjectDetail>, string>({

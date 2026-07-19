@@ -58,7 +58,7 @@ export default function AIAnalysisResultsPage({ params }: { params: Promise<{ id
             href={`/sub-user/projects/${id}`}
             className="inline-flex items-center gap-1 text-sm font-bold text-gray-500 hover:text-gray-900 dark:hover:text-white mb-4 transition-colors"
           >
-            <ArrowLeft className="w-4 h-4" /> Back to Project
+            <ArrowLeft className="w-4 h-4" /> Back to Tender
           </Link>
           <h1 className="text-[28px] font-bold text-gray-900 dark:text-white leading-tight">
             AI Analysis Results

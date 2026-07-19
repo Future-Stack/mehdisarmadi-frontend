@@ -31,20 +31,24 @@ interface GetAdminUsersResponse {
 }
 
 export const getAdminUsersApi = baseApi.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     getAdminUsers: builder.query<
       GetAdminUsersResponse,
       GetAdminUsersParams
     >({
-      query: ({ page = 1, limit = 10, search = "" }) => ({
-        url: "/admin/users",
-        method: "GET",
-        params: {
-          page,
-          limit,
-          search,
-        },
-      }),
+      query: (params) => {
+        const cleanParams: Record<string, any> = {};
+        if (params.page) cleanParams.page = params.page;
+        if (params.limit) cleanParams.limit = params.limit;
+        if (params.search?.trim()) cleanParams.search = params.search.trim();
+
+        return {
+          url: "/admin/users",
+          method: "GET",
+          params: cleanParams,
+        };
+      },
       providesTags: ["Users"],
     }),
   }),

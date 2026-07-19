@@ -32,7 +32,7 @@ const smallFeatures = [
   },
   {
     title: "Risk Assessment",
-    desc: "Identify and mitigate project risks",
+    desc: "Identify and mitigate tender risks",
     icon: Shield,
     bgIcon: "bg-[#9810FA]",
     color: "text-white",
@@ -75,7 +75,7 @@ export default function Step3({ onBack, onLogin, onRegister, onSkip }: Step3Prop
           </div>
 
           <p className="text-base text-[#4A5565] max-w-[841px] leading-relaxed -mt-2">
-            Start analyzing tenders and building quotes in minutes. No credit card required for your first project.
+            Start analyzing tenders and building quotes in minutes. No credit card required for your first tender.
           </p>
         </div>
 

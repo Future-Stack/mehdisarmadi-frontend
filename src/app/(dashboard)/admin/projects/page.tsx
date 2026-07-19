@@ -3,7 +3,7 @@ import ProjectsManagement from "@/features/auth/components/adminComponents/Proje
 export default function ProjectsPage() {
   return (
     <ProjectsManagement 
-      title="Projects Management" 
+      title="Tenders Management" 
       description="Manage user accounts, roles, and permissions" 
     />
   );

@@ -72,7 +72,7 @@ export default function GlobalSettings() {
       {/* ── Header ── */}
       <StaticPage
         title="Global Settings"
-        description="Company-level defaults for all projects"
+        description="Company-level defaults for all tenders"
       />
 
       <div className="space-y-6 pt-2">

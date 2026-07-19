@@ -7,7 +7,7 @@ import { useGetDivisionByIdQuery } from "@/store/api/admin/Division/getDivisionb
 import { useUpdateDivisionMutation } from "@/store/api/admin/Division/updateDivision";
 import { useEnableDivisionMutation, useDisableDivisionMutation } from "@/store/api/admin/Division/toggleDivisionStatus";
 import { ChevronLeft, ChevronRight, Edit, Eye, Loader, Plus, Search, ToggleLeft, ToggleRight, Trash, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import DivisionCreateModal from "./CreateDivision";
 
@@ -397,6 +397,14 @@ export default function DivisionsPage() {
     const totalPages = data?.data?.totalPages ?? 1;
     const total = data?.data?.total ?? 0;
 
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            setPage(1);
+            setSearch(searchInput.trim());
+        }, 400);
+        return () => clearTimeout(timeout);
+    }, [searchInput]);
+
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         setPage(1);
@@ -453,10 +461,10 @@ export default function DivisionsPage() {
                             onChange={(e) => {
                                 setSearchInput(e.target.value);
 
-                                if (e.target.value.trim() === "") {
-                                    setPage(1);
-                                    setSearch("");
-                                }
+                                // if (e.target.value.trim() === "") {
+                                //     setPage(1);
+                                //     setSearch("");
+                                // }
                             }}
                             placeholder="Search divisions…"
                             className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-[#D1D5DC] dark:border-gray-700 bg-white dark:bg-gray-900 text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent shadow-sm transition"

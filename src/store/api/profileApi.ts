@@ -9,7 +9,7 @@ export const profileApi = baseApi.injectEndpoints({
       query: () => "/user/profile",
       providesTags: ["User"],
     }),
-    updateProfile: builder.mutation<ApiResponse<User>, ProfileFormValues>({
+    updateProfile: builder.mutation<ApiResponse<User>, Partial<ProfileFormValues>>({
       query: (payload) => ({
         url: "/user/profile-update",
         method: "PATCH",

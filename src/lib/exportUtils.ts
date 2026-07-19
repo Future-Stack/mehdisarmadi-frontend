@@ -203,8 +203,8 @@ export async function exportQuoteToDocx(
           body(quoteData.companyAddress || "123 Main Street, Toronto, ON M5V 3A8"),
           divider(),
           // Quote meta
-          heading("Project & Quote Details"),
-          body(`Project Name: ${quoteData.projectName || ""}`),
+          heading("Tender & Quote Details"),
+          body(`Tender Name: ${quoteData.projectName || ""}`),
           body(`Client Name: ${quoteData.clientName || ""}`),
           body(`Quote Number: ${quoteData.quoteNumber || ""}`),
           divider(),

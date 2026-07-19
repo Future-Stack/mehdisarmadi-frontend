@@ -87,11 +87,11 @@ const processFiles = useCallback(
 
 if (isLoading)
   return (
-    <div className="p-8 text-center text-gray-500">Loading project details...</div>
+    <div className="p-8 text-center text-gray-500">Loading tender details...</div>
   );
 if (error || !project)
   return (
-    <div className="p-8 text-center text-red-500">Failed to load project details.</div>
+    <div className="p-8 text-center text-red-500">Failed to load tender details.</div>
   );
 
   const addTenderFiles = (files: File[]) => {

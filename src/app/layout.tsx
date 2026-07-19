@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     default: "Renofield",
     template: "%s | Renofield",
   },
-  description: "A production-ready project management dashboard for Renofield.",
+  description: "A production-ready tender management dashboard for Renofield.",
   icons: {
     icon: "/Images/Renofield.png",
   },

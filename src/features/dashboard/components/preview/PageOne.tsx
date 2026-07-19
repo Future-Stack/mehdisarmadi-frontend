@@ -18,7 +18,7 @@ export const PageOne = ({ exportMode, quoteData }: { exportMode?: boolean; quote
         <div className={`mb-6 pb-5 border-b border-gray-100 px-12 ${exportMode ? 'export-section' : ''}`}>
             <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">PREPARED FOR</div>
             <div className="text-[13px] font-bold text-gray-900">{q.clientName || "ABC Construction Ltd."}</div>
-            <div className="text-[11px] text-gray-500 mt-0.5">Attention: {q.attention || "John Smith, Project Manager"}</div>
+            <div className="text-[11px] text-gray-500 mt-0.5">Attention: {q.attention || "John Smith, Tender Manager"}</div>
             <div className="text-[11px] text-gray-500">General Contractor: {q.gcName || "Prime Construction Ltd."}</div>
         </div>
 
@@ -27,8 +27,8 @@ export const PageOne = ({ exportMode, quoteData }: { exportMode?: boolean; quote
             <h3 className="text-[12px] font-bold text-gray-700 mb-3 uppercase tracking-widest">TENDER INFORMATION</h3>
             <table className="w-full text-[11px] border-collapse border border-gray-200">
                 <tbody className="divide-y divide-gray-100">
-                    <tr><td className="py-2 px-4 font-bold text-gray-500 w-44 bg-gray-50">Project Name</td><td className="py-2 px-4 font-medium">{q.projectName || "N/A"}</td></tr>
-                    <tr><td className="py-2 px-4 font-bold text-gray-500 bg-gray-50">Project Address</td><td className="py-2 px-4 font-medium">{q.projectLocation || "N/A"}</td></tr>
+                    <tr><td className="py-2 px-4 font-bold text-gray-500 w-44 bg-gray-50">Tender Name</td><td className="py-2 px-4 font-medium">{q.projectName || "N/A"}</td></tr>
+                    <tr><td className="py-2 px-4 font-bold text-gray-500 bg-gray-50">Tender Address</td><td className="py-2 px-4 font-medium">{q.projectLocation || "N/A"}</td></tr>
                     <tr><td className="py-2 px-4 font-bold text-gray-500 bg-gray-50">Client / GC Name</td><td className="py-2 px-4 font-medium">{q.clientName || "N/A"} | {q.gcName || "N/A"}</td></tr>
                     <tr><td className="py-2 px-4 font-bold text-gray-500 bg-gray-50">Quote Number</td><td className="py-2 px-4 font-medium">{q.quoteNumber || "N/A"}</td></tr>
                     <tr><td className="py-2 px-4 font-bold text-gray-500 bg-gray-50">Quote Date</td><td className="py-2 px-4 font-medium">{q.startDate || "N/A"}</td></tr>
@@ -53,7 +53,7 @@ export const PageOne = ({ exportMode, quoteData }: { exportMode?: boolean; quote
                     <>
                         <div>
                             <span className="font-bold text-gray-900">Division 06 – Wood, Plastics & Composites: </span>
-                            Supply and install a total of forty (40) solid core wooden doors complete with pre-hung frames, paint-grade factory finish, and all required accessories necessary for a complete and fully operational installation. Doors shall be 1-3/4&quot; thick and installed in accordance with manufacturer specifications and project requirements. Scope also includes the supply and installation of forty (40) complete door hardware sets including hinges, locksets, handles, stops, and related fastening materials.
+                            Supply and install a total of forty (40) solid core wooden doors complete with pre-hung frames, paint-grade factory finish, and all required accessories necessary for a complete and fully operational installation. Doors shall be 1-3/4&quot; thick and installed in accordance with manufacturer specifications and tender requirements. Scope also includes the supply and installation of forty (40) complete door hardware sets including hinges, locksets, handles, stops, and related fastening materials.
                         </div>
                         <div>
                             <span className="font-bold text-gray-900">Division 08 – Openings: </span>

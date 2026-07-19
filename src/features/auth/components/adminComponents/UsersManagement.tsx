@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Eye, UserMinus, Trash2, Plus, ChevronDown, Search, ChevronLeft, ChevronRight, Loader } from "lucide-react";
 import StaticPage from "@/components/layout/StaticDemoPage";
 import { Modal } from "@/components/ui/Modal";
@@ -86,11 +86,20 @@ export default function UsersManagement() {
   const [isViewModalOpen, setIsViewModalOpen] =
     useState(false);
 
+
+  useEffect(() => {
+      const timeout = setTimeout(() => {
+        setPage(1);
+        setSearch(searchInput.trim());
+      }, 400);
+      return () => clearTimeout(timeout);
+  }, [searchInput]);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setPage(1);
-    setSearch(searchInput);
-  };
+    setSearch(searchInput.trim());
+};
 
   const validateForm = () => {
     const errors: Partial<Record<keyof CreateUserPayload, string>> = {};
@@ -209,9 +218,9 @@ export default function UsersManagement() {
 
       {/* ── Search ── */}
       <form onSubmit={handleSearch} className="relative w-full sm:w-72">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+        <button type="submit" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
           <Search size={16} />
-        </span>
+        </button>
         <input
           type="text"
           value={searchInput}

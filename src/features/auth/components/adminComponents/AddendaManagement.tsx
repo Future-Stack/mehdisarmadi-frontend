@@ -115,7 +115,7 @@ function ChangesBadge({ changes }: { changes: number | null }) {
 // ─── Table Headings ───────────────────────────────────────────────────────────
 
 const TABLE_HEADINGS = [
-  "Project Name",
+  "Tender Name",
   "Addendum Number",
   "File Name",
   "Upload Date",
@@ -246,9 +246,9 @@ export default function AddendaManagement({
         <hr className="mb-4 border-gray-200" />
         <div className="space-y-5 text-sm text-gray-700 dark:text-gray-300">
           <div className="space-y-1.5">
-            <label className="block font-semibold text-gray-900 dark:text-white">Project</label>
+            <label className="block font-semibold text-gray-900 dark:text-white">Tender</label>
             <select className="w-full rounded-lg border border-gray-200 dark:border-gray-800 p-2.5 text-sm focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-all bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200">
-              <option value="" disabled selected>Select a project</option>
+              <option value="" disabled selected>Select a tender</option>
               <option>City Mall Tender</option>
               <option>Office Fitout</option>
               <option>Complex</option>

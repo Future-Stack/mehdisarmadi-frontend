@@ -35,7 +35,7 @@ export default function SubUserDashboardPage() {
     const toastId = toast.loading(`Deleting ${deletingProject.name}…`);
     try {
         await deleteProject(deletingProject.id).unwrap();
-        toast.success("Project deleted", { id: toastId, description: `"${deletingProject.name}" was removed.` });
+        toast.success("Tender deleted", { id: toastId, description: `"${deletingProject.name}" was removed.` });
         setDeletingProject(null);
     } catch {
         toast.error("Delete failed", { id: toastId, description: "Something went wrong. Please try again." });
@@ -185,7 +185,7 @@ export default function SubUserDashboardPage() {
                   </div>
                   <input
                     type="text"
-                    placeholder="Search Projects..........."
+                    placeholder="Search Tenders..........."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="w-full h-10 pl-18 pr-4 bg-white dark:bg-[#111827] text-sm placeholder:text-[#6B7280] shadow-sm shadow-[#00000040] placeholder:font-medium border border-gray-200 dark:border-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm font-medium"
@@ -266,13 +266,13 @@ export default function SubUserDashboardPage() {
                     {isProjectsLoading ? (
                       <tr>
                         <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
-                          Loading projects...
+                          Loading tenders...
                         </td>
                       </tr>
                     ) : projects.length === 0 ? (
                       <tr>
                         <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
-                          No projects found.
+                          No tenders found.
                         </td>
                       </tr>
                     ) : (
@@ -447,7 +447,7 @@ export default function SubUserDashboardPage() {
                 variant="primary"
                 className="w-full h-10 text-sm font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white"
               >
-                View All Projects
+                View All Tenders
               </Button>
             </div>
 
@@ -496,7 +496,7 @@ export default function SubUserDashboardPage() {
           </div>
         </div>
       </div>
-      {/* Hidden export view for the currently selected project */}
+      {/* Hidden export view for the currently selected tender */}
       {exportingId && (
         <div
           style={{
@@ -514,7 +514,7 @@ export default function SubUserDashboardPage() {
         open={!!deletingProject}
         onClose={() => setDeletingProject(null)}
         onConfirm={handleDelete}
-        title="Delete Project"
+        title="Delete Tender"
         description={`Are you sure you want to delete "${deletingProject?.name}"? This action cannot be undone.`}
         isDeleting={isDeleting}
       />

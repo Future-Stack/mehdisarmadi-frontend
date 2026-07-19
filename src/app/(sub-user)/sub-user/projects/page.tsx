@@ -56,7 +56,7 @@ const handleDelete = async () => {
     const toastId = toast.loading(`Deleting ${deletingProject.name}…`);
     try {
         await deleteProject(deletingProject.id).unwrap();
-        toast.success("Project deleted", { id: toastId, description: `"${deletingProject.name}" was removed.` });
+        toast.success("Tender deleted", { id: toastId, description: `"${deletingProject.name}" was removed.` });
         setDeletingProject(null);
     } catch {
         toast.error("Delete failed", { id: toastId, description: "Something went wrong. Please try again." });
@@ -71,16 +71,16 @@ const handleDelete = async () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1.5">
           <h1 className="text-[28px] font-bold text-[#000000] dark:text-white tracking-tight">
-            All Projects
+            All Tenders
           </h1>
           <p className="text-[#4A5565] dark:text-gray-400 text-sm font-medium">
-            Manage, filter, and track your tender projects in one place.
+            Manage, filter, and track your tenders in one place.
           </p>
         </div>
         <Link href="/sub-user/projects/new">
           <Button variant="primary" className="h-11 px-6 rounded-xl font-bold bg-emerald-600 hover:bg-emerald-700 shadow-md text-white">
             <Plus className="w-5 h-5 mr-2" />
-            New Project
+            New Tender
           </Button>
         </Link>
       </div>
@@ -94,7 +94,7 @@ const handleDelete = async () => {
                   </div>
                   <input
                     type="text"
-                    placeholder="Search Projects..........."
+                    placeholder="Search Tenders..........."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="w-full h-10 pl-18 pr-4 bg-white dark:bg-[#111827] text-sm placeholder:text-[#6B7280] shadow-sm shadow-[#00000040] placeholder:font-medium border border-gray-200 dark:border-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm font-medium"
@@ -165,13 +165,13 @@ const handleDelete = async () => {
                 {isLoading ? (
                   <tr>
                     <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
-                      Loading projects...
+                      Loading tenders...
                     </td>
                   </tr>
                 ) : projects.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
-                      No projects found.
+                      No tenders found.
                     </td>
                   </tr>
                 ) : (
@@ -253,7 +253,7 @@ const handleDelete = async () => {
                             onClick={() => setDeletingProject({ id: row.id, name: row.name })}
                             disabled={isDeleting && deletingProject?.id === row.id}
                             className="p-1.5 text-red-400 hover:text-red-600 transition-colors disabled:opacity-40"
-                            title="Delete project"
+                            title="Delete Tender"
                         >
                             {isDeleting && deletingProject?.id === row.id ? (
                                 <Loader2 className="w-4 h-4 animate-spin text-red-600" />
@@ -261,12 +261,6 @@ const handleDelete = async () => {
                                 <Trash2 className="w-4 h-4" />
                             )}
                         </button>
-                          {/* <button 
-                            onClick={() => toast.error(`Delete project endpoint pending.`)}
-                            className="p-1.5 text-red-400 hover:text-red-600 transition-colors"
-                          >
-                            <AlertTriangle className="w-4 h-4" />
-                          </button> */}
                         </div>
                       </td>
                     </tr>
@@ -278,7 +272,7 @@ const handleDelete = async () => {
         </div>
       </div>
 
-      {/* Hidden export view for the currently selected project */}
+      {/* Hidden export view for the currently selected Tender */}
       {exportingId && (
         <div
           style={{
@@ -297,10 +291,11 @@ const handleDelete = async () => {
         open={!!deletingProject}
         onClose={() => setDeletingProject(null)}
         onConfirm={handleDelete}
-        title="Delete Project"
+        title="Delete Tender"
         description={`Are you sure you want to delete "${deletingProject?.name}"? This action cannot be undone.`}
         isDeleting={isDeleting}
       />
     </div>
   );
 }
+  
