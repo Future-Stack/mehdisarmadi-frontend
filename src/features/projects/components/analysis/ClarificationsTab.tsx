@@ -3,7 +3,7 @@ import { Edit3, FileText, Trash2, Check, X, Plus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { toast } from "sonner";
 import { useGetProjectClarificationsQuery, useUpdateProjectAnalysisSectionMutation } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, AIInstructionSection, ProposedChangesReview, DeleteConfirmationModal } from "./shared";
+import { SectionSkeleton, SectionError, ReanalyzeBlock, DeleteConfirmationModal } from "./shared";
 
 interface Props {
   projectId: string;
@@ -12,7 +12,7 @@ interface Props {
 export default function ClarificationsTab({ projectId }: Props) {
   const { data, isLoading, isError, refetch } = useGetProjectClarificationsQuery(projectId);
   const [updateSection, { isLoading: isUpdating }] = useUpdateProjectAnalysisSectionMutation();
-  const clarifications = data?.data;
+  const clarifications = data?.data?.payload || data?.data;
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
@@ -57,7 +57,6 @@ export default function ClarificationsTab({ projectId }: Props) {
 
   return (
     <div className="space-y-6">
-      <ProposedChangesReview projectId={projectId} section="clarifications" data={data?.data} />
       <div className="bg-white dark:bg-[#111827] border border-gray-100 dark:border-gray-800 rounded-3xl p-6 md:p-8 shadow-sm">
 
         <div className="flex justify-between items-center mb-6 border-b border-gray-100 dark:border-gray-800 pb-4">
@@ -144,7 +143,7 @@ export default function ClarificationsTab({ projectId }: Props) {
         </div>
       </div>
 
-      <AIInstructionSection projectId={projectId} section="clarifications" />
+      <ReanalyzeBlock projectId={projectId} section="clarifications" data={data?.data} />
       <DeleteConfirmationModal
         isOpen={!!deleteItemId}
         onClose={() => setDeleteItemId(null)}

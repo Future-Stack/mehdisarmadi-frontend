@@ -18,7 +18,7 @@ export default function SubUserNavbar() {
 
   const navLinks = [
     { label: "Dashboard", href: "/sub-user", icon: <LayoutDashboard className="w-4 h-4" /> },
-    { label: "Projects", href: "/sub-user/projects", icon: <FolderKanban className="w-4 h-4" /> },
+    { label: "Tenders", href: "/sub-user/projects", icon: <FolderKanban className="w-4 h-4" /> },
   ];
 
   return (
@@ -27,7 +27,7 @@ export default function SubUserNavbar() {
 
         {/* Left: Logo + Theme Toggle */}
         <div className="flex items-center gap-3 sm:gap-6">
-          <Link href="/sub-user" className="dark:bg-white dark:rounded-lg dark:px-2 dark:py-1 transition-all flex-shrink-0">
+          <Link href="/sub-user" prefetch={false} className="dark:bg-white dark:rounded-lg dark:px-2 dark:py-1 transition-all flex-shrink-0">
             <Logo />
           </Link>
 
@@ -75,7 +75,7 @@ export default function SubUserNavbar() {
               className="h-9 md:h-10 px-3 md:px-4 rounded-xl font-medium shadow-sm shadow-emerald-100 text-sm"
             >
               <Plus className="w-4 h-4 flex-shrink-0" />
-              <span className="hidden md:inline ml-1.5 whitespace-nowrap dark:text-white">Create New Project</span>
+              <span className="hidden md:inline ml-1.5 whitespace-nowrap dark:text-white">Create New Tender</span>
               <span className="inline md:hidden ml-0 sr-only">New</span>
             </Button>
           </Link>

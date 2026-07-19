@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
-import { Search, FileText, Share2, Clock, Filter, Calendar, ChevronDown, CheckCircle2, Download, AlertTriangle, Eye, Edit, Funnel, Calendar1, Loader2 } from "lucide-react";
+import React, { useState, useCallback } from "react";
+import { Search, FileText, Share2, Clock, Filter, Calendar, ChevronDown, CheckCircle2, Download, AlertTriangle, Eye, Edit, Funnel, Calendar1, Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { DeleteModal } from "@/components/ui/DeleteModal";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { useGetProjectDashboardStatsQuery, useGetProjectDashboardProjectsQuery } from "@/store/api/projectApi";
+import { useGetProjectDashboardStatsQuery, useGetProjectDashboardProjectsQuery, useDeleteProjectMutation } from "@/store/api/projectApi";
 
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -23,6 +24,26 @@ export default function SubUserDashboardPage() {
   const { data: statsData, isLoading: isStatsLoading } = useGetProjectDashboardStatsQuery();
   const { data: projectsData, isLoading: isProjectsLoading } = useGetProjectDashboardProjectsQuery({ page, limit, status, timeRange, search });
 
+  const [deleteProject] = useDeleteProjectMutation();
+  const [deletingProject, setDeletingProject] = useState<{ id: string; name: string } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (!deletingProject) return;
+
+    setIsDeleting(true);
+    const toastId = toast.loading(`Deleting ${deletingProject.name}…`);
+    try {
+        await deleteProject(deletingProject.id).unwrap();
+        toast.success("Tender deleted", { id: toastId, description: `"${deletingProject.name}" was removed.` });
+        setDeletingProject(null);
+    } catch {
+        toast.error("Delete failed", { id: toastId, description: "Something went wrong. Please try again." });
+    } finally {
+        setIsDeleting(false);
+    }
+};
+
   const stats = statsData?.data;
   const projects = projectsData?.data?.items || [];
   const recentActivity = stats?.recentActivity || [];
@@ -34,7 +55,7 @@ export default function SubUserDashboardPage() {
     toast.info(`Preparing export for ${projectName}...`);
   };
 
-  const handleExportReady = async () => {
+  const handleExportReady = useCallback(async () => {
     if (!exportingId) return;
     try {
       await exportAnalysisPDF(`Analysis-${exportingId}`);
@@ -44,7 +65,7 @@ export default function SubUserDashboardPage() {
     } finally {
       setExportingId(null);
     }
-  };
+  }, [exportingId]);
 
   const STATS_CARDS = [
     {
@@ -164,13 +185,13 @@ export default function SubUserDashboardPage() {
                   </div>
                   <input
                     type="text"
-                    placeholder="Search Projects..........."
+                    placeholder="Search Tenders..........."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="w-full h-10 pl-18 pr-4 bg-white dark:bg-[#111827] text-sm placeholder:text-[#6B7280] shadow-sm shadow-[#00000040] placeholder:font-medium border border-gray-200 dark:border-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm font-medium"
                   />
                 </div>
-                <div className="flex flex-col xs:flex-row gap-3 w-full sm:w-auto">
+                <div className="flex flex-row gap-3 w-full sm:w-auto">
                   <div className="relative w-full sm:w-48">
                     {/* Left Icon */}
                     <Funnel className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] pointer-events-none" />
@@ -219,10 +240,21 @@ export default function SubUserDashboardPage() {
             <div className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm shadow-[#00000040] overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
-                  <thead>
+                  {/* <thead>
                     <tr className="bg-[#F8F8F8] dark:bg-gray-800  border-b border-gray-100 dark:border-gray-800">
                       <th className="px-4 sm:px-6 py-4 text-[11px] font-bold text-[#364153] dark:text-gray-400 uppercase tracking-wider">Tender</th>
                       <th className="px-4 sm:px-6 py-4 text-[11px] font-bold text-[#364153] dark:text-gray-400 uppercase tracking-wider hidden sm:table-cell">Client</th>
+                      <th className="px-4 sm:px-6 py-4 text-[11px] font-bold text-[#364153] dark:text-gray-400 uppercase tracking-wider">Status</th>
+                      <th className="px-4 sm:px-6 py-4 text-[11px] font-bold text-[#364153] dark:text-gray-400 uppercase tracking-wider hidden lg:table-cell">Question Date</th>
+                      <th className="px-4 sm:px-6 py-4 text-[11px] font-bold text-[#364153] dark:text-gray-400 uppercase tracking-wider hidden lg:table-cell">Closing Date</th>
+                      <th className="px-4 sm:px-6 py-4 text-[11px] font-bold text-[#364153] dark:text-gray-400 uppercase tracking-wider hidden md:table-cell">Value</th>
+                      <th className="px-4 sm:px-6 py-4 text-[11px] font-bold text-[#364153] dark:text-gray-400 uppercase tracking-wider text-right">Actions</th>
+                    </tr>
+                  </thead> */}
+                  <thead>
+                    <tr className="bg-[#F8F8F8] dark:bg-gray-800  border-b border-gray-100 dark:border-gray-800">
+                      <th className="px-4 sm:px-6 py-4 text-[11px] font-bold text-[#364153] dark:text-gray-400 uppercase tracking-wider min-w-[220px]">Tender</th>
+                      <th className="px-4 sm:px-6 py-4 text-[11px] font-bold text-[#364153] dark:text-gray-400 uppercase tracking-wider hidden sm:table-cell min-w-[160px]">Client</th>
                       <th className="px-4 sm:px-6 py-4 text-[11px] font-bold text-[#364153] dark:text-gray-400 uppercase tracking-wider">Status</th>
                       <th className="px-4 sm:px-6 py-4 text-[11px] font-bold text-[#364153] dark:text-gray-400 uppercase tracking-wider hidden lg:table-cell">Question Date</th>
                       <th className="px-4 sm:px-6 py-4 text-[11px] font-bold text-[#364153] dark:text-gray-400 uppercase tracking-wider hidden lg:table-cell">Closing Date</th>
@@ -234,19 +266,19 @@ export default function SubUserDashboardPage() {
                     {isProjectsLoading ? (
                       <tr>
                         <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
-                          Loading projects...
+                          Loading tenders...
                         </td>
                       </tr>
                     ) : projects.length === 0 ? (
                       <tr>
                         <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
-                          No projects found.
+                          No tenders found.
                         </td>
                       </tr>
                     ) : (
                       projects.map((row) => (
                         <tr key={row.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors group">
-                          <td className="px-4 sm:px-6 py-4">
+                          {/* <td className="px-4 sm:px-6 py-4">
                             <Link href={`/sub-user/projects/${row.id}`} className="block">
                               <div className="text-xs font-semibold text-gray-900 dark:text-white mb-1 group-hover:text-emerald-600 transition-colors line-clamp-1">{row.name}</div>
                               <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
@@ -261,6 +293,24 @@ export default function SubUserDashboardPage() {
                           </td>
                           <td className="px-4 sm:px-6 py-4 hidden sm:table-cell">
                             <div className="text-sm text-gray-600 dark:text-gray-300 font-medium line-clamp-2">{row.clientName}</div>
+                          </td> */}
+                          <td className="px-4 sm:px-6 py-4">
+                            <Link href={`/sub-user/projects/${row.id}`} className="block">
+                              <div className="text-xs font-semibold text-gray-900 dark:text-white mb-1 group-hover:text-emerald-600 transition-colors line-clamp-2 max-w-[220px]">
+                                {row.name}
+                              </div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                                {row.highPriority && (
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                                    High
+                                  </span>
+                                )}
+                                {row.fileCount} files
+                              </div>
+                            </Link>
+                          </td>
+                          <td className="px-4 sm:px-6 py-4 hidden sm:table-cell">
+                            <div className="text-sm text-gray-600 dark:text-gray-300 font-medium line-clamp-2 max-w-[160px]">{row.clientName}</div>
                           </td>
                           <td className="px-4 sm:px-6 py-4">
                             <span className={cn(
@@ -318,6 +368,18 @@ export default function SubUserDashboardPage() {
                                   <Download className="w-4 h-4" />
                                 )}
                               </button>
+                              <button
+                            onClick={() => setDeletingProject({ id: row.id, name: row.name })}
+                            disabled={isDeleting && deletingProject?.id === row.id}
+                            className="p-1.5 text-red-400 hover:text-red-600 transition-colors disabled:opacity-40"
+                            title="Delete project"
+                        >
+                            {isDeleting && deletingProject?.id === row.id ? (
+                                <Loader2 className="w-4 h-4 animate-spin text-red-600" />
+                            ) : (
+                                <Trash2 className="w-4 h-4" />
+                            )}
+                        </button>
 
                             </div>
                           </td>
@@ -343,12 +405,12 @@ export default function SubUserDashboardPage() {
                   <p className="text-sm text-gray-500">No recent activity.</p>
                 ) : (
                   recentActivity.map((activity, idx) => {
-                    const { icon: Icon, bg, color } = getActivityIcon(activity.type);
+                    const { icon: Icon, color } = getActivityIcon(activity.type);
 
                     return (
                       <div
                         key={activity.id}
-                        className="flex gap-3 p-3 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30"
+                        className="flex gap-3 p-3 rounded-xl border border-[#E8E8E8] dark:border-gray-800 bg-[#F9FAFB] dark:bg-gray-800/30"
                       >
                         <div
                           className={cn(
@@ -385,7 +447,7 @@ export default function SubUserDashboardPage() {
                 variant="primary"
                 className="w-full h-10 text-sm font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white"
               >
-                View All Projects
+                View All Tenders
               </Button>
             </div>
 
@@ -434,7 +496,7 @@ export default function SubUserDashboardPage() {
           </div>
         </div>
       </div>
-      {/* Hidden export view for the currently selected project */}
+      {/* Hidden export view for the currently selected tender */}
       {exportingId && (
         <div
           style={{
@@ -448,6 +510,14 @@ export default function SubUserDashboardPage() {
           <AnalysisExportView projectId={exportingId} onReady={handleExportReady} />
         </div>
       )}
+      <DeleteModal
+        open={!!deletingProject}
+        onClose={() => setDeletingProject(null)}
+        onConfirm={handleDelete}
+        title="Delete Tender"
+        description={`Are you sure you want to delete "${deletingProject?.name}"? This action cannot be undone.`}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 }

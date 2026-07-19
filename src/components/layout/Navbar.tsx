@@ -8,11 +8,14 @@ import { useLogout } from "@/features/auth/hooks/useAuth";
 import { Bell, Sun, Moon, LogOut, User, Settings, Menu } from "lucide-react";
 import { setTheme, toggleSidebar } from "@/store/slices/uiSlice";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const dispatch = useAppDispatch();
   const theme = useAppSelector((s) => s.ui.theme);
   const user = useAppSelector((s) => s.auth.user);
+  const router = useRouter();
+  console.log(user, 'user') ;  
   const { logout, isLoading } = useLogout();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -29,7 +32,7 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-gray-100 bg-white px-4 md:px-8 dark:bg-gray-900 dark:border-gray-800 transition-colors duration-300 gap-4">
+    <header className="sticky top-0 z-30 flex h-18 w-full items-center justify-between border border-l-2 border-gray-200 shadow-sm shadow-[#00000015] bg-white px-4 md:px-8 dark:bg-gray-900 dark:border-gray-800 transition-colors duration-300 gap-4">
 
       {/* Left: Hamburger (mobile) + Search */}
       <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -52,8 +55,8 @@ export default function Navbar() {
           </div>
           <input
             type="text"
-            placeholder="Search projects, files or users..."
-            className="w-full h-[42px] rounded-xl border border-[#99A1AF] bg-gray-50/30 pl-11 pr-4 text-sm focus:border-secondary focus:outline-none transition-all placeholder:text-[#968C8C] dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 text-gray-900 focus:bg-white dark:focus:bg-gray-700"
+            placeholder="Search tenders, files or users..."
+            className="w-full h-[42px] rounded-xl border border-[#D1D5DC] bg-gray-50/30 pl-11 pr-4 text-sm focus:border-secondary focus:outline-none transition-all placeholder:text-[#968C8C] dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 text-gray-900 focus:bg-white dark:focus:bg-gray-700"
           />
         </div>
       </div>
@@ -64,9 +67,10 @@ export default function Navbar() {
         <button
           type="button"
           aria-label="Notifications"
+          onClick={() => router.push("/admin/notifications")}
           className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gray-50/50 transition-all hover:bg-red-50 group dark:bg-gray-800 dark:hover:bg-red-950/30"
         >
-          <Bell size={22} className="text-[#EF4444] transition-transform group-hover:scale-110" />
+          <Bell size={22} className="text-[#0A0A0A] transition-transform group-hover:scale-110" />
         </button>
 
         {/* User profile dropdown */}
@@ -76,12 +80,12 @@ export default function Navbar() {
             className="flex items-center gap-2 p-1 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 group"
           >
             <div className="text-right hidden sm:block">
-              <p className="text-xs font-bold text-black dark:text-white transition-colors">Admin User</p>
+              <p className="text-sm font-bold text-black dark:text-white transition-colors">Admin User</p>
               <p className="text-[11px] font-medium text-[#968C8C] dark:text-gray-400 transition-colors">
-                Akash Abrrar
+                {user?.fullName}
               </p>
             </div>
-            <div className="relative h-9 w-9 overflow-hidden rounded-full ring-2 ring-gray-100 dark:ring-gray-700 transition-all group-hover:ring-secondary/50">
+            <div className="relative h-9 w-9 overflow-hidden rounded-full ring-2 ring-gray-100 dark:ring-gray-700 transition-all group-hover:ring-secondary/50 border border-[#008236]">
                <Image
                  src={`https://api.dicebear.com/7.x/avataaars/svg?seed=Akash`}
                  alt="Avatar"
@@ -123,13 +127,15 @@ export default function Navbar() {
               </div>
 
               <div className="space-y-1">
-                <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800 transition-colors">
+                <button 
+                  onClick={() => {
+                    setIsDropdownOpen(false);
+                    router.push("/admin/profile");
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800 transition-colors"
+                >
                   <User size={18} className="text-gray-400" />
                   My Profile
-                </button>
-                <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800 transition-colors">
-                  <Settings size={18} className="text-gray-400" />
-                  Account Settings
                 </button>
                 <hr className="border-gray-100 dark:border-gray-800 mx-2" />
                 <button

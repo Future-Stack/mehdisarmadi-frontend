@@ -9,34 +9,38 @@ import { getAccessTokenFromCookie } from "@/lib/axios";
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
   const dispatch = useAppDispatch();
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
-  
-  // Only try to fetch if we have a token in the cookie but we aren't authenticated in Redux yet
-  const hasToken = typeof window !== "undefined" ? !!getAccessTokenFromCookie() : false;
+
+  // ── Compute hasToken ONCE on mount (stable state) ─────────────────────────
+  // Reading document.cookie inline during render caused infinite loops:
+  //   Redux update → re-render → re-read cookie → shouldFetchUser flips →
+  //   RTK Query re-fires → dispatch(setCredentials) → Redux update → repeat.
+  // By using useState, hasToken is computed only once and never changes.
+  const [hasToken] = useState<boolean>(
+    () => typeof window !== "undefined" ? !!getAccessTokenFromCookie() : false
+  );
+
+  // Only fetch /auth/me when we have a cookie token but aren't yet authenticated in Redux
   const shouldFetchUser = hasToken && !isAuthenticated;
 
-  // useGetMeQuery will skip if shouldFetchUser is false
-  const { data, isLoading, isError } = useGetMeQuery(undefined, {
+  const { data, isError } = useGetMeQuery(undefined, {
     skip: !shouldFetchUser,
   });
 
   useEffect(() => {
-    // If there is no token, we can mark loading as false
     if (!hasToken) {
       dispatch(setAuthLoading(false));
       return;
     }
 
-    // If we successfully fetched the user data, store it in Redux
     if (data?.data) {
       dispatch(
         setCredentials({
           user: data.data,
           accessToken: getAccessTokenFromCookie() || "",
-          refreshToken: "", // Refresh token isn't strictly needed here unless the API gives it
+          refreshToken: "",
         })
       );
     } else if (isError) {
-      // If fetching failed (e.g., token expired), auth logic in axios interceptor handles redirect
       dispatch(setAuthLoading(false));
     }
   }, [data, isError, hasToken, dispatch]);

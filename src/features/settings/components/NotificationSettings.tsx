@@ -43,10 +43,10 @@ export function NotificationSettings() {
   };
 
   const notificationOptions = [
-    { key: "processingComplete" as const, title: "Processing Complete", description: "Receive a notification when project processing is successfully completed." },
-    { key: "processingFailed" as const, title: "Processing Failed", description: "Get alerted immediately if project processing encounters an error." },
+    { key: "processingComplete" as const, title: "Processing Complete", description: "Receive a notification when tender processing is successfully completed." },
+    { key: "processingFailed" as const, title: "Processing Failed", description: "Get alerted immediately if tender processing encounters an error." },
     { key: "quoteExported" as const, title: "Quote Exported", description: "Get notified when a quote is successfully exported to PDF or Excel." },
-    { key: "addendaUploaded" as const, title: "Addenda Uploaded", description: "Receive updates when new addenda are uploaded to your projects." },
+    { key: "addendaUploaded" as const, title: "Addenda Uploaded", description: "Receive updates when new addenda are uploaded to your tenders." },
   ];
 
   if (isFetching) {

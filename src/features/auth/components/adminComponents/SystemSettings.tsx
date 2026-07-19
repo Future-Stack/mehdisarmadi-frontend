@@ -68,8 +68,8 @@ export default function SystemSettings() {
 
       <div className="space-y-6 pt-2">
         {/* ── API Configuration ── */}
-        <div className="card-premium p-6 bg-white dark:bg-gray-900">
-          <h3 className="text-[17px] font-bold text-gray-900 dark:text-white mb-6">API Configuration</h3>
+        <div className="card-premium border border-[#E5E7EB] dark:border-gray-700 p-6 bg-white dark:bg-gray-900">
+          <h3 className="text-lg font-semibold text-[#101828] dark:text-white mb-3">API Configuration</h3>
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">OpenAI API Key</label>
             <div className="relative">
@@ -96,8 +96,8 @@ export default function SystemSettings() {
         </div>
 
         {/* ── AI Configuration ── */}
-        <div className="card-premium p-6 bg-white dark:bg-gray-900">
-          <h3 className="text-[17px] font-bold text-gray-900 dark:text-white mb-6">AI Configuration</h3>
+        <div className="card-premium border border-[#E5E7EB] dark:border-gray-700 p-6 bg-white dark:bg-gray-900">
+          <h3 className="text-lg font-semibold text-[#101828] dark:text-white mb-3">AI Configuration</h3>
           <div className="space-y-6">
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Model Version</label>
@@ -146,8 +146,8 @@ export default function SystemSettings() {
         </div>
 
         {/* ── File Settings ── */}
-        <div className="card-premium p-6 bg-white dark:bg-gray-900">
-          <h3 className="text-[17px] font-bold text-gray-900 dark:text-white mb-6">File Settings</h3>
+        <div className="card-premium border border-[#E5E7EB] dark:border-gray-700 p-6 bg-white dark:bg-gray-900">
+          <h3 className="text-lg font-semibold text-[#101828] dark:text-white mb-3">File Settings</h3>
           <div className="space-y-6">
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Max Upload Size</label>

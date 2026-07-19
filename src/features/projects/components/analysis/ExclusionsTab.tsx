@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Edit3, FileText, Trash2, Check, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useGetProjectExclusionsQuery, useUpdateProjectAnalysisSectionMutation } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, AIInstructionSection, ProposedChangesReview, DeleteConfirmationModal } from "./shared";
+import { SectionSkeleton, SectionError, ReanalyzeBlock, DeleteConfirmationModal } from "./shared";
 
 interface Props {
   projectId: string;
@@ -11,7 +11,7 @@ interface Props {
 export default function ExclusionsTab({ projectId }: Props) {
   const { data, isLoading, isError, refetch } = useGetProjectExclusionsQuery(projectId);
   const [updateSection, { isLoading: isUpdating }] = useUpdateProjectAnalysisSectionMutation();
-  const exclusions = data?.data;
+  const exclusions = data?.data?.payload || data?.data;
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
@@ -54,7 +54,6 @@ export default function ExclusionsTab({ projectId }: Props) {
 
   return (
     <div className="space-y-6">
-      <ProposedChangesReview projectId={projectId} section="exclusions" data={data?.data} />
       <div className="bg-white dark:bg-[#111827] border border-gray-100 dark:border-gray-800 rounded-3xl p-6 md:p-8 shadow-sm">
 
         <div className="flex justify-between items-center mb-6 border-b border-gray-100 dark:border-gray-800 pb-4">
@@ -75,7 +74,7 @@ export default function ExclusionsTab({ projectId }: Props) {
                 key={item.id}
                 className="flex gap-4 p-4 rounded-xl border border-red-100 dark:border-red-900/30 bg-red-50/30 dark:bg-red-900/10 group"
               >
-                <span className="text-[10px] text-red-500 mt-1 shrink-0">🔴</span>
+                <span className="text-[10px] text-red-500 mt-1 shrink-0">❌</span>
                 <div className="flex-1">
                   {editingId === item.id ? (
                     <textarea
@@ -141,7 +140,7 @@ export default function ExclusionsTab({ projectId }: Props) {
         </div>
       </div>
 
-      <AIInstructionSection projectId={projectId} section="exclusions" />
+      <ReanalyzeBlock projectId={projectId} section="exclusions" data={data?.data} />
       <DeleteConfirmationModal
         isOpen={!!deleteItemId}
         onClose={() => setDeleteItemId(null)}

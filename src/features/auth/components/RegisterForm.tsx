@@ -7,8 +7,10 @@ import { useRegister } from "@/features/auth/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { ROUTES } from "@/constants";
-import Logo from "@/components/Reuseable/Logo";
+// import Logo from "@/components/Reuseable/Logo";
+import Logo from "../../../../public/Images/Renofield.png";
 import { ArrowLeft } from "lucide-react";
+import Image from "next/image";
 
 export default function RegisterForm() {
   const { register: registerUser, isLoading } = useRegister();
@@ -32,12 +34,20 @@ export default function RegisterForm() {
       noValidate
     >
       <div className="flex flex-col items-center gap-6 text-center">
-        <Logo />
-        <div className="space-y-1">
-          <h1 className="text-3xl font-bold text-[#059669]">
+        {/* <Logo /> */}
+        <Image
+                                src={Logo}
+                                alt="logo"
+                                // height={195}
+                                // width={390}
+                                className="w-[120px] md:w-[240px] h-auto object-contain"
+                                // style={{ width: "auto", height: "auto" }}
+                              />
+        <div className="space-y-1 -mt-8">
+          <h1 className="text-[32px] font-bold text-[#000000]">
             Create Account
           </h1>
-          <p className="text-[15px] text-gray-500 font-medium">
+          <p className="text-[16px] text-[#4A5565] font-medium">
             Join TenderPro AI to streamline your workflow
           </p>
         </div>
@@ -78,6 +88,18 @@ export default function RegisterForm() {
           className="h-12 rounded-xl border-gray-200"
           {...register("password")}
         />
+
+        <Input
+          label="Confirm Password"
+          type="password"
+          id="register-confirm-password"
+          placeholder="Confirm your Password"
+          autoComplete="new-password"
+          error={errors.confirmPassword?.message}
+          required
+          className="h-12 rounded-xl border-gray-200"
+          {...register("confirmPassword")}
+        />
       </div>
 
       <div className="space-y-4">
@@ -96,7 +118,7 @@ export default function RegisterForm() {
             Already have an account?{" "}
             <Link
               href={ROUTES.LOGIN}
-              className="font-bold text-[#059669] hover:underline ml-1"
+              className="font-bold text-[#009966] hover:underline ml-1"
             >
               Login
             </Link>

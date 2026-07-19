@@ -1,6 +1,6 @@
 import { AlertTriangle, AlertCircle, Edit3, Trash2, Check, X } from "lucide-react";
 import { useGetProjectPricingQuery } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, AIInstructionSection, ProposedChangesReview, DeleteConfirmationModal } from "./shared";
+import { SectionSkeleton, SectionError, AIInstructionSection, ProposedChangesReview, DeleteConfirmationModal, ReanalyzeBlock } from "./shared";
 import { cn } from "@/lib/utils";
 import React, { useState } from "react";
 import { toast } from "sonner";
@@ -13,7 +13,7 @@ interface Props {
 export default function PricingTab({ projectId }: Props) {
   const { data, isLoading, isError, refetch } = useGetProjectPricingQuery(projectId);
   const [updateSection, { isLoading: isUpdating }] = useUpdateProjectAnalysisSectionMutation();
-  const pricing = data?.data;
+  const pricing = data?.data?.payload || data?.data;
 
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -57,26 +57,26 @@ export default function PricingTab({ projectId }: Props) {
     return <SectionError message="Failed to load pricing data. Please try again." onRetry={refetch} />;
 
   // Helper for Additional Cost Items border colors
-const getCostItemStyle = (name?: string) => {
-  const lowerName = (name ?? "").toLowerCase();
+  const getCostItemStyle = (name?: string) => {
+    const lowerName = (name ?? "").toLowerCase();
 
-  if (lowerName.includes("night")) {
-    return "border-l-orange-400 bg-orange-50/30 dark:bg-orange-900/10";
-  }
+    if (lowerName.includes("night")) {
+      return "border-l-orange-400 bg-orange-50/30 dark:bg-orange-900/10";
+    }
 
-  if (lowerName.includes("bond")) {
-    return "border-l-blue-400 bg-blue-50/30 dark:bg-blue-900/10";
-  }
+    if (lowerName.includes("bond")) {
+      return "border-l-blue-400 bg-blue-50/30 dark:bg-blue-900/10";
+    }
 
-  if (
-    lowerName.includes("coordination") ||
-    lowerName.includes("contingency")
-  ) {
-    return "border-l-purple-400 bg-purple-50/30 dark:bg-purple-900/10";
-  }
+    if (
+      lowerName.includes("coordination") ||
+      lowerName.includes("contingency")
+    ) {
+      return "border-l-purple-400 bg-purple-50/30 dark:bg-purple-900/10";
+    }
 
-  return "border-l-gray-400 bg-gray-50 dark:bg-gray-800/50";
-};
+    return "border-l-gray-400 bg-gray-50 dark:bg-gray-800/50";
+  };
 
   return (
     <div className="space-y-6 pb-8">
@@ -131,7 +131,7 @@ const getCostItemStyle = (name?: string) => {
                 --
               </div>
               <div className="text-[12px] font-normal text-gray-500 mb-2">Enter estimator price</div>
-              
+
             </div>
           </div>
         </div>
@@ -168,14 +168,22 @@ const getCostItemStyle = (name?: string) => {
           <p className="text-[13px] text-gray-500 mb-4">Bonds, insurance, coordination, and contingency</p>
 
           <div className="space-y-3">
-            {pricing?.additionalCostItems?.map((item: any) => (
+            {/* {pricing?.additionalCostItems?.map((item: any) => ( */}
+            {pricing?.additionalCostItems?.map((item: any, index: number) => (
               <div
-                key={item.id}
+                key={item.id ?? `cost-item-${index}`}
                 className={cn(
                   "p-4 rounded-xl border-l-4 border-r border-t border-b border-r-gray-100 border-t-gray-100 border-b-gray-100 dark:border-r-gray-800 dark:border-t-gray-800 dark:border-b-gray-800 group relative",
                   getCostItemStyle(item.name)
                 )}
               >
+                {/* <div
+                key={item.id}
+                className={cn(
+                  "p-4 rounded-xl border-l-4 border-r border-t border-b border-r-gray-100 border-t-gray-100 border-b-gray-100 dark:border-r-gray-800 dark:border-t-gray-800 dark:border-b-gray-800 group relative",
+                  getCostItemStyle(item.name)
+                )}  
+              > */}
                 {editingId === item.id ? (
                   <div className="space-y-2">
                     <input
@@ -192,17 +200,17 @@ const getCostItemStyle = (name?: string) => {
                   </div>
                 ) : (
                   <>
-                  <div className="flex items-center justify-between gap-2 mb-1">
-                    <div>
-                      <div className="text-[14px] font-bold text-gray-900 dark:text-gray-100 mb-0.5">{item.name}</div>
-                      <div className="text-[12px] text-gray-600 dark:text-gray-400">{item.description}</div>
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <div>
+                        <div className="text-[14px] font-bold text-gray-900 dark:text-gray-100 mb-0.5">{item.name}</div>
+                        <div className="text-[12px] text-gray-600 dark:text-gray-400">{item.description}</div>
+                      </div>
+                      {
+                        item.amount > 0 && (
+                          <div className="text-[12px] text-gray-600 dark:text-gray-400">${item.amount}</div>
+                        )
+                      }
                     </div>
-                    {
-                      item.amount > 0 && (
-                        <div className="text-[12px] text-gray-600 dark:text-gray-400">${item.amount}</div>
-                      )
-                    }  
-                  </div>
                   </>
                 )}
 
@@ -234,7 +242,7 @@ const getCostItemStyle = (name?: string) => {
           </div>
         </div>
 
-       
+
 
         {/* Missing Information */}
         {pricing?.missingInformation?.length > 0 && (
@@ -263,11 +271,19 @@ const getCostItemStyle = (name?: string) => {
           <p className="text-[13px] text-gray-500 mb-4">How AI arrived at these estimates</p>
 
           <div className="space-y-3">
-            {pricing?.pricingBasisAndReasoning?.map((item: any) => (
+            {/* {pricing?.pricingBasisAndReasoning?.map((item: any ) => (
               <div
                 key={item.id}
                 className={cn(
                   "p-4 rounded-xl border-gray-500 dark:border-gray-700 border-l-4 border-r border-t border-b border-r-gray-100 border-t-gray-100 border-b-gray-100 dark:border-r-gray-800 dark:border-t-gray-800 dark:border-b-gray-800 group relative",
+                  getCostItemStyle(item.name)
+                )}
+              > */}
+            {pricing?.pricingBasisAndReasoning?.map((item: any, index: number) => (
+              <div
+                key={item.id ?? `basis-${index}`}
+                className={cn(
+                  "p-4 rounded-xl border-l-4 border-r border-t border-b border-r-gray-100 border-t-gray-100 border-b-gray-100 dark:border-r-gray-800 dark:border-t-gray-800 dark:border-b-gray-800 group relative",
                   getCostItemStyle(item.name)
                 )}
               >
@@ -322,7 +338,8 @@ const getCostItemStyle = (name?: string) => {
 
       </div>
 
-      <AIInstructionSection projectId={projectId} section="pricing" />
+      {/* <AIInstructionSection projectId={projectId} section="pricing" /> */}
+      <ReanalyzeBlock projectId={projectId} section="pricing" data={data?.data} />
       <DeleteConfirmationModal
         isOpen={!!deleteItemId}
         onClose={() => setDeleteItemId(null)}

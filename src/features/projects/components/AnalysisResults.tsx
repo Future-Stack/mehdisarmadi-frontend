@@ -70,7 +70,7 @@ const SCOPE_ITEMS = [
     source: "A901 Finish Schedule • Page 12",
   },
   {
-    title: "Project Management Fees",
+    title: "Tender Management Fees",
     div: "Div 01",
     qty: "Lump Sum",
     specs: "Comprehensive site supervision and safety",
@@ -106,7 +106,7 @@ export default function AnalysisResults({ dashboardPath = "/admin" }: { dashboar
               href={dashboardPath}
               className="flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-[#059669] transition-colors"
             >
-              <ArrowLeft className="w-4 h-4" /> Back to Project
+              <ArrowLeft className="w-4 h-4" /> Back to Tenders
             </Link>
             <div className="space-y-1">
               <h1 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight">

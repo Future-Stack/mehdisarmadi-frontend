@@ -36,7 +36,7 @@ const navItems: NavItem[] = [
     icon: <LayoutDashboard size={18} />,
   },
   {
-    label: "Projects",
+    label: "Tenders",
     href: "/admin/projects",
     icon: <FolderKanban size={18} />,
   },
@@ -95,7 +95,7 @@ export default function Sidebar() {
   const sidebarContent = (
     <aside
       className={cn(
-        "relative z-40 flex flex-col bg-white text-gray-900 transition-all duration-300 ease-in-out border-r border-gray-100 shadow-sm dark:bg-gray-950 dark:text-white dark:border-gray-800 h-full",
+        "relative z-40 flex flex-col bg-white text-gray-900 transition-all duration-300 ease-in-out border-r-2 border-gray-200 shadow-sm dark:bg-gray-950 dark:text-white dark:border-gray-800 h-full",
         isOpen ? "w-64" : "w-20"
       )}
     >
@@ -113,6 +113,7 @@ export default function Sidebar() {
               height={38}
               priority
               className="w-full h-auto object-contain"
+              style={{ width: "auto", height: "auto" }}
             />
           </div>
           {isOpen && (
@@ -232,6 +233,7 @@ export default function Sidebar() {
                       height={34}
                       priority
                       className="w-full h-auto object-contain"
+                      style={{ width: "auto", height: "auto" }}
                     />
                   </div>
                 </Link>

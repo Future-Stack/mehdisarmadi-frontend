@@ -346,11 +346,11 @@ export default function QuoteBuilderPage({ params }: { params: Promise<{ id: str
 
         {/* Project & Quote Details */}
         <section className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
-          <h2 className="text-[16px] font-bold text-gray-900 dark:text-white mb-6">Project & Quote Details</h2>
+          <h2 className="text-[16px] font-bold text-gray-900 dark:text-white mb-6">Tender & Quote Details</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
             <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Quote Number</label><input value={quoteNumber} onChange={e => setQuoteNumber(e.target.value)} className={inputCls} /></div>
-            <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Project Location</label><input value={projectLocation} onChange={e => setProjectLocation(e.target.value)} className={inputCls} /></div>
-            <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Project Name</label><input value={projectName} onChange={e => setProjectName(e.target.value)} className={inputCls} /></div>
+            <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Tender Location</label><input value={projectLocation} onChange={e => setProjectLocation(e.target.value)} className={inputCls} /></div>
+            <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Tender Name</label><input value={projectName} onChange={e => setProjectName(e.target.value)} className={inputCls} /></div>
             <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Start Date</label><input value={startDate} onChange={e => setStartDate(e.target.value)} className={inputCls} /></div>
             <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Client Name</label><input value={clientName} onChange={e => setClientName(e.target.value)} className={inputCls} /></div>
             <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Revision Number</label><input value={revisionNumber} onChange={e => setRevisionNumber(e.target.value)} className={inputCls} /></div>

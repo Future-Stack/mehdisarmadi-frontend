@@ -11,9 +11,13 @@ import { PageOne } from "@/features/dashboard/components/preview/PageOne";
 import { PageTwo } from "@/features/dashboard/components/preview/PageTwo";
 import { PageThree } from "@/features/dashboard/components/preview/PageThree";
 import { exportElementToPDF, exportQuoteToDocx } from "@/lib/exportUtils";
+import { useGetProjectQuoteQuery } from "@/store/api/projectApi";
 
 export default function QuotePreviewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = React.use(params);
+  const { data: quoteResponse, isLoading: isLoadingQuote } = useGetProjectQuoteQuery(id);
+  const quoteData = quoteResponse?.data || {};
+
   const [isExportingPDF, setIsExportingPDF] = useState(false);
 
   const handleExportPDF = async () => {
@@ -90,17 +94,23 @@ export default function QuotePreviewPage({ params }: { params: Promise<{ id: str
 
       {/* Visual Document canvas (single page) */}
       <div className="mb-12 rounded-3xl p-6 md:p-10 ">
-        {currentPage === 1 && <PageOne />}
-        {currentPage === 2 && <PageTwo />}
-        {currentPage === 3 && <PageThree />}
+        {isLoadingQuote ? (
+          <div className="flex justify-center items-center h-64"><Loader2 className="w-8 h-8 animate-spin text-emerald-600" /></div>
+        ) : (
+          <>
+            {currentPage === 1 && <PageOne quoteData={quoteData} />}
+            {currentPage === 2 && <PageTwo quoteData={quoteData} />}
+            {currentPage === 3 && <PageThree quoteData={quoteData} />}
+          </>
+        )}
       </div>
 
       {/* Hidden Document canvas for export (all pages) */}
       <div className="fixed top-full left-0 opacity-0 pointer-events-none -z-50">
         <div id="quote-preview-doc-all" className="flex flex-col gap-0 w-[850px] bg-white">
-          <PageOne exportMode={true} />
-          <PageTwo exportMode={true} />
-          <PageThree exportMode={true} />
+          <PageOne exportMode={true} quoteData={quoteData} />
+          <PageTwo exportMode={true} quoteData={quoteData} />
+          <PageThree exportMode={true} quoteData={quoteData} />
         </div>
       </div>
 

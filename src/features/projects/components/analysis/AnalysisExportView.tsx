@@ -129,7 +129,7 @@ export default function AnalysisExportView({ projectId, onReady }: { projectId: 
         </div>
         <div style={{ textAlign: "right" }}>
           <div style={{ fontWeight: 700, fontSize: 12, color: "#e2e8f0" }}>
-            {project?.name || "Project Analysis"}
+            {project?.name || "Tender Analysis"}
           </div>
           <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2 }}>{today}</div>
         </div>
@@ -142,7 +142,7 @@ export default function AnalysisExportView({ projectId, onReady }: { projectId: 
         marginBottom: 20,
       }}>
         {[
-          { label: "Project", value: project?.name },
+          { label: "Tender", value: project?.name },
           { label: "Client", value: project?.clientName },
           { label: "Closing Date", value: project?.closingDate ? new Date(project.closingDate).toLocaleDateString() : undefined },
           { label: "Divisions", value: summary?.selected_divisions?.map((d: any) => d.name).join(", ") },
@@ -176,7 +176,7 @@ export default function AnalysisExportView({ projectId, onReady }: { projectId: 
 
         {/* Stats */}
         {(summary?.estimated_value || summary?.total_items) && (
-          <SectionBlock title="Project Stats">
+          <SectionBlock title="Tender Stats">
             <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
               {[
                 { label: "Estimated Value", value: summary?.estimated_value != null ? `$${summary.estimated_value.toLocaleString()}` : null },

@@ -9,7 +9,7 @@ interface UiState {
 
 const initialState: UiState = {
   sidebarOpen: true,
-  theme: "system",
+  theme: "light",
   activeModal: null,
 };
 

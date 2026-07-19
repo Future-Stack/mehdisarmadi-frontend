@@ -13,7 +13,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<Variant, string> = {
   primary:
-    "bg-[#059669] text-white hover:bg-[#047857] focus-visible:ring-emerald-500 shadow-sm shadow-emerald-100",
+    "bg-[#009966] text-white hover:bg-[#047857] focus-visible:ring-emerald-500 shadow-sm shadow-emerald-100",
   secondary:
     "bg-white border-2 border-green-200 rounded-lg dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-700",
   ghost:
@@ -49,7 +49,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(
           "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
-          "disabled:pointer-events-none disabled:opacity-60",
+          "disabled:pointer-events-none disabled:opacity-60 cursor-pointer",
           variantClasses[variant],
           sizeClasses[size],
           className

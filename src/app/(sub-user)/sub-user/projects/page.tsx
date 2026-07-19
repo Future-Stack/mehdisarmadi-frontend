@@ -1,13 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
-import { Search, Eye, Edit, Download, AlertTriangle, Calendar, Plus, Funnel, ChevronDown, Calendar1 } from "lucide-react";
+import React, { useState, useCallback } from "react";
+import { Search, Eye, Edit, Download, AlertTriangle, Calendar, Plus, Funnel, ChevronDown, Calendar1, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { DeleteModal } from "@/components/ui/DeleteModal";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { useGetProjectsQuery } from "@/store/api/projectApi";
+import { useDeleteProjectMutation, useGetProjectsQuery } from "@/store/api/projectApi";
 import AnalysisExportView from "@/features/projects/components/analysis/AnalysisExportView";
 import { exportAnalysisPDF } from "@/features/projects/utils/exportUtils";
 import { Loader2 } from "lucide-react";
@@ -19,6 +20,10 @@ export default function ProjectsPage() {
   const [status, setStatus] = useState("all");
   const [timeRange, setTimeRange] = useState("all");
   const [search, setSearch] = useState("");
+  const [deleteProject] = useDeleteProjectMutation();
+  const [deletingProject, setDeletingProject] = useState<{ id: string; name: string } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
 
   const { data, isLoading } = useGetProjectsQuery({ page, limit, status, timeRange, search });
   const projects = data?.data?.items || [];
@@ -30,7 +35,7 @@ export default function ProjectsPage() {
     toast.info(`Preparing export for ${projectName}...`);
   };
 
-  const handleExportReady = async () => {
+  const handleExportReady = useCallback(async () => {
     if (!exportingId) return;
     try {
       await exportAnalysisPDF(`Analysis-${exportingId}`);
@@ -40,7 +45,25 @@ export default function ProjectsPage() {
     } finally {
       setExportingId(null);
     }
-  };
+  }, [exportingId]);
+
+
+
+const handleDelete = async () => {
+    if (!deletingProject) return;
+
+    setIsDeleting(true);
+    const toastId = toast.loading(`Deleting ${deletingProject.name}…`);
+    try {
+        await deleteProject(deletingProject.id).unwrap();
+        toast.success("Tender deleted", { id: toastId, description: `"${deletingProject.name}" was removed.` });
+        setDeletingProject(null);
+    } catch {
+        toast.error("Delete failed", { id: toastId, description: "Something went wrong. Please try again." });
+    } finally {
+        setIsDeleting(false);
+    }
+};
 
   return (
     <div className="flex flex-col gap-6 pb-12 max-w-7xl mx-auto">
@@ -48,16 +71,16 @@ export default function ProjectsPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1.5">
           <h1 className="text-[28px] font-bold text-[#000000] dark:text-white tracking-tight">
-            All Projects
+            All Tenders
           </h1>
           <p className="text-[#4A5565] dark:text-gray-400 text-sm font-medium">
-            Manage, filter, and track your tender projects in one place.
+            Manage, filter, and track your tenders in one place.
           </p>
         </div>
         <Link href="/sub-user/projects/new">
           <Button variant="primary" className="h-11 px-6 rounded-xl font-bold bg-emerald-600 hover:bg-emerald-700 shadow-md text-white">
             <Plus className="w-5 h-5 mr-2" />
-            New Project
+            New Tender
           </Button>
         </Link>
       </div>
@@ -71,13 +94,13 @@ export default function ProjectsPage() {
                   </div>
                   <input
                     type="text"
-                    placeholder="Search Projects..........."
+                    placeholder="Search Tenders..........."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="w-full h-10 pl-18 pr-4 bg-white dark:bg-[#111827] text-sm placeholder:text-[#6B7280] shadow-sm shadow-[#00000040] placeholder:font-medium border border-gray-200 dark:border-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm font-medium"
                   />
                 </div>
-                <div className="flex flex-col xs:flex-row gap-3 w-full sm:w-auto">
+                <div className="flex flex-row gap-3 w-full sm:w-auto">
                   <div className="relative w-full sm:w-48">
                     {/* Left Icon */}
                     <Funnel className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] pointer-events-none" />
@@ -142,13 +165,13 @@ export default function ProjectsPage() {
                 {isLoading ? (
                   <tr>
                     <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
-                      Loading projects...
+                      Loading tenders...
                     </td>
                   </tr>
                 ) : projects.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
-                      No projects found.
+                      No tenders found.
                     </td>
                   </tr>
                 ) : (
@@ -226,12 +249,18 @@ export default function ProjectsPage() {
                                <Download className="w-4 h-4" />
                             )}
                           </button>
-                          {/* <button 
-                            onClick={() => toast.error(`Delete project endpoint pending.`)}
-                            className="p-1.5 text-red-400 hover:text-red-600 transition-colors"
-                          >
-                            <AlertTriangle className="w-4 h-4" />
-                          </button> */}
+                          <button
+                            onClick={() => setDeletingProject({ id: row.id, name: row.name })}
+                            disabled={isDeleting && deletingProject?.id === row.id}
+                            className="p-1.5 text-red-400 hover:text-red-600 transition-colors disabled:opacity-40"
+                            title="Delete Tender"
+                        >
+                            {isDeleting && deletingProject?.id === row.id ? (
+                                <Loader2 className="w-4 h-4 animate-spin text-red-600" />
+                            ) : (
+                                <Trash2 className="w-4 h-4" />
+                            )}
+                        </button>
                         </div>
                       </td>
                     </tr>
@@ -243,7 +272,7 @@ export default function ProjectsPage() {
         </div>
       </div>
 
-      {/* Hidden export view for the currently selected project */}
+      {/* Hidden export view for the currently selected Tender */}
       {exportingId && (
         <div
           style={{
@@ -258,6 +287,15 @@ export default function ProjectsPage() {
         </div>
       )}
 
+      <DeleteModal
+        open={!!deletingProject}
+        onClose={() => setDeletingProject(null)}
+        onConfirm={handleDelete}
+        title="Delete Tender"
+        description={`Are you sure you want to delete "${deletingProject?.name}"? This action cannot be undone.`}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 }
+  

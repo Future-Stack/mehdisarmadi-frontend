@@ -1,6 +1,8 @@
 import React from "react";
-import { ChevronLeft, FileUp, Cpu, ShieldCheck, FileSpreadsheet, Users, ChevronRight } from "lucide-react";
-import Logo from "../Reuseable/Logo";
+import { ChevronLeft, FileUp, Cpu, ShieldCheck, FileSpreadsheet, Users, ChevronRight, Brain, Shield, DollarSign, Download, FileText } from "lucide-react";
+import Logo from "../../../public/Images/Renofield.png";
+// import Logo from "../Reuseable/Logo";
+import Image from "next/image";
 
 type Step3Props = {
   onBack: () => void;
@@ -13,34 +15,38 @@ const smallFeatures = [
   {
     title: "Upload Documents",
     desc: "Support for PDF, DOCX, and XLSX files",
-    icon: FileUp,
+    icon: FileText,
+    bgIcon: "bg-[#00996638]",
     color: "text-emerald-500",
-    bg: "bg-emerald-50",
-    border: "border-emerald-100",
+    bg: "bg-gradient-to-b from-[#ECFDF5] to-[#FFFFFF]",
+    border: "border-[#A4F4CF]",
   },
   {
     title: "AI Analysis",
     desc: "Automated extraction and insights",
-    icon: Cpu,
+        bgIcon: "bg-[#155DFC4F]",
+        icon: Brain,
     color: "text-blue-500",
-    bg: "bg-blue-50",
-    border: "border-blue-100",
+     bg: "bg-gradient-to-b from-[#EFF6FF] to-[#FFFFFF]",
+    border: "border-[#BEDBFF]",
   },
   {
     title: "Risk Assessment",
-    desc: "Identify and mitigate project risks",
-    icon: ShieldCheck,
-    color: "text-purple-500",
-    bg: "bg-purple-50",
-    border: "border-purple-100",
+    desc: "Identify and mitigate tender risks",
+    icon: Shield,
+    bgIcon: "bg-[#9810FA]",
+    color: "text-white",
+     bg: "bg-gradient-to-b from-[#FAF5FF] to-[#FFFFFF]",
+    border: "border-[#E9D4FF]",
   },
   {
     title: "Quote Builder",
     desc: "Professional quote generation",
-    icon: FileSpreadsheet,
-    color: "text-orange-500",
-    bg: "bg-orange-50",
-    border: "border-orange-100",
+     icon: DollarSign,
+     bgIcon: "bg-[#F54900]",
+    color: "text-white",
+    bg: "bg-gradient-to-b from-[#FFF7ED] to-[#FFFFFF]",
+    border: "border-[#FFD6A8]",
   },
 ];
 
@@ -50,19 +56,26 @@ export default function Step3({ onBack, onLogin, onRegister, onSkip }: Step3Prop
       <div className="w-full max-w-4xl space-y-12 text-center">
         {/* Logo + Heading */}
         <div className="flex flex-col items-center space-y-6">
-          <Logo />
+          {/* <Logo /> */}
+           <Image
+                          src={Logo}
+                          alt="logo"
+                          // height={195}
+                          className="w-[120px] md:w-[240px] h-auto object-contain"
+                          // style={{ width: "auto", height: "auto" }}
+                        />
 
-          <div className="space-y-2">
-            <h1 className="text-4xl md:text-5xl font-bold text-[#006D44]">
+          <div className="space-y-11">
+            <h1 className="text-4xl md:text-5xl font-bold text-[#0A0A0A] -mt-5">
               Ready to Get Started?
             </h1>
-            <p className="text-xl font-semibold text-gray-700">
+            <p className="text-xl lg:text-2xl font-semibold text-[#364153]">
               Join Thousands of Construction Professionals
             </p>
           </div>
 
-          <p className="text-base text-gray-500 max-w-2xl leading-relaxed">
-            Start analyzing tenders and building quotes in minutes. No credit card required for your first project.
+          <p className="text-base text-[#4A5565] max-w-[841px] leading-relaxed -mt-2">
+            Start analyzing tenders and building quotes in minutes. No credit card required for your first tender.
           </p>
         </div>
 
@@ -73,9 +86,9 @@ export default function Step3({ onBack, onLogin, onRegister, onSkip }: Step3Prop
             return (
               <div
                 key={index}
-                className={`flex items-center gap-4 p-4 border ${item.border} rounded-2xl ${item.bg} text-left`}
+                className={`flex items-center gap-4 p-4 border ${item.border} shadow-md shadow-[#0000001A] rounded-2xl ${item.bg} text-left`}
               >
-                <div className="p-2 bg-white rounded-xl shadow-sm">
+                <div className={`${item.bgIcon} ${item.color} p-2 rounded-xl shadow-sm`}>
                   <Icon className={`w-5 h-5 ${item.color}`} />
                 </div>
                 <div>
@@ -116,24 +129,24 @@ export default function Step3({ onBack, onLogin, onRegister, onSkip }: Step3Prop
         </div>
 
         {/* Buttons */}
-        <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 pt-4">
+        <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-12 pt-4">
           <button
             onClick={onBack}
-            className="flex items-center gap-2 text-gray-500 font-medium hover:text-gray-800 transition-colors"
+            className="flex items-center gap-2 border border-gray-200 px-8 py-2.5 rounded-lg text-[#0A0A0A] font-medium hover:text-gray-800 transition-colors"
           >
             <ChevronLeft className="w-5 h-5" /> Previous
           </button>
 
           <button
             onClick={onLogin}
-            className="px-8 py-3 bg-[#006D44] text-white rounded-xl font-semibold hover:bg-[#005a38] transition-all shadow-md hover:shadow-xl"
+            className="px-24 py-2.5 bg-[#009966] text-white rounded-xl font-semibold hover:bg-[#005a38] transition-all shadow-md hover:shadow-xl"
           >
             Login
           </button>
 
           <button
             onClick={onRegister}
-            className="px-8 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-all shadow-sm"
+            className="px-24 py-2.5 border border-[#0A0A0A] text-[#0A0A0A] rounded-xl font-semibold hover:bg-gray-50 transition-all shadow-sm"
           >
             Sign Up Free
           </button>

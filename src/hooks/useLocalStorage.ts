@@ -23,16 +23,21 @@ export function useLocalStorage<T>(
   );
 
   // ─── Snapshot Logic ────────────────────────────────────────────────────────
-  const getSnapshot = () => {
+  // Both snapshot functions MUST be stable references (memoized) — React's
+  // useSyncExternalStore will throw error #310 ("infinite loop") if getSnapshot
+  // returns a new function reference on every render.
+  const getSnapshot = useCallback(() => {
     try {
       const item = window.localStorage.getItem(key);
       return item ? item : JSON.stringify(initial);
     } catch {
       return JSON.stringify(initial);
     }
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]); // `initial` intentionally omitted — it's a mount-time default
 
-  const getServerSnapshot = () => JSON.stringify(initial);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const getServerSnapshot = useCallback(() => JSON.stringify(initial), []);
 
   // ─── Syncing ───────────────────────────────────────────────────────────────
   const rawValue = useSyncExternalStore(

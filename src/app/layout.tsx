@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     default: "Renofield",
     template: "%s | Renofield",
   },
-  description: "A production-ready project management dashboard for Renofield.",
+  description: "A production-ready tender management dashboard for Renofield.",
   icons: {
     icon: "/Images/Renofield.png",
   },
@@ -36,10 +36,9 @@ export default function RootLayout({
               (function() {
                 try {
                   var theme = localStorage.getItem('theme');
-                  var supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
-                  if (theme === 'dark' || (!theme && supportDarkMode)) {
+                  if (theme === 'dark') {
                     document.documentElement.classList.add('dark');
-                  } else if (theme === 'light') {
+                  } else {
                     document.documentElement.classList.add('light');
                   }
                 } catch (e) {}

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const profileSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
+  fullName: z.string().min(2, { message: "Name must be at least 2 characters" }),
   email: z.email({ message: "Enter a valid email address" }),
   bio: z.string().max(160).optional(),
   avatar: z.string().url().optional().or(z.literal("")),

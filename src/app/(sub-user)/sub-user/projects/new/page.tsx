@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 const STEPS = [
-  { id: 1, title: "Basic Info", subtitle: "Project details" },
+  { id: 1, title: "Basic Info", subtitle: "Tender details" },
   { id: 2, title: "Upload Files", subtitle: "Tender documents" },
   { id: 3, title: "AI Options", subtitle: "Analysis settings" },
   { id: 4, title: "Review", subtitle: "Confirm & create" }
@@ -63,7 +63,7 @@ export default function NewProjectWizard() {
 
   const handleCreate = async () => {
     if (!formData.projectName || !formData.projectAddress) {
-      toast.error("Project Name and Address are required.");
+      toast.error("Tender Name and Address are required.");
       return;
     }
 
@@ -88,14 +88,14 @@ export default function NewProjectWizard() {
       });
 
       const response = await createProject(data).unwrap();
-      toast.success("Project created successfully!");
+      toast.success("Tender created successfully!");
       router.push(`/sub-user/projects/${response.data.project.id}`);
     } catch (err: any) {
-      toast.error(err?.data?.message || "Failed to create project");
+      toast.error(err?.data?.message || "Failed to create tender");
     }
   };
 
-  // Calculate progress for the Project Summary
+  // Calculate progress for the Tender Summary
   let progress = 0;
   if (currentStep >= 1 && formData.projectName) progress += 25;
   if (currentStep >= 2 && uploadedFiles.length > 0) progress += 25;
@@ -129,9 +129,9 @@ export default function NewProjectWizard() {
                 )}>
                   {isCompleted ? <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : String(step.id).padStart(2, '0')}
                 </div>
-                <div className="text-center hidden xs:block">
+                <div className="text-center ">
                   <div className={cn("text-[10px] sm:text-[12px] font-bold", isActive || isCompleted ? "text-[#101828] dark:text-white" : "text-[#6B6969]")}>{step.title}</div>
-                  <div className={cn("text-[9px] sm:text-[11px] font-medium hidden sm:block", isActive || isCompleted ? "text-[#101828] dark:text-white" : "text-[#6A7282]")}>{step.subtitle}</div>
+                  <div className={cn("text-[9px] sm:text-[11px] font-medium ", isActive || isCompleted ? "text-[#101828] dark:text-white" : "text-[#6A7282]")}>{step.subtitle}</div>
                 </div>
               </div>
             );
@@ -155,12 +155,12 @@ export default function NewProjectWizard() {
               <div className="space-y-6">
                 <div>
                   <h2 className="text-[22px] font-bold text-gray-900 dark:text-white">Basic Info</h2>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Project details</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Tender details</p>
                 </div>
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-[13px] font-medium text-gray-700 dark:text-gray-300 mb-1.5">Project Name *</label>
+                    <label className="block text-[13px] font-medium text-gray-700 dark:text-gray-300 mb-1.5">Tender Name *</label>
                     <input
                       type="text"
                       placeholder="e.g., Green Valley Residential Complex"
@@ -197,19 +197,35 @@ export default function NewProjectWizard() {
                         <input
                           type="date"
                           value={formData.closingDate}
-                          onChange={(e) => setFormData({ ...formData, closingDate: e.target.value })}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setFormData((prev) => ({
+                              ...prev,
+                              closingDate: value,
+                              // reset questionDate if it's now invalid relative to the new closing date
+                              questionDate: prev.questionDate && value && prev.questionDate > value ? "" : prev.questionDate,
+                            }));
+                          }}
                           className="w-full h-11 pl-10 pr-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                         />
                         <CalendarIcon className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-[13px] font-medium text-gray-700 dark:text-gray-300 mb-1.5">QUESTION DATE</label>
+                      <label className="block text-[13px] font-medium text-gray-700 dark:text-gray-300 mb-1.5">QUESTION DUE DATE</label>
                       <div className="relative">
                         <input
                           type="date"
                           value={formData.questionDate}
-                          onChange={(e) => setFormData({ ...formData, questionDate: e.target.value })}
+                          max={formData.closingDate || undefined}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (formData.closingDate && value > formData.closingDate) {
+                              toast.error("Question due date cannot be after the closing date.");
+                              return;
+                            }
+                            setFormData({ ...formData, questionDate: value });
+                          }}
                           className="w-full h-11 pl-10 pr-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                         />
                         <CalendarIcon className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -218,7 +234,7 @@ export default function NewProjectWizard() {
                   </div>
 
                   <div>
-                    <label className="block text-[13px] font-medium text-gray-700 dark:text-gray-300 mb-1.5">Project Address *</label>
+                    <label className="block text-[13px] font-medium text-gray-700 dark:text-gray-300 mb-1.5">Tender Address *</label>
                     <input
                       type="text"
                       placeholder="e.g., 123 Main St..."
@@ -228,9 +244,9 @@ export default function NewProjectWizard() {
                     />
                   </div>
                   <div>
-                    <label className="block text-[13px] font-medium text-gray-700 dark:text-gray-300 mb-1.5">Project Description</label>
+                    <label className="block text-[13px] font-medium text-gray-700 dark:text-gray-300 mb-1.5">Tender Description</label>
                     <textarea
-                      placeholder="Brief description of the project scope...."
+                      placeholder="Brief description of the tender scope...."
                       value={formData.projectDescription}
                       onChange={(e) => setFormData({ ...formData, projectDescription: e.target.value })}
                       className="w-full h-24 p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 resize-none"
@@ -346,7 +362,7 @@ export default function NewProjectWizard() {
                   <div className="mt-0.5"><SparklesIcon className="text-[#155DFC] w-4 h-4" /></div>
                   <div>
                     <h4 className="text-[13px] font-bold text-[#1C398E] dark:text-blue-400 mb-1">AI Analysis Options</h4>
-                    <p className="text-[13px] text-[#193CB8] dark:text-blue-300">Select which AI features you want to use for this project. You can change these settings later.</p>
+                    <p className="text-[13px] text-[#193CB8] dark:text-blue-300">Select which AI features you want to use for this tender. You can change these settings later.</p>
                   </div>
                 </div>
 
@@ -395,17 +411,17 @@ export default function NewProjectWizard() {
                 <div className="bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900 p-4 rounded-xl flex gap-3">
                   <div className="mt-0.5 text-emerald-600"><CheckCircle2 className="w-5 h-5" /></div>
                   <div>
-                    <h4 className="text-[14px] font-bold text-emerald-800 dark:text-emerald-400 mb-0.5">Ready to Create Project</h4>
-                    <p className="text-[13px] text-emerald-600/80 dark:text-emerald-300">Review your project details below before creating</p>
+                    <h4 className="text-[14px] font-bold text-emerald-800 dark:text-emerald-400 mb-0.5">Ready to Create Tender</h4>
+                    <p className="text-[13px] text-emerald-600/80 dark:text-emerald-300">Review your tender details below before creating</p>
                   </div>
                 </div>
 
                 <div className="space-y-8">
                   <div>
-                    <h3 className="text-[15px] font-bold text-gray-900 dark:text-white mb-4">Project Information</h3>
+                    <h3 className="text-[15px] font-bold text-gray-900 dark:text-white mb-4">Tender Information</h3>
                     <div className="bg-gray-50/50 dark:bg-gray-800/30 rounded-xl p-5 border border-gray-100 dark:border-gray-800">
                       <div className="grid grid-cols-[120px_1fr] gap-y-3 text-sm">
-                        <div className="text-gray-500 font-medium">Project Name:</div>
+                        <div className="text-gray-500 font-medium">Tender Name:</div>
                         <div className="text-gray-900 dark:text-white font-semibold text-right">{formData.projectName || "N/A"}</div>
 
                         <div className="text-gray-500 font-medium">Client:</div>
@@ -500,16 +516,16 @@ export default function NewProjectWizard() {
         </div>
       </div>
 
-      {/* Right Sidebar - Project Summary */}
+      {/* Right Sidebar - Tender Summary */}
       <div className="w-full lg:w-[320px] flex-shrink-0">
         <div className="bg-white dark:bg-[#111827] border border-gray-100 dark:border-gray-800 rounded-3xl p-6 shadow-sm lg:sticky lg:top-28">
-          <h3 className="text-base font-bold text-gray-900 dark:text-white mb-5">Project Summary</h3>
+          <h3 className="text-base font-bold text-gray-900 dark:text-white mb-5">Tender Summary</h3>
 
           <div className="space-y-3">
             <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 flex gap-3">
               <Building2 className="w-4 h-4 text-emerald-500 mt-0.5" />
               <div>
-                <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">Project</div>
+                <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">Tender Name</div>
                 <div className="text-[13px] font-semibold text-gray-900 dark:text-white line-clamp-2">
                   {formData.projectName || "..."}
                 </div>
