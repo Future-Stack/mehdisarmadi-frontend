@@ -2,51 +2,61 @@ import Logo from "@/components/Reuseable/Logo";
 
 /* ─── Shared Document Header ─── */
 export const DocumentHeader = ({ showFull = false, quoteData }: { showFull?: boolean; quoteData?: any }) => {
-    const q = quoteData?.quote || {};
+    const q = quoteData?.savedQuote || {};
+    const c = quoteData?.companyDetails || {};
     return (
-    <div className="flex justify-between items-start mb-8 px-12 pt-12 ">
-        <div>
-            <div className="mb-4"><Logo /></div>
-            {showFull && (
-                <>
-                    <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">SUBMITTED BY</div>
-                    <div className="text-[12px] font-bold text-gray-900 mb-0.5">{q.companyName || "N/A"}</div>
-                    <div className="text-[11px] text-gray-500 space-y-0.5">
-                        <div>{q.companyAddress || "N/A"}</div>
-                        <div>Phone: {q.companyPhone || "N/A"}</div>
-                        <div>Email: {q.companyEmail || "N/A"}</div>
-                        <div>HST #: {q.companyHst || "N/A"}</div>
+    <div className="relative overflow-hidden mb-6">
+        {/* Green gradient accent strip */}
+        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-400" />
+
+        <div className="flex justify-between items-start px-12 pt-10 pb-8">
+            {/* Left: Company Brand */}
+            <div>
+                <div className="mb-4 flex items-center gap-3">
+                    <Logo />
+                </div>
+                {showFull && (
+                    <>
+                        <div className="text-[9px] font-black text-emerald-600 uppercase tracking-[0.12em] mb-2">Submitted By</div>
+                        {(c.name || q.companyName) && (
+                            <div className="text-[13px] font-bold text-gray-900 mb-1">{c.name || q.companyName}</div>
+                        )}
+                        <div className="text-[11px] text-gray-500 leading-relaxed space-y-0.5">
+                            {(c.address || q.companyAddress) && <div>{c.address || q.companyAddress}</div>}
+                            {(c.phone || q.companyPhone) && <div>Phone: {c.phone || q.companyPhone}</div>}
+                            {(c.email || q.companyEmail) && <div>Email: {c.email || q.companyEmail}</div>}
+                            {(c.hstNumber || q.companyHst) && <div>HST #: {c.hstNumber || q.companyHst}</div>}
+                        </div>
+                    </>
+                )}
+                {!showFull && (q.quoteNumber || q.clientName) && (
+                    <div className="text-[10px] text-gray-400 font-semibold mt-1">
+                        {[q.quoteNumber, q.clientName].filter(Boolean).join(" | ")}
                     </div>
-                </>
-            )}
-            {!showFull && (
-                <div className="text-[10px] text-gray-400 font-bold mt-1">{q.quoteNumber || "Q-2026-042"} | {q.clientName || "ABC Construction Ltd."}</div>
-            )}
+                )}
+            </div>
+
+            {/* Right: Quote Badge */}
+            <div className="text-right mt-2">
+                <div className="text-[22px] font-black text-gray-900 tracking-tight mb-3">QUOTATION</div>
+                <div className="bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 rounded-xl p-4 w-64 text-[11px] shadow-sm">
+                    {[
+                        { label: "Quote No.", value: q.quoteNumber },
+                        { label: "Revision", value: q.revisionNumber },
+                        { label: "Issue Date", value: q.startDate },
+                        { label: "Valid Until", value: q.validityPeriod },
+                    ].filter(r => r.value).map((row, i, arr) => (
+                        <div key={i} className={`flex justify-between items-center py-1.5 ${i < arr.length - 1 ? "border-b border-gray-200" : ""}`}>
+                            <span className="font-semibold text-gray-400 uppercase tracking-wider text-[9px]">{row.label}</span>
+                            <span className={`font-bold ${i === 0 ? "text-emerald-600 text-[12px] font-black" : "text-gray-900"}`}>{row.value}</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
         </div>
-        <div className="text-right mt-5">
-            <h1 className="text-[20px] font-bold text-gray-900 mb-4 tracking-tight">QUOTATION</h1>
-            <div className="bg-[#F9FAFB] border border-[#E5E7EB] p-4 rounded-lg space-y-2 w-64 text-[11px]">
-                <div className="flex justify-between">
-                    <span className="font-bold text-gray-400">Quote Number:</span>
-                    <span className="font-semibold text-gray-900">{q.quoteNumber || "N/A"}</span>
-                </div>
 
-                <div className="flex justify-between">
-                    <span className="font-bold text-gray-400">Revision:</span>
-                    <span className="font-semibold text-gray-900">{q.revisionNumber || "N/A"}</span>
-                </div>
-
-                <div className="flex justify-between">
-                    <span className="font-bold text-gray-400">Date:</span>
-                    <span className="font-semibold text-gray-900">{q.startDate || "N/A"}</span>
-                </div>
-
-                <div className="flex justify-between">
-                    <span className="font-bold text-gray-400">Valid Until:</span>
-                    <span className="font-semibold text-gray-900">{q.validityPeriod || "N/A"}</span>
-                </div>
-                </div>
-        </div>
+        {/* Bottom separator with gradient */}
+        <div className="mx-12 h-px bg-gradient-to-r from-emerald-500/30 via-gray-200 to-transparent" />
     </div>
-    )
+    );
 }

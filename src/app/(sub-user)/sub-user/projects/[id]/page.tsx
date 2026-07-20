@@ -450,7 +450,7 @@ const existingAddendaFiles =
                         isSelected ? "text-[#101828] dark:text-emerald-400" : "text-gray-500 dark:text-gray-400"
                       )}
                     >
-                      Div {div.code}
+                     {div.code}
                     </span>
                     {isSelected && <CheckCircle2 className="w-4 h-4 text-[#10B981]" />}
                   </div>

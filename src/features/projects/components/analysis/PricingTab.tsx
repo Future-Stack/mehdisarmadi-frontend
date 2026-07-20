@@ -19,20 +19,75 @@ export default function PricingTab({ projectId }: Props) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
   const [editingDescription, setEditingDescription] = useState("");
+  const [editingAmount, setEditingAmount] = useState<string>("");
 
   const handleStartEdit = (item: any) => {
     setEditingId(item.id);
-    setEditingName(item.name);
+    setEditingName(item.name || item.title);
     setEditingDescription(item.description);
+    setEditingAmount(item.amount != null ? item.amount.toString() : "");
+  };
+
+  const [estimatorPriceInput, setEstimatorPriceInput] = useState<string>("");
+
+  React.useEffect(() => {
+    if (pricing?.comparison?.estimatorFinalPrice != null) {
+      setEstimatorPriceInput(pricing.comparison.estimatorFinalPrice.toString());
+    } else {
+      setEstimatorPriceInput("");
+    }
+  }, [pricing?.comparison?.estimatorFinalPrice]);
+
+  const handleUpdateEstimatorPrice = async () => {
+    // Allow clearing the input to remove the final price
+    const newPriceStr = estimatorPriceInput.trim();
+    const numericPrice = newPriceStr === "" ? null : Number(newPriceStr.replace(/[^0-9.-]+/g, ""));
+    const currentPrice = pricing?.comparison?.estimatorFinalPrice;
+    
+    if (Number.isNaN(numericPrice) || numericPrice === currentPrice) return;
+    
+    // Auto-calculate new variance
+    const aiDraftEstimate = pricing?.comparison?.aiDraftEstimate || 0;
+    const newVariance = numericPrice != null ? numericPrice - aiDraftEstimate : null;
+    
+    try {
+      await updateSection({
+        projectId,
+        section: "pricing",
+        data: {
+          payload: {
+            ...pricing,
+            comparison: {
+              ...pricing?.comparison,
+              estimatorFinalPrice: numericPrice,
+              variance: newVariance,
+            }
+          },
+          note: "Updated estimator final price"
+        }
+      }).unwrap();
+      toast.success("Estimator final price updated.");
+    } catch {
+      toast.error("Failed to update estimator price.");
+    }
+  };
+
+  const handleKeyDownEstimatorPrice = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleUpdateEstimatorPrice();
+    }
   };
 
   const handleSaveEdit = async (item: any) => {
     if (!pricing?.additionalCostItems) return;
+    
+    const numericAmount = editingAmount.trim() === "" ? null : Number(editingAmount.replace(/[^0-9.-]+/g, ""));
+    
     const newItems = pricing.additionalCostItems.map((i: any) =>
-      i.id === item.id ? { ...i, name: editingName, description: editingDescription } : i
+      i.id === item.id ? { ...i, name: editingName, description: editingDescription, amount: numericAmount } : i
     );
     try {
-      await updateSection({ projectId, section: "pricing", data: { payload: { additionalCostItems: newItems }, note: "Manual edits from estimator" } }).unwrap();
+      await updateSection({ projectId, section: "pricing", data: { payload: { ...pricing, additionalCostItems: newItems }, note: "Manual edits from estimator" } }).unwrap();
       toast.success("Cost item updated.");
       setEditingId(null);
     } catch {
@@ -44,7 +99,7 @@ export default function PricingTab({ projectId }: Props) {
     if (!pricing?.additionalCostItems || !deleteItemId) return;
     const newItems = pricing.additionalCostItems.filter((i: any) => i.id !== deleteItemId);
     try {
-      await updateSection({ projectId, section: "pricing", data: { payload: { additionalCostItems: newItems }, note: "Manual edits from estimator" } }).unwrap();
+      await updateSection({ projectId, section: "pricing", data: { payload: { ...pricing, additionalCostItems: newItems }, note: "Manual edits from estimator" } }).unwrap();
       toast.success("Cost item deleted.");
       setDeleteItemId(null);
     } catch {
@@ -119,19 +174,30 @@ export default function PricingTab({ projectId }: Props) {
                   <input
                     type="text"
                     placeholder="0"
-                    className="w-32 h-10 pl-7 pr-3 border border-emerald-200 dark:border-emerald-800/50 rounded-lg focus:outline-none focus:border-emerald-500 bg-emerald-50/30 dark:bg-emerald-900/10 text-center font-bold text-[15px] text-gray-900 dark:text-white"
+                    value={estimatorPriceInput}
+                    onChange={(e) => setEstimatorPriceInput(e.target.value)}
+                    onKeyDown={handleKeyDownEstimatorPrice}
+                    className="w-32 h-10 pl-7 pr-8 border border-emerald-200 dark:border-emerald-800/50 rounded-lg focus:outline-none focus:border-emerald-500 bg-emerald-50/30 dark:bg-emerald-900/10 text-center font-bold text-[15px] text-gray-900 dark:text-white"
                   />
-                  <Edit3 className="absolute -right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
+                  <button 
+                    onClick={handleUpdateEstimatorPrice}
+                    disabled={isUpdating}
+                    title="Save Price"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 text-emerald-600 hover:text-emerald-700 p-1.5 rounded-md hover:bg-emerald-100 transition-colors disabled:opacity-50"
+                  >
+                    <Check className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
             </div>
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-5 border border-blue-100 dark:border-blue-800/50 flex flex-col items-center justify-center shadow-sm">
-              <div className="text-[14px] font-medium text-gray-500 mb-2">AI Draft Estimate</div>
-              <div className="text-lg font-black text-gray-400 dark:text-blue-400">
-                --
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-5 border border-purple-100 dark:border-purple-800/50 flex flex-col items-center justify-center shadow-sm">
+              <div className="text-[14px] font-medium text-gray-500 mb-2">Variance</div>
+              <div className={cn("text-lg font-black", pricing?.comparison?.variance ? "text-purple-600 dark:text-purple-400" : "text-gray-400")}>
+                {pricing?.comparison?.variance != null ? `$${pricing.comparison.variance.toLocaleString()}` : "--"}
               </div>
-              <div className="text-[12px] font-normal text-gray-500 mb-2">Enter estimator price</div>
-
+              <div className="text-[12px] font-normal text-gray-500 mb-2">
+                {pricing?.comparison?.variance != null ? "Difference from AI" : "Enter estimator price"}
+              </div>
             </div>
           </div>
         </div>
@@ -151,9 +217,14 @@ export default function PricingTab({ projectId }: Props) {
           <div className="space-y-3">
             {pricing?.aiDraftEstimateBreakdown?.length ? (
               pricing.aiDraftEstimateBreakdown.map((div: any) => (
-                <div key={div.division} className="flex items-center p-3 rounded-xl bg-gray-50/50 dark:bg-gray-800/30 border border-transparent hover:border-gray-100 dark:hover:border-gray-700 transition-colors">
-                  <span className="text-[10px] font-bold text-white bg-emerald-600 rounded px-2 py-1 mr-4">Div {div.division}</span>
-                  <span className="text-[13px] font-medium text-gray-900 dark:text-gray-100">{div.name}</span>
+                <div key={div.division} className="flex items-center justify-between p-3 rounded-xl bg-gray-50/50 dark:bg-gray-800/30 border border-transparent hover:border-gray-100 dark:hover:border-gray-700 transition-colors">
+                  <div className="flex items-center">
+                    <span className="text-[10px] font-bold text-white bg-emerald-600 rounded px-2 py-1 mr-4">Div {div.division}</span>
+                    <span className="text-[13px] font-medium text-gray-900 dark:text-gray-100">{div.name}</span>
+                  </div>
+                  {div.amount != null && (
+                    <span className="text-[13px] font-bold text-gray-900 dark:text-gray-100">${div.amount.toLocaleString()}</span>
+                  )}
                 </div>
               ))
             ) : (
@@ -189,14 +260,26 @@ export default function PricingTab({ projectId }: Props) {
                     <input
                       value={editingName}
                       onChange={e => setEditingName(e.target.value)}
+                      placeholder="Item Name"
                       className="w-full px-2 py-1 rounded border border-gray-300 dark:border-gray-700 bg-transparent text-[14px] font-bold focus:outline-none focus:border-emerald-500"
                     />
                     <textarea
                       value={editingDescription}
                       onChange={e => setEditingDescription(e.target.value)}
                       rows={2}
+                      placeholder="Description"
                       className="w-full px-2 py-1 rounded border border-gray-300 dark:border-gray-700 bg-transparent text-[12px] resize-none focus:outline-none focus:border-emerald-500"
                     />
+                    <div className="relative w-32">
+                      <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 text-[12px] font-medium">$</span>
+                      <input
+                        value={editingAmount}
+                        onChange={e => setEditingAmount(e.target.value)}
+                        placeholder="Amount"
+                        type="text"
+                        className="w-full pl-5 pr-2 py-1 rounded border border-gray-300 dark:border-gray-700 bg-transparent text-[13px] font-medium focus:outline-none focus:border-emerald-500"
+                      />
+                    </div>
                   </div>
                 ) : (
                   <>
@@ -284,7 +367,7 @@ export default function PricingTab({ projectId }: Props) {
                 key={item.id ?? `basis-${index}`}
                 className={cn(
                   "p-4 rounded-xl border-l-4 border-r border-t border-b border-r-gray-100 border-t-gray-100 border-b-gray-100 dark:border-r-gray-800 dark:border-t-gray-800 dark:border-b-gray-800 group relative",
-                  getCostItemStyle(item.name)
+                  getCostItemStyle(item.title || item.name)
                 )}
               >
                 {editingId === item.id ? (
@@ -303,7 +386,7 @@ export default function PricingTab({ projectId }: Props) {
                   </div>
                 ) : (
                   <>
-                    <div className="text-[14px] font-bold text-gray-900 dark:text-gray-100 mb-0.5">{item.name}</div>
+                    <div className="text-[14px] font-bold text-gray-900 dark:text-gray-100 mb-0.5">{item.title || item.name}</div>
                     <div className="text-[12px] text-gray-600 dark:text-gray-400">{item.description}</div>
                   </>
                 )}

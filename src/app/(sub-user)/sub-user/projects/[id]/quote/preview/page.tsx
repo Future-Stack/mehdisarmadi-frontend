@@ -37,23 +37,45 @@ export default function QuotePreviewPage({ params }: { params: Promise<{ id: str
   const handleExportDocx = async () => {
     setIsExportingDocx(true);
     try {
+      const q = quoteData?.quote || {};
+      const companyDetails = quoteData?.companyDetails || {};
+      const projectDetails = quoteData?.projectQuoteDetails || {};
+      const aiDraft = quoteData?.aiQuoteDraft || {};
+
+      const scopeText = Array.isArray(q.scopeOfWork)
+        ? q.scopeOfWork.join("\n")
+        : (aiDraft.scope_of_work ? aiDraft.scope_of_work.map((s: any) => `Division ${s.division_code} - ${s.division_label}: ${s.details?.join(", ")}`).join("\n") : "");
+
+      const assumptionsText = Array.isArray(q.assumptions)
+        ? q.assumptions.join("\n")
+        : (aiDraft.assumptions?.join("\n") || "");
+
+      const exclusionsText = Array.isArray(q.exclusions)
+        ? q.exclusions.join("\n")
+        : (aiDraft.exclusions?.join("\n") || "");
+
+      const clarificationsText = Array.isArray(q.clarifications)
+        ? q.clarifications.join("\n")
+        : "";
+
       await exportQuoteToDocx({
-        companyName: "ABC Construction Ltd.",
-        projectName: "Green Valley Residential Complex",
-        clientName: "Green Valley Developers Inc.",
-        quoteNumber: "Q-2026-042",
-        baseBidPrice: "485000",
-        hstPercentage: "13",
-        currency: "CAD",
-        scopeOfWork: "Division 06 – Wood, Plastics & Composites...\nDivision 08 – Openings...\nDivision 09 – Finishes...",
-        assumptions: "1. Site access provided as per tender specifications\n2. Temporary facilities provided by general contractor",
-        exclusions: "1. Electrical rough-in and fixture installation\n2. Plumbing rough-in and fixture installation",
-        clarifications: "Confirm exact working hours permitted for night work",
-        paymentTerms: "Progress payments monthly based on work completed. Net 30 days from invoice date.",
-        holdbackNote: "10% holdback will be retained as per Construction Act requirements until final completion and lien period expiry.",
-        validityPeriod: "30 days",
-        footerNotes: "Thank you for considering our proposal."
-      }, "quote-preview.docx");
+        companyName: companyDetails.name || "ABC Construction Ltd.",
+        companyAddress: companyDetails.address || "123 Main Street, Toronto, ON M5V 3A8",
+        projectName: q.projectName || projectDetails.projectName || "",
+        clientName: q.clientName || projectDetails.clientName || "",
+        quoteNumber: q.quoteNumber || "Q-2026-042",
+        baseBidPrice: String(q.baseBidPrice || aiDraft.pricing_summary?.base_bid_price || "0"),
+        hstPercentage: String(q.hstPercentage || "13").replace("%", ""),
+        currency: q.currency || aiDraft.pricing_summary?.currency || "CAD",
+        scopeOfWork: scopeText,
+        assumptions: assumptionsText,
+        exclusions: exclusionsText,
+        clarifications: clarificationsText,
+        paymentTerms: q.paymentTerms || aiDraft.terms_and_conditions?.payment_terms || "",
+        holdbackNote: q.holdbackNote || aiDraft.terms_and_conditions?.holdback || "",
+        validityPeriod: q.validityPeriod || aiDraft.terms_and_conditions?.quote_validity || "30 days",
+        footerNotes: q.footerNotes || "Thank you for considering our proposal."
+      }, `quote-${q.quoteNumber || "preview"}.docx`);
       toast.success("DOCX exported successfully!");
     } catch (err) {
       toast.error("Failed to export DOCX.");
