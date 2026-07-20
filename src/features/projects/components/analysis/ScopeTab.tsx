@@ -270,7 +270,7 @@ import { CheckSquare, Edit3, Copy, Trash2, FileText, Loader2, Check, X, Square, 
 import { Button } from "@/components/ui/Button";
 import { toast } from "sonner";
 import { useGetProjectScopeQuery, useUpdateProjectAnalysisSectionMutation } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, getHighlightStyle, ReanalyzeBlock, DeleteConfirmationModal } from "./shared";
+import { SectionSkeleton, SectionError, getHighlightStyle, ReanalyzeBlock, DeleteConfirmationModal, ProposedChangesReview } from "./shared";
 
 interface Props {
   projectId: string;
@@ -566,81 +566,7 @@ export default function ScopeTab({ projectId }: Props) {
 
       <ReanalyzeBlock projectId={projectId} section="scope" data={data?.data} />
 
-      {/* Proposed Changes review card — only shows when the AI has a pending proposal for this section */}
-      {/* {proposedChanges && (
-        <div className="bg-blue-50/40 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/40 rounded-3xl p-6 md:p-8 shadow-sm space-y-4">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-blue-500" />
-            <h3 className="text-[14px] font-bold text-gray-900 dark:text-white">Proposed Changes</h3>
-          </div>
-
-          {proposedChanges.changes_label && (
-            <p className="text-[12px] font-bold text-gray-600 dark:text-gray-300">{proposedChanges.changes_label}:</p>
-          )}
-
-          {proposedChanges.changes?.length ? (
-            <ul className="space-y-1.5">
-              {proposedChanges.changes.map((change: string, i: number) => (
-                <li key={i} className="flex items-start gap-2 text-[13px] text-gray-700 dark:text-gray-300">
-                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0" />
-                  {change}
-                </li>
-              ))}
-            </ul>
-          ) : null}
-
-          {proposedChanges.pricing_impact && (
-            <div className="flex items-start gap-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800 rounded-xl p-3">
-              <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-[12px] font-bold text-amber-800 dark:text-amber-300">Pricing Impact:</p>
-                <p className="text-[12px] text-amber-800 dark:text-amber-300">{proposedChanges.pricing_impact}</p>
-              </div>
-            </div>
-          )}
-
-          {proposedChanges.affected_tabs?.length ? (
-            <div className="bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-100 dark:border-yellow-900/30 rounded-xl p-3">
-              <p className="text-[11px] font-bold text-gray-500 mb-1.5">This change may affect:</p>
-              <div className="flex flex-wrap gap-2">
-                {proposedChanges.affected_tabs.map((tab: string) => (
-                  <span key={tab} className="text-[11px] font-bold px-2.5 py-1 rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200">
-                    {tab}
-                  </span>
-                ))}
-              </div>
-            </div>
-          ) : null}
-
-          <div className="flex items-center gap-2 pt-1">
-            <Button
-              onClick={() => handleDecision("accept")}
-              disabled={isUpdating || currentAction === "accept"}
-              variant="primary"
-              className="h-9 px-4 rounded-lg font-bold bg-[#009966] hover:bg-emerald-700 text-white text-[12px] flex items-center gap-1.5 disabled:opacity-60"
-            >
-              {isUpdating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ThumbsUp className="w-3.5 h-3.5" />}
-              Accept Changes
-            </Button>
-            <Button
-              variant="secondary"
-              className="h-9 px-4 rounded-lg font-bold bg-white border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-[12px] flex items-center gap-1.5"
-            >
-              <Edit3 className="w-3.5 h-3.5" />
-              Edit
-            </Button>
-            <Button
-              onClick={() => handleDecision("reject")}
-              disabled={isUpdating || currentAction === "reject"}
-              variant="secondary"
-              className="h-9 px-4 rounded-lg font-bold bg-white border border-red-200 dark:border-red-800 text-red-600 text-[12px] flex items-center gap-1.5 disabled:opacity-60"
-            >
-              <X className="w-3.5 h-3.5" />
-              Reject
-            </Button>
-          </div>
-        </div>
-      )} */}
+      {/* <ProposedChangesReview projectId={projectId} section="scope" data={data?.data} /> */}
 
       <DeleteConfirmationModal
         isOpen={!!deleteItemId}

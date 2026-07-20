@@ -1,6 +1,6 @@
 import { baseApi } from "@/store/api/baseApi";
 
-export type FocusLevel = "LOW" | "NORMAL" | "HIGH";
+export type FocusLevel = "NORMAL" | "HIGH" | "CRITICAL" | "IGNORE";
 
 export interface Division {
   id: string;

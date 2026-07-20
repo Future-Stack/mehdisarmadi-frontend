@@ -262,9 +262,10 @@ function EditModal({ division, onClose }: { division: Division; onClose: () => v
                             onChange={(e) => setForm((f) => ({ ...f, focusLevel: e.target.value as Division["focusLevel"] }))}
                             className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-[#0B0F1A] text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
                         >
-                            <option value="LOW">Low</option>
-                            <option value="NORMAL">Normal</option>
+                            <option value="CRITICAL">Critical</option>
                             <option value="HIGH">High</option>
+                            <option value="NORMAL">Normal</option>
+                            <option value="IGNORE">Ignore</option>
                         </select>
                     </div>
 

@@ -1,6 +1,6 @@
 import { FileText, Edit3, Trash2, Check, X, Loader2 } from "lucide-react";
 import { useGetProjectAddendaQuery, useUpdateProjectAnalysisSectionMutation } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, ReanalyzeBlock, DeleteConfirmationModal } from "./shared";
+import { SectionSkeleton, SectionError, ReanalyzeBlock, ProposedChangesReview, DeleteConfirmationModal } from "./shared";
 import React, { useState } from "react";
 import { toast } from "sonner";
 
@@ -194,6 +194,7 @@ export default function AddendaTab({ projectId }: Props) {
       </div>
 
       <ReanalyzeBlock projectId={projectId} section="addenda" data={data?.data} />
+      <ProposedChangesReview projectId={projectId} section="addenda" data={data?.data} />
       <DeleteConfirmationModal
         isOpen={!!deleteItemId}
         onClose={() => setDeleteItemId(null)}

@@ -3,7 +3,7 @@ import { Edit3, FileText, Trash2, Check, X, Plus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { toast } from "sonner";
 import { useGetProjectClarificationsQuery, useUpdateProjectAnalysisSectionMutation } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, ReanalyzeBlock, DeleteConfirmationModal } from "./shared";
+import { SectionSkeleton, SectionError, ReanalyzeBlock, DeleteConfirmationModal, ProposedChangesReview } from "./shared";
 
 interface Props {
   projectId: string;
@@ -144,6 +144,7 @@ export default function ClarificationsTab({ projectId }: Props) {
       </div>
 
       <ReanalyzeBlock projectId={projectId} section="clarifications" data={data?.data} />
+      <ProposedChangesReview projectId={projectId} section="clarifications" data={data?.data} />
       <DeleteConfirmationModal
         isOpen={!!deleteItemId}
         onClose={() => setDeleteItemId(null)}

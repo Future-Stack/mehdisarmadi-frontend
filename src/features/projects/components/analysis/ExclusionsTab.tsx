@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Edit3, FileText, Trash2, Check, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useGetProjectExclusionsQuery, useUpdateProjectAnalysisSectionMutation } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, ReanalyzeBlock, DeleteConfirmationModal } from "./shared";
+import { SectionSkeleton, SectionError, ReanalyzeBlock, DeleteConfirmationModal, ProposedChangesReview } from "./shared";
 
 interface Props {
   projectId: string;
@@ -141,6 +141,7 @@ export default function ExclusionsTab({ projectId }: Props) {
       </div>
 
       <ReanalyzeBlock projectId={projectId} section="exclusions" data={data?.data} />
+      <ProposedChangesReview projectId={projectId} section="exclusions" data={data?.data} />
       <DeleteConfirmationModal
         isOpen={!!deleteItemId}
         onClose={() => setDeleteItemId(null)}
