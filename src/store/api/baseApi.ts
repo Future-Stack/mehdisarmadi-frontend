@@ -24,10 +24,11 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
   if (result.error && result.error.status === 401) {
     // Clear auth state in Redux
     api.dispatch(clearCredentials());
-    
-    // Redirect to login page
+
+    // Call the server-side signout route so the httpOnly session cookie
+    // is properly deleted before redirecting to /login.
     if (typeof window !== "undefined") {
-      window.location.href = "/login?reason=session_expired";
+      window.location.href = "/api/auth/signout?reason=session_expired";
     }
   }
   

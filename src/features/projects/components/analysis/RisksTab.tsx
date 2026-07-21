@@ -75,35 +75,40 @@ export default function RisksTab({ projectId }: Props) {
         </div>
 
         {/* Filters */}
-        {risks?.filters?.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-6">
-            <button
-              onClick={() => setActiveFilter("all")}
-              className={cn(
-                "px-3 py-1.5 rounded-full text-[12px] font-bold transition-colors",
-                activeFilter === "all"
-                  ? "bg-emerald-600 text-white"
-                  : "bg-gray-100 dark:bg-gray-800 text-gray-500 hover:text-gray-900 dark:hover:text-white"
-              )}
-            >
-              All
-            </button>
-            {risks.filters.map((f: any) => (
-              <button
-                key={f.code}
-                onClick={() => setActiveFilter(f.code === "all" ? "all" : f.label?.toLowerCase())}
-                className={cn(
-                  "px-3 py-1.5 rounded-full text-[12px] font-bold transition-colors",
-                  f.active && activeFilter !== "all"
-                    ? "bg-emerald-600 text-white"
-                    : "bg-gray-100 dark:bg-gray-800 text-gray-500 hover:text-gray-900 dark:hover:text-white"
-                )}
-              >
-                {f.label}
-              </button>
-            ))}
-          </div>
-        )}
+       {risks?.filters?.length > 0 && (
+  <div className="flex flex-wrap gap-2 mb-6">
+    {/* <button
+      onClick={() => setActiveFilter("all")}
+      className={cn(
+        "px-3 py-1.5 rounded-full text-[12px] font-bold transition-colors",
+        activeFilter === "all"
+          ? "bg-emerald-600 text-white"
+          : "bg-gray-100 dark:bg-gray-800 text-gray-500 hover:text-gray-900 dark:hover:text-white"
+      )}
+    >
+      All
+    </button> */}
+
+    {risks.filters.map((f: any) => {
+      const filterValue = f.code === "all" ? "all" : f.label?.toLowerCase();
+
+      return (
+        <button
+          key={f.code}
+          onClick={() => setActiveFilter(filterValue)}
+          className={cn(
+            "px-3 py-1.5 rounded-full text-[12px] font-bold transition-colors",
+            activeFilter === filterValue
+              ? "bg-emerald-600 text-white"
+              : "bg-gray-100 dark:bg-gray-800 text-gray-500 hover:text-gray-900 dark:hover:text-white"
+          )}
+        >
+          {f.label}
+        </button>
+      );
+    })}
+  </div>
+)}
 
         <div className="space-y-4">
           {filteredItems.length ? (
@@ -139,7 +144,7 @@ export default function RisksTab({ projectId }: Props) {
                     </span>
 
                     {/* Edit/Delete Buttons - visible on hover */}
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {/* <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       {editingId === risk.id ? (
                         <>
                           <button
@@ -173,7 +178,7 @@ export default function RisksTab({ projectId }: Props) {
                           </button>
                         </>
                       )}
-                    </div>
+                    </div> */}
                   </div>
                 </div>
 
@@ -207,14 +212,7 @@ export default function RisksTab({ projectId }: Props) {
       </div>
 
       <ReanalyzeBlock projectId={projectId} section="risks" data={data?.data} />
-      <DeleteConfirmationModal
-        isOpen={!!deleteItemId}
-        onClose={() => setDeleteItemId(null)}
-        onConfirm={handleDeleteConfirm}
-        isDeleting={isUpdating}
-        title="Delete Risk"
-        description="Are you sure you want to delete this risk? This action cannot be undone."
-      />
+      
     </div>
   );
 }

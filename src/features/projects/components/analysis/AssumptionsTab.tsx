@@ -1,4 +1,4 @@
-import { Edit3, Copy, Trash2, CheckSquare, FileText, Loader2, Square } from "lucide-react";
+import { Edit3, Copy, Trash2, CheckSquare, FileText, Loader2, Square, Edit } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { toast } from "sonner";
 import { useGetProjectAssumptionsQuery, useUpdateProjectAnalysisSectionMutation } from "@/store/api/projectApi";
@@ -15,6 +15,7 @@ export default function AssumptionsTab({ projectId }: Props) {
   const assumptions = data?.data?.payload || data?.data;
 
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const handleToggleInclude = async (itemToToggle: any) => {
     if (!assumptions?.items) return;
@@ -29,6 +30,12 @@ export default function AssumptionsTab({ projectId }: Props) {
     } catch (err: any) {
       toast.error("Failed to remove assumption.");
     }
+  };
+  const [editingText, setEditingText] = useState("");
+
+  const handleEdit = (item: any) => {
+    setEditingId(item.id);
+    setEditingText(item.text);
   };
 
   const handleDeleteConfirm = async () => {
@@ -112,12 +119,20 @@ export default function AssumptionsTab({ projectId }: Props) {
                     {item.include !== false ? 'Included' : 'Include'}
                   </button>
                   <div className="flex items-center gap-1">
-                    <button className="p-1.5 text-gray-400 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30">
-                      <Edit3 className="w-4 h-4" />
+                    <button
+                      onClick={() => handleEdit(item)}
+                      className="p-1.5 text-gray-400 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30">
+                      <Edit className="w-4 h-4" />
                     </button>
-                    {/* <button className="p-1.5 text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                    <button
+                      onClick={() => {
+                        navigator.clipboard?.writeText(item.text || "");
+                        toast.success("Copied to clipboard.");
+                      }}
+                      className="p-1.5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+                    >
                       <Copy className="w-4 h-4" />
-                    </button> */}
+                    </button>
                     <button
                       onClick={() => setDeleteItemId(item.id)}
                       disabled={isUpdating}

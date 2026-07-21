@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Edit3, FileText, Trash2, Check, X, Loader2 } from "lucide-react";
+import { Edit3, FileText, Trash2, Check, X, Loader2, Edit } from "lucide-react";
 import { toast } from "sonner";
 import { useGetProjectExclusionsQuery, useUpdateProjectAnalysisSectionMutation } from "@/store/api/projectApi";
 import { SectionSkeleton, SectionError, ReanalyzeBlock, DeleteConfirmationModal } from "./shared";
@@ -97,7 +97,7 @@ export default function ExclusionsTab({ projectId }: Props) {
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity self-start">
+                <div className="flex items-center gap-1  transition-opacity self-start">
                   {editingId === item.id ? (
                     <>
                       <button
@@ -118,17 +118,17 @@ export default function ExclusionsTab({ projectId }: Props) {
                     <>
                       <button
                         onClick={() => handleStartEdit(item)}
-                        className="p-1.5 text-gray-400 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30"
+                        className="flex gap-1 items-center px-3 py-1.5 text-white bg-emerald-600 hover:bg-emerald-700 transition-colors rounded-lg text-[12px] font-bold hover:bg-blue-50 dark:hover:bg-blue-900/30"
                       >
-                        <Edit3 className="w-4 h-4" />
+                        Edit<Edit className="w-4 h-4" />
                       </button>
-                      <button
+                      {/* <button
                         onClick={() => setDeleteItemId(item.id)}
                         disabled={isUpdating}
                         className="p-1.5 text-gray-400 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 disabled:opacity-50"
                       >
                         <Trash2 className="w-4 h-4" />
-                      </button>
+                      </button> */}
                     </>
                   )}
                 </div>
@@ -141,14 +141,14 @@ export default function ExclusionsTab({ projectId }: Props) {
       </div>
 
       <ReanalyzeBlock projectId={projectId} section="exclusions" data={data?.data} />
-      <DeleteConfirmationModal
+      {/* <DeleteConfirmationModal
         isOpen={!!deleteItemId}
         onClose={() => setDeleteItemId(null)}
         onConfirm={handleDeleteConfirm}
         isDeleting={isUpdating}
         title="Delete Exclusion"
         description="Are you sure you want to delete this exclusion? This action cannot be undone."
-      />
+      /> */}
     </div>
   );
 }
