@@ -38,9 +38,10 @@ apiClient.interceptors.response.use(
       error.response?.data?.message ?? error.message ?? "An error occurred";
 
     if (error.response?.status === 401) {
-      // Token expired — let the auth flow handle redirect
+      // Token expired — call server-side signout to clear the httpOnly
+      // session cookie before redirecting to /login.
       if (typeof window !== "undefined") {
-        window.location.href = "/login?reason=session_expired";
+        window.location.href = "/api/auth/signout?reason=session_expired";
       }
     } else if (error.response?.status === 403) {
       toast.error("You don't have permission to perform this action.");

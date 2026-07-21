@@ -262,9 +262,10 @@ function EditModal({ division, onClose }: { division: Division; onClose: () => v
                             onChange={(e) => setForm((f) => ({ ...f, focusLevel: e.target.value as Division["focusLevel"] }))}
                             className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-[#0B0F1A] text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
                         >
-                            <option value="LOW">Low</option>
-                            <option value="NORMAL">Normal</option>
+                            <option value="CRITICAL">Critical</option>
                             <option value="HIGH">High</option>
+                            <option value="NORMAL">Normal</option>
+                            <option value="IGNORE">Ignore</option>
                         </select>
                     </div>
 
@@ -609,7 +610,7 @@ export default function DivisionsPage() {
                                                 key={p}
                                                 onClick={() => setPage(p as number)}
                                                 className={`w-7 h-7 rounded-lg text-xs font-medium transition ${page === p
-                                                    ? "bg-indigo-600 text-white shadow-sm"
+                                                    ? "bg-[#008236] text-white shadow-sm"
                                                     : "text-slate-600 hover:bg-white hover:shadow-sm border border-transparent hover:border-slate-200"
                                                     }`}
                                             >

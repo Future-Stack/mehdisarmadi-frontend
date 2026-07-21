@@ -256,7 +256,15 @@ export const projectApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: (result, error, { projectId, section }) => [{ type: "Project", id: `${projectId}_analysis_${section}` }],
+      invalidatesTags: (result, error, { projectId, section }) => [
+        // Invalidate the generic analysis section cache
+        { type: "Project", id: `${projectId}_analysis_${section}` },
+        // Invalidate the section-specific query so the data table refetches
+        { type: "Project", id: `${projectId}_${section}` },
+        // Also invalidate summary/pricing if they may be affected
+        { type: "Project", id: `${projectId}_summary` },
+        { type: "Project", id: `${projectId}_pricing` },
+      ],
     }),
     getProjectSummary: builder.query<ApiResponse<any>, string>({
       query: (projectId) => `/project/${projectId}/summary`,

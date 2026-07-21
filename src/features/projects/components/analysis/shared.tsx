@@ -1,5 +1,5 @@
 import React from "react";
-import { AlertCircle, Loader2, Sparkles } from "lucide-react";
+import { AlertCircle, Loader2, Sparkles, CheckCircle2, Check, X, AlertTriangle, Edit3, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { toast } from "sonner";
 import {
@@ -104,8 +104,6 @@ export function AIInstructionSection({
     </div>
   );
 }
-
-import { CheckCircle2, Check, X, AlertTriangle, Edit3, Trash2 } from "lucide-react";
 
 // ─── Proposed Changes Review ──────────────────────────────────────────────────
 interface ProposedChangesReviewProps {
