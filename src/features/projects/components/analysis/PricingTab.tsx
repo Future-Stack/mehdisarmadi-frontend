@@ -1,6 +1,6 @@
 import { AlertTriangle, AlertCircle, Edit3, Trash2, Check, X } from "lucide-react";
 import { useGetProjectPricingQuery } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, AIInstructionSection, ProposedChangesReview, DeleteConfirmationModal, ReanalyzeBlock } from "./shared";
+import { SectionSkeleton, SectionError, AIInstructionSection, DeleteConfirmationModal, ReanalyzeBlock } from "./shared";
 import { cn } from "@/lib/utils";
 import React, { useState } from "react";
 import { toast } from "sonner";
@@ -135,8 +135,6 @@ export default function PricingTab({ projectId }: Props) {
 
   return (
     <div className="space-y-6 pb-8">
-      <ProposedChangesReview projectId={projectId} section="pricing" data={data?.data} />
-
       {/* Warning banner */}
       <div className="bg-orange-50/70 dark:bg-orange-900/10 rounded-xl p-4 flex gap-3">
         <AlertTriangle className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />

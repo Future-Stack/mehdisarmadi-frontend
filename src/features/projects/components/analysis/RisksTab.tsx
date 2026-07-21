@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { FileText, Edit3, Trash2, Check, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useGetProjectRisksQuery, useUpdateProjectAnalysisSectionMutation } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, getRiskBadgeColor, ReanalyzeBlock, DeleteConfirmationModal, ProposedChangesReview } from "./shared";
+import { SectionSkeleton, SectionError, getRiskBadgeColor, ReanalyzeBlock, DeleteConfirmationModal } from "./shared";
 
 interface Props {
   projectId: string;
@@ -144,7 +144,7 @@ export default function RisksTab({ projectId }: Props) {
                     </span>
 
                     {/* Edit/Delete Buttons - visible on hover */}
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {/* <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       {editingId === risk.id ? (
                         <>
                           <button
@@ -178,7 +178,7 @@ export default function RisksTab({ projectId }: Props) {
                           </button>
                         </>
                       )}
-                    </div>
+                    </div> */}
                   </div>
                 </div>
 
@@ -212,15 +212,7 @@ export default function RisksTab({ projectId }: Props) {
       </div>
 
       <ReanalyzeBlock projectId={projectId} section="risks" data={data?.data} />
-      <ProposedChangesReview projectId={projectId} section="risks" data={data?.data} />
-      <DeleteConfirmationModal
-        isOpen={!!deleteItemId}
-        onClose={() => setDeleteItemId(null)}
-        onConfirm={handleDeleteConfirm}
-        isDeleting={isUpdating}
-        title="Delete Risk"
-        description="Are you sure you want to delete this risk? This action cannot be undone."
-      />
+      
     </div>
   );
 }

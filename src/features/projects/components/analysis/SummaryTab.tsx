@@ -84,29 +84,7 @@ export default function SummaryTab({ projectId }: Props) {
                       )}
                     />
                     
-                    {/* Actions */}
-                    <div className="absolute top-3 right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      {editingId === (highlight.id || highlight.type) ? (
-                        <>
-                          <button onClick={() => handleSaveEdit(highlight)} disabled={isUpdating} className="p-1.5 text-emerald-600 hover:bg-emerald-100 rounded-lg">
-                            {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                          </button>
-                          <button onClick={() => setEditingId(null)} className="p-1.5 text-gray-500 hover:bg-gray-200 rounded-lg">
-                            <X className="w-4 h-4" />
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <button onClick={() => handleStartEdit(highlight)} className="p-1.5 text-blue-500 hover:bg-blue-100 rounded-lg">
-                            <Edit3 className="w-4 h-4" />
-                          </button>
-                          <button onClick={() => setDeleteItemId(highlight.id || highlight.type)} className="p-1.5 text-red-500 hover:bg-red-100 rounded-lg">
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </>
-                      )}
-                    </div>
-
+                   
                     {editingId === (highlight.id || highlight.type) ? (
                       <div className="space-y-2 pr-16">
                         <input
@@ -184,15 +162,7 @@ export default function SummaryTab({ projectId }: Props) {
         </div>
       </div>
 
-      {/* <ReanalyzeBlock projectId={projectId} section="summary" data={data?.data} /> */}
-      <DeleteConfirmationModal
-        isOpen={!!deleteItemId}
-        onClose={() => setDeleteItemId(null)}
-        onConfirm={handleDeleteConfirm}
-        isDeleting={isUpdating}
-        title="Delete Highlight"
-        description="Are you sure you want to delete this highlight? This action cannot be undone."
-      />
+     
     </div>
   );
 }

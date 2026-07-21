@@ -264,6 +264,9 @@
 //   );
 // }
 
+
+
+
 import React, { useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { CheckSquare, Edit3, Copy, Trash2, FileText, Loader2, Check, X, Square, Sparkles, ThumbsUp, ThumbsDown, AlertTriangle } from "lucide-react";
@@ -276,11 +279,6 @@ interface Props {
   projectId: string;
 }
 
-// Normalizes whatever shape the backend actually sends for this section into
-// the row shape the table below expects (id, division, scopeItem, quantity,
-// notes, source, include, actions). This keeps the table UI exactly as-is
-// even though the current backend payload for "scope" doesn't send a real
-// items[] array yet — it sends { action } + proposedPayload.proposed_changes.
 function normalizeScopeRows(section: any): { items: any[]; filters: any[] } {
   const payload = section?.payload;
   const proposedPayload = section?.proposedPayload;
