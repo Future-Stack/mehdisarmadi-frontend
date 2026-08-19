@@ -272,8 +272,8 @@ import { cn } from "@/lib/utils";
 import { CheckSquare, Edit3, Copy, Trash2, FileText, Loader2, Check, X, Square, Sparkles, ThumbsUp, ThumbsDown, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { toast } from "sonner";
-import { useGetProjectScopeQuery, useUpdateProjectAnalysisSectionMutation } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, getHighlightStyle, ReanalyzeBlock, DeleteConfirmationModal, ProposedChangesReview } from "./shared";
+import { useGetProjectByIdQuery, useGetProjectScopeQuery, useUpdateProjectAnalysisSectionMutation, useSaveProjectQuoteMutation, useGetProjectQuoteQuery } from "@/store/api/projectApi";
+import { SectionSkeleton, SectionError, getHighlightStyle, ReanalyzeBlock, DeleteConfirmationModal, ProposedChangesReview, PdfReferenceLink } from "./shared";
 
 interface Props {
   projectId: string;
@@ -301,7 +301,7 @@ function normalizeScopeRows(section: any): { items: any[]; filters: any[] } {
     include: payload?.action !== "reject",
     notes: proposedPayload?.ai_instructions || "",
     source: { document: undefined, page: undefined },
-    actions: { canDelete: false }, // derived rows aren't independently deletable
+    actions: { canDelete: false }, 
   }));
 
   return { items: derivedItems, filters: [{ code: "all", label: "All", active: true }] };
@@ -310,6 +310,9 @@ function normalizeScopeRows(section: any): { items: any[]; filters: any[] } {
 export default function ScopeTab({ projectId }: Props) {
   const { data, isLoading, isError, refetch } = useGetProjectScopeQuery(projectId);
   const [updateSection, { isLoading: isUpdating }] = useUpdateProjectAnalysisSectionMutation();
+  const { data: projectData } = useGetProjectByIdQuery(projectId);
+  const projectFiles = projectData?.data?.files;
+
 
   const { items, filters } = useMemo(() => normalizeScopeRows(data?.data), [data]);
   const proposedChanges = data?.data?.proposedPayload?.proposed_changes;
@@ -337,57 +340,207 @@ export default function ScopeTab({ projectId }: Props) {
   const [editingScopeItem, setEditingScopeItem] = useState("");
   const [editingNotes, setEditingNotes] = useState("");
 
+  // Pass the project's files into ScopeTab as a prop, or fetch them here
+const fileUrlMap = useMemo(() => {
+  const map = new Map<string, string>();
+  projectFiles?.forEach((f: any) => {
+    if (f.originalName && f.fileUrl) map.set(f.originalName, f.fileUrl);
+  });
+  return map;
+}, [projectFiles]);
+
   const handleStartEdit = (row: any) => {
     setEditingId(row.id);
     setEditingScopeItem(row.scopeItem);
     setEditingNotes(row.notes || "");
   };
+  const currentPayload = data?.data?.payload || {};
 
-  const handleSaveEdit = async (rowId: string) => {
+const handleSaveEdit = async (rowId: string) => {
     const newItems = items.map((item: any) =>
       item.id === rowId ? { ...item, scopeItem: editingScopeItem, notes: editingNotes } : item
     );
     try {
-      await updateSection({ projectId, section: "scope", data: { payload: { items: newItems }, note: "Manual edits from estimator" } }).unwrap();
+      await updateSection({
+        projectId,
+        section: "scope",
+        data: { payload: { ...currentPayload, items: newItems }, note: "Manual edits from estimator" }
+      }).unwrap();
       toast.success("Scope item updated.");
       setEditingId(null);
     } catch {
       toast.error("Failed to update scope item.");
     }
-  };
+};
 
-  const handleToggleInclude = async (itemToToggle: any) => {
+const handleToggleInclude = async (itemToToggle: any) => {
     const newItems = items.filter((item: any) => item.id !== itemToToggle.id);
     try {
-      await updateSection({ projectId, section: "scope", data: { payload: { items: newItems }, note: "Manual edits from estimator" } }).unwrap();
+      await updateSection({
+        projectId,
+        section: "scope",
+        data: { payload: { ...currentPayload, items: newItems, total_items: newItems.length }, note: "Manual edits from estimator" }
+      }).unwrap();
       toast.success("Scope item removed.");
     } catch {
       toast.error("Failed to remove scope item.");
     }
-  };
+};
 
-  const handleDeleteConfirm = async () => {
+const handleDeleteConfirm = async () => {
     if (!deleteItemId) return;
     const newItems = items.filter((item: any) => item.id !== deleteItemId);
     try {
-      await updateSection({ projectId, section: "scope", data: { payload: { items: newItems }, note: "Manual edits from estimator" } }).unwrap();
+      await updateSection({
+        projectId,
+        section: "scope",
+        data: { payload: { ...currentPayload, items: newItems, total_items: newItems.length }, note: "Manual edits from estimator" }
+      }).unwrap();
       toast.success("Scope item deleted successfully.");
       setDeleteItemId(null);
     } catch {
       toast.error("Failed to delete scope item.");
     }
-  };
+};
+// const handleAddRow = async () => {
+//     const newRow = {
+//       id: crypto.randomUUID(),
+//       notes: "",
+//       source: { page: null, sheet: null, section: null, document: null },
+//       include: true,
+//       division: activeFilterCode !== "all" ? activeFilterCode : "",
+//       location: "",
+//       quantity: { unit: "unspecified", value: 0 },
+//       scopeItem: "New scope item",
+//       work_type: "new work",
+//       confidence: "low",
+//       inclusions: [],
+//       quantity_basis: "not found",
+//       specifications: [],
+//       trade_interfaces: [],
+//     };
+//     const newItems = [...items, newRow];
+//     try {
+//       await updateSection({
+//         projectId,
+//         section: "scope",
+//         data: { payload: { ...currentPayload, items: newItems, total_items: newItems.length }, note: "Estimator added a manual scope row" }
+//       }).unwrap();
+//       toast.success("Scope item added.");
+//       handleStartEdit(newRow); // immediately drop the new row into edit mode
+//     } catch {
+//       toast.error("Failed to add scope item.");
+//     }
+// };
+
+  // const handleSaveEdit = async (rowId: string) => {
+  //   const newItems = items.map((item: any) =>
+  //     item.id === rowId ? { ...item, scopeItem: editingScopeItem, notes: editingNotes } : item
+  //   );
+  //   try {
+  //     await updateSection({ projectId, section: "scope", data: { payload: { items: newItems }, note: "Manual edits from estimator" } }).unwrap();
+  //     toast.success("Scope item updated.");
+  //     setEditingId(null);
+  //   } catch {
+  //     toast.error("Failed to update scope item.");
+  //   }
+  // };
+
+  // const handleToggleInclude = async (itemToToggle: any) => {
+  //   const newItems = items.filter((item: any) => item.id !== itemToToggle.id);
+  //   try {
+  //     await updateSection({ projectId, section: "scope", data: { payload: { items: newItems }, note: "Manual edits from estimator" } }).unwrap();
+  //     toast.success("Scope item removed.");
+  //   } catch {
+  //     toast.error("Failed to remove scope item.");
+  //   }
+  // };
+
+  // const handleDeleteConfirm = async () => {
+  //   if (!deleteItemId) return;
+  //   const newItems = items.filter((item: any) => item.id !== deleteItemId);
+  //   try {
+  //     await updateSection({ projectId, section: "scope", data: { payload: { items: newItems }, note: "Manual edits from estimator" } }).unwrap();
+  //     toast.success("Scope item deleted successfully.");
+  //     setDeleteItemId(null);
+  //   } catch {
+  //     toast.error("Failed to delete scope item.");
+  //   }
+  // };
 
   // Accept / reject the AI-proposed changes shown in the "Proposed Changes" card below.
+  // const handleDecision = async (decision: "accept" | "reject") => {
+  //   const currentPayload = data?.data?.payload || {};
+  //   try {
+  //     await updateSection({
+  //       projectId,
+  //       section: "scope",
+  //       data: { payload: { ...currentPayload, action: decision }, note: `Estimator ${decision}ed proposed scope changes` },
+  //     }).unwrap();
+  //     toast.success(decision === "accept" ? "Proposed changes accepted." : "Proposed changes rejected.");
+  //   } catch {
+  //     toast.error(`Failed to ${decision} proposed changes.`);
+  //   }
+  // };
+  const { data: quoteData } = useGetProjectQuoteQuery(projectId);
+  const [saveQuote] = useSaveProjectQuoteMutation();
+
   const handleDecision = async (decision: "accept" | "reject") => {
+    const proposedPayload = data?.data?.proposedPayload;
     const currentPayload = data?.data?.payload || {};
+
+    const nextPayload =
+      decision === "accept" && proposedPayload?.updated
+        ? proposedPayload.updated
+        : currentPayload;
+
     try {
+      // 1. Update scope section payload
       await updateSection({
         projectId,
         section: "scope",
-        data: { payload: { ...currentPayload, action: decision }, note: `Estimator ${decision}ed proposed scope changes` },
+        data: {
+          payload: nextPayload,
+          note:
+            decision === "accept"
+              ? `Estimator accepted AI-proposed scope changes: ${proposedPayload?.ai_instructions || ""}`
+              : "Estimator rejected AI-proposed scope changes",
+        },
       }).unwrap();
-      toast.success(decision === "accept" ? "Proposed changes accepted." : "Proposed changes rejected.");
+
+      // 2. Sync to quote via PUT /api/v1/project/{projectId}/quote
+      if (quoteData?.data) {
+        const existingQuote = quoteData.data.savedQuote?.quote || {};
+        const aiDraft = quoteData.data.aiQuoteDraft || {};
+        const projectDetails = quoteData.data.projectQuoteDetails || {};
+
+        let scopeOfWork: string[] = existingQuote.scopeOfWork || aiDraft.scope_of_work?.map((s: any) => `Division ${s.division_code} - ${s.division_label}: ${s.details?.join(", ") || ""}`) || [];
+
+        if (decision === "accept" && proposedPayload?.updated?.items) {
+          scopeOfWork = proposedPayload.updated.items.map((it: any) =>
+            it.scopeItem ? `[Div ${it.division || "00"}] ${it.scopeItem}${it.notes ? `: ${it.notes}` : ""}` : String(it.text || it)
+          );
+        } else if (decision === "reject" && proposedPayload?.proposed_changes?.changes) {
+          const changes: string[] = proposedPayload.proposed_changes.changes;
+          scopeOfWork = scopeOfWork.filter((item) => !changes.some(c => item.includes(c)));
+        }
+
+        const quotePayload = {
+          quote: {
+            ...existingQuote,
+            projectName: existingQuote.projectName || projectDetails.projectName || "",
+            quoteNumber: existingQuote.quoteNumber || "Q-2026-042",
+            clientName: existingQuote.clientName || projectDetails.clientName || "",
+            scopeOfWork,
+          },
+          status: "completed"
+        };
+
+        await saveQuote({ projectId, data: quotePayload }).unwrap();
+      }
+
+      toast.success(decision === "accept" ? "Proposed changes accepted and saved to quote." : "Proposed changes rejected.");
+      refetch();
     } catch {
       toast.error(`Failed to ${decision} proposed changes.`);
     }
@@ -440,12 +593,21 @@ export default function ScopeTab({ projectId }: Props) {
               })}
             </div>
           </div>
-          <Button
+          {/* <Button
             variant="secondary"
             className="h-10 px-5 rounded-xl font-bold bg-white border border-gray-200 dark:border-gray-700 shadow-sm text-gray-700 dark:text-gray-200 text-[13px] hover:bg-gray-50 dark:hover:bg-gray-800 flex-shrink-0"
           >
             + Add Row
-          </Button>
+          </Button> */}
+          {/* <Button
+            variant="secondary"
+            onClick={handleAddRow}
+            disabled={isUpdating}
+            className="h-10 px-5 rounded-xl font-bold bg-white border border-gray-200 dark:border-gray-700 shadow-sm text-gray-700 dark:text-gray-200 text-[13px] hover:bg-gray-50 dark:hover:bg-gray-800 flex-shrink-0"
+          >
+            {isUpdating ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : null}
+            + Add Row
+          </Button> */}
         </div>
 
         {/* Table */}
@@ -494,12 +656,15 @@ export default function ScopeTab({ projectId }: Props) {
                         <input value={editingNotes} onChange={e => setEditingNotes(e.target.value)} className="w-full h-8 px-2 rounded border border-gray-200 dark:border-gray-700 bg-transparent text-[12px] focus:outline-none focus:border-emerald-500" />
                       ) : row.notes}
                     </td>
-                    <td className="px-4 py-3">
+                    {/* <td className="px-4 py-3">
                       <div className="flex items-center gap-1.5 text-gray-500">
                         <FileText className="w-3.5 h-3.5" />
                         <span>{row.source?.document}</span>
                         {row.source?.page && <span className="text-gray-400">p.{row.source.page}</span>}
                       </div>
+                    </td> */}
+                    <td className="px-4 py-3">
+                      <PdfReferenceLink projectId={projectId} reference={row.source} />
                     </td>
                     <td className="px-4 py-3 text-center">
                       <div className="flex items-center justify-center gap-2">
@@ -562,7 +727,13 @@ export default function ScopeTab({ projectId }: Props) {
         </div>
       </div>
 
-      <ReanalyzeBlock projectId={projectId} section="scope" data={data?.data} />
+      <ReanalyzeBlock 
+        projectId={projectId} 
+        section="scope" 
+        data={data?.data} 
+        onAccept={() => handleDecision("accept")}
+        onReject={() => handleDecision("reject")}
+      />
 
       {/* <ProposedChangesReview projectId={projectId} section="scope" data={data?.data} /> */}
 

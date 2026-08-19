@@ -1,6 +1,6 @@
 /* ─── Premium Document Footer ─── */
 export const DocFooter = ({ quoteData }: { quoteData?: any }) => {
-    const q = quoteData?.quote || {};
+    const q = quoteData?.savedQuote || quoteData?.quote || {};
     const c = quoteData?.companyDetails || {};
     const companyName = c.name || q.companyName;
     const companyAddress = c.address || q.companyAddress;

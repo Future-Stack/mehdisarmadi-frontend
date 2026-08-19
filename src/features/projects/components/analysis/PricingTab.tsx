@@ -1,6 +1,6 @@
 import { AlertTriangle, AlertCircle, Edit3, Trash2, Check, X } from "lucide-react";
 import { useGetProjectPricingQuery } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, AIInstructionSection, DeleteConfirmationModal, ReanalyzeBlock } from "./shared";
+import { SectionSkeleton, SectionError, AIInstructionSection, DeleteConfirmationModal, ReanalyzeBlock, PdfReferenceLink } from "./shared";
 import { cn } from "@/lib/utils";
 import React, { useState } from "react";
 import { toast } from "sonner";
@@ -13,7 +13,7 @@ interface Props {
 export default function PricingTab({ projectId }: Props) {
   const { data, isLoading, isError, refetch } = useGetProjectPricingQuery(projectId);
   const [updateSection, { isLoading: isUpdating }] = useUpdateProjectAnalysisSectionMutation();
-  const pricing = data?.data?.payload || data?.data;
+  const pricing = data?.data?.payload;
 
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -214,15 +214,37 @@ export default function PricingTab({ projectId }: Props) {
 
           <div className="space-y-3">
             {pricing?.aiDraftEstimateBreakdown?.length ? (
-              pricing.aiDraftEstimateBreakdown.map((div: any) => (
-                <div key={div.division} className="flex items-center justify-between p-3 rounded-xl bg-gray-50/50 dark:bg-gray-800/30 border border-transparent hover:border-gray-100 dark:hover:border-gray-700 transition-colors">
-                  <div className="flex items-center">
-                    <span className="text-[10px] font-bold text-white bg-emerald-600 rounded px-2 py-1 mr-4">Div {div.division}</span>
-                    <span className="text-[13px] font-medium text-gray-900 dark:text-gray-100">{div.name}</span>
+              pricing.aiDraftEstimateBreakdown.map((div: any, idx: number) => (
+                <div key={div.id ?? idx} className="p-4 rounded-xl bg-gray-50/50 dark:bg-gray-800/30 border border-gray-100 dark:border-gray-800 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      {div.division && (
+                        <span className="text-[10px] font-bold text-white bg-emerald-600 rounded px-2 py-1 mr-3">Div {div.division}</span>
+                      )}
+                      <span className="text-[14px] font-bold text-gray-900 dark:text-gray-100">{div.name}</span>
+                    </div>
+                    {div.amount != null && (
+                      <span className="text-[14px] font-black text-emerald-600 dark:text-emerald-400">${div.amount.toLocaleString()}</span>
+                    )}
                   </div>
-                  {div.amount != null && (
-                    <span className="text-[13px] font-bold text-gray-900 dark:text-gray-100">${div.amount.toLocaleString()}</span>
+
+                  {div.calculation && (
+                    <p className="text-[12px] text-gray-600 dark:text-gray-400 font-mono bg-white/70 dark:bg-gray-900/50 px-2.5 py-1 rounded border border-gray-100 dark:border-gray-800 inline-block">
+                      {div.calculation}
+                    </p>
                   )}
+
+                  <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-[11px] text-gray-500">
+                    <div className="flex items-center gap-4">
+                      {div.unit && <span>Unit: <strong className="text-gray-700 dark:text-gray-300">{div.unit}</strong></span>}
+                      {div.quantity != null && <span>Qty: <strong className="text-gray-700 dark:text-gray-300">{div.quantity}</strong></span>}
+                      {div.unit_rate != null && <span>Rate: <strong className="text-gray-700 dark:text-gray-300">${div.unit_rate}</strong></span>}
+                    </div>
+
+                    {div.source?.file && (
+                      <PdfReferenceLink projectId={projectId} reference={div.source} />
+                    )}
+                  </div>
                 </div>
               ))
             ) : (
@@ -326,14 +348,14 @@ export default function PricingTab({ projectId }: Props) {
 
 
         {/* Missing Information */}
-        {pricing?.missingInformation?.length > 0 && (
+        {Boolean(pricing?.missingInformation?.length) && (
           <div className="bg-red-50/50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/50 rounded-2xl p-6">
             <h3 className="text-[14px] font-bold text-red-800 dark:text-red-400 flex items-center gap-2 mb-1">
               <AlertCircle className="w-4 h-4" /> Missing Information
             </h3>
             <p className="text-[12px] text-red-600/80 dark:text-red-300 mb-4">Items requiring evaluation or estimator input</p>
             <div className="space-y-3">
-              {pricing.missingInformation.map((err: any, i: number) => (
+              {pricing?.missingInformation?.map((err: any, i: number) => (
                 <div key={i} className="flex gap-3 bg-white/60 dark:bg-red-900/20 p-3 rounded-lg border border-red-100/60 dark:border-red-800/30">
                   <div className="mt-0.5 text-red-500 text-[10px]">❌</div>
                   <div>

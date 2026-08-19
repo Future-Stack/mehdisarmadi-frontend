@@ -2,7 +2,7 @@ import Logo from "@/components/Reuseable/Logo";
 
 /* ─── Shared Document Header ─── */
 export const DocumentHeader = ({ showFull = false, quoteData }: { showFull?: boolean; quoteData?: any }) => {
-    const q = quoteData?.savedQuote || {};
+    const q = quoteData?.savedQuote || quoteData?.quote || {};
     const c = quoteData?.companyDetails || {};
     return (
     <div className="relative overflow-hidden mb-6">

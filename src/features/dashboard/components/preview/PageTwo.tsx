@@ -45,7 +45,7 @@ export const PageTwo = ({ exportMode, quoteData }: { exportMode?: boolean; quote
                                 </li>
                             ))
                         ) : (
-                            <span>No exclusions listed</span>
+                            <span className="text-[11px] text-gray-600">No exclusions listed</span>
                         )}
                     </ul>
                 </div>
@@ -101,7 +101,7 @@ export const PageTwo = ({ exportMode, quoteData }: { exportMode?: boolean; quote
                         </div>
                     ))
                 ) : (
-                    <span>No separate prices listed</span>
+                    <span className="text-[11px] text-gray-600">No separate prices listed</span>
                 )}
             </div>
 
@@ -131,7 +131,7 @@ export const PageTwo = ({ exportMode, quoteData }: { exportMode?: boolean; quote
                         </div>
                     ))
                 ) : (
-                    <span>No alternative prices listed</span>
+                    <span className="text-[11px] text-gray-600">No alternative prices listed</span>
                 )}
             </div>
 

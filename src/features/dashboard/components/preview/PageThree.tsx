@@ -16,7 +16,7 @@ const SectionHeading = ({ label }: { label: string }) => (
 // ];
 
 export const PageThree = ({ exportMode, quoteData }: { exportMode?: boolean; quoteData?: any }) => {
-    const q = quoteData?.savedQuote || {};
+    const q = quoteData?.savedQuote || quoteData?.quote || {};
     const unitPrices = q.unitPrices && Array.isArray(q.unitPrices) && q.unitPrices.length > 0 ? q.unitPrices : [];
 
     const numericBase = typeof q.baseBidPrice === 'string' ? Number(q.baseBidPrice.replace(/[^0-9.-]+/g, "")) : (q.baseBidPrice || 485000);
