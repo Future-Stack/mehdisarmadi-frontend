@@ -15,6 +15,233 @@ export interface Division {
   updatedAt?: string;
 }
 
+export interface ProjectSectionResponse<T = any> {
+  id: string;
+  section: string;
+  payload: T;
+  meta: any;
+  proposedPayload: any;
+  proposedMeta: any;
+  lastInstruction: string | null;
+  proposedInstruction: string | null;
+  lastSyncedAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SummaryPayload {
+  labor_hours: number;
+  total_items: number;
+  duration_weeks: number;
+  key_highlights: Array<{
+    id: string;
+    type: "scope" | "pricing" | "risk" | "addenda" | string;
+    title: string;
+    description: string;
+  }>;
+  estimated_value: number;
+  selected_divisions: Array<{ id: string; code: string; name: string }>;
+}
+
+export interface ScopePayload {
+  items: Array<{
+    id: string;
+    notes: string;
+    source: {
+      page: number | null;
+      sheet: string | null;
+      section: string | null;
+      document: string | null;
+    };
+    include: boolean;
+    division: string;
+    location: string;
+    quantity: {
+      unit: string;
+      value: number;
+    };
+    scopeItem: string;
+    work_type: string;
+    confidence: string;
+    inclusions: string[];
+    quantity_basis: string;
+    specifications: string[];
+    trade_interfaces: string[];
+  }>;
+  title: string;
+  filters: Array<{ id: string; code: string; label: string; active: boolean }>;
+  showing: string;
+  warnings: string[];
+  confidence: string;
+  total_items: number;
+  completeness: string;
+  validation_errors: string[];
+  missing_information: string[];
+  action?: string;
+}
+
+export interface PricingPayload {
+  warnings: string[];
+  comparison: {
+    variance: number | null;
+    aiDraftEstimate: number | null;
+    estimatorFinalPrice: number | null;
+  };
+  confidence: string;
+  completeness: string;
+  stated_total: number | null;
+  breakdown_note: string;
+  estimate_scope: string;
+  validation_errors: string[];
+  breakdown_complete: boolean;
+  missingInformation?: Array<{ id: string; title: string; severity: string; description: string }>;
+  priced_scope_total: number;
+  additionalCostItems: Array<{
+    id: string;
+    name: string;
+    amount: number | null;
+    editable: boolean;
+    description: string;
+  }>;
+  missing_information: string[];
+  breakdown_difference: number;
+  aiDraftEstimateBreakdown: Array<{
+    id: string;
+    name: string;
+    unit: string;
+    amount: number;
+    source: { file: string; page: number; section: string };
+    division: string;
+    editable: boolean;
+    quantity: number;
+    unit_rate: number;
+    calculation: string;
+  }>;
+  pricingBasisAndReasoning: Array<{ id: string; title: string; description: string }>;
+}
+
+export interface RiskPayload {
+  items: Array<{
+    id: number | string;
+    title: string;
+    trigger: string;
+    category: string;
+    severity: string;
+    reference: { file: string; page: number | null; section: string | null };
+    mitigation: string;
+    cost_impact: string;
+    description: string;
+    probability: string;
+    schedule_impact: string;
+    quote_protection: string;
+    contingency_guidance: string;
+  }>;
+  title: string;
+  filters: Array<{ id: string; code: string; label: string; active: boolean }>;
+  showing: string;
+  subtitle: string;
+  warnings: string[];
+  confidence: string;
+  total_items: number;
+  completeness: string;
+  validation_errors: string[];
+  missing_information: string[];
+}
+
+export interface ClarificationPayload {
+  items: Array<{
+    id: number | string;
+    reason: string;
+    priority: string;
+    question: string;
+    reference: { file: string; page: number | null; section: string | null };
+    risk_category: string;
+    requested_from: string;
+    linked_risk_title: string;
+    impact_if_unresolved: string;
+  }>;
+  title: string;
+  filters: Array<{ id: string; code: string; label: string; active: boolean }>;
+  showing: string;
+  subtitle: string;
+  warnings: string[];
+  confidence: string;
+  total_items: number;
+  completeness: string;
+  risk_cross_check: any;
+  validation_errors: string[];
+  missing_information: string[];
+}
+
+export interface AssumptionPayload {
+  items: Array<{
+    id: number | string;
+    text: string;
+    basis: string;
+    status: string;
+    reference: { file: string; page: number | null; section: string | null };
+    assumption_type: string;
+    impact_if_false: string;
+    validation_required: string;
+  }>;
+  title: string;
+  filters: Array<{ id: string; code: string; label: string; active: boolean }>;
+  showing: string;
+  subtitle: string;
+  warnings: string[];
+  confidence: string;
+  total_items: number;
+  completeness: string;
+  validation_errors: string[];
+  missing_information: string[];
+}
+
+export interface ExclusionPayload {
+  items: Array<{
+    id: number | string;
+    text: string;
+    reason: string;
+    category: string;
+    division: string;
+    reference: { file: string; page: number | null; section: string | null };
+    assigned_to: string;
+    exclusion_type: string;
+    scope_boundary: string;
+    commercial_treatment: string;
+  }>;
+  title: string;
+  filters: Array<{ id: string; code: string; label: string; active: boolean }>;
+  showing: string;
+  subtitle: string;
+  warnings: string[];
+  confidence: string;
+  total_items: number;
+  completeness: string;
+  validation_errors: string[];
+  missing_information: string[];
+}
+
+export interface AddendaPayload {
+  items: Array<{
+    id: number | string;
+    title?: string;
+    text?: string;
+    description?: string;
+    reference?: { file: string; page?: number; section?: string };
+  }>;
+  title: string;
+  filters: Array<{ id: string; code: string; label: string; active: boolean }>;
+  showing: string;
+  subtitle: string;
+  warnings: string[];
+  confidence: string;
+  total_items: number;
+  completeness: string;
+  retrieval_warning?: string;
+  validation_errors: string[];
+  missing_information: string[];
+}
+
 export interface AdminProjectListItem {
   id: string;
   name: string;
@@ -266,35 +493,35 @@ export const projectApi = baseApi.injectEndpoints({
         { type: "Project", id: `${projectId}_pricing` },
       ],
     }),
-    getProjectSummary: builder.query<ApiResponse<any>, string>({
+    getProjectSummary: builder.query<ApiResponse<ProjectSectionResponse<SummaryPayload>>, string>({
       query: (projectId) => `/project/${projectId}/summary`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_summary` }],
     }),
-    getProjectScope: builder.query<ApiResponse<any>, string>({
+    getProjectScope: builder.query<ApiResponse<ProjectSectionResponse<ScopePayload>>, string>({
       query: (projectId) => `/project/${projectId}/scope`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_scope` }],
     }),
-    getProjectPricing: builder.query<ApiResponse<any>, string>({
+    getProjectPricing: builder.query<ApiResponse<ProjectSectionResponse<PricingPayload>>, string>({
       query: (projectId) => `/project/${projectId}/pricing`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_pricing` }],
     }),
-    getProjectRisks: builder.query<ApiResponse<any>, string>({
+    getProjectRisks: builder.query<ApiResponse<ProjectSectionResponse<RiskPayload>>, string>({
       query: (projectId) => `/project/${projectId}/risks`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_risks` }],
     }),
-    getProjectClarifications: builder.query<ApiResponse<any>, string>({
+    getProjectClarifications: builder.query<ApiResponse<ProjectSectionResponse<ClarificationPayload>>, string>({
       query: (projectId) => `/project/${projectId}/clarifications`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_clarifications` }],
     }),
-    getProjectAssumptions: builder.query<ApiResponse<any>, string>({
+    getProjectAssumptions: builder.query<ApiResponse<ProjectSectionResponse<AssumptionPayload>>, string>({
       query: (projectId) => `/project/${projectId}/assumptions`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_assumptions` }],
     }),
-    getProjectExclusions: builder.query<ApiResponse<any>, string>({
+    getProjectExclusions: builder.query<ApiResponse<ProjectSectionResponse<ExclusionPayload>>, string>({
       query: (projectId) => `/project/${projectId}/exclusions`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_exclusions` }],
     }),
-    getProjectAddenda: builder.query<ApiResponse<any>, string>({
+    getProjectAddenda: builder.query<ApiResponse<ProjectSectionResponse<AddendaPayload>>, string>({
       query: (projectId) => `/project/${projectId}/addenda`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_addenda` }],
     }),

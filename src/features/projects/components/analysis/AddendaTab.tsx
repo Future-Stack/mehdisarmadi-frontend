@@ -1,6 +1,6 @@
-import { FileText, Edit3, Trash2, Check, X, Loader2 } from "lucide-react";
+import { FileText, Edit3, Trash2, Check, X, Loader2, AlertCircle, Info } from "lucide-react";
 import { useGetProjectAddendaQuery, useUpdateProjectAnalysisSectionMutation } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, ReanalyzeBlock, DeleteConfirmationModal } from "./shared";
+import { SectionSkeleton, SectionError, ReanalyzeBlock, DeleteConfirmationModal, PdfReferenceLink } from "./shared";
 import React, { useState } from "react";
 import { toast } from "sonner";
 
@@ -11,10 +11,10 @@ interface Props {
 export default function AddendaTab({ projectId }: Props) {
   const { data, isLoading, isError, refetch } = useGetProjectAddendaQuery(projectId);
   const [updateSection, { isLoading: isUpdating }] = useUpdateProjectAnalysisSectionMutation();
-  const addenda = data?.data?.payload || data?.data;
+  const addenda = data?.data?.payload;
 
-  const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [deleteItemId, setDeleteItemId] = useState<string | number | null>(null);
+  const [editingId, setEditingId] = useState<string | number | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
   const [editingDescription, setEditingDescription] = useState("");
 
@@ -67,12 +67,25 @@ export default function AddendaTab({ projectId }: Props) {
           </p>
         </div>
 
+        {/* Warning / Retrieval Note */}
+        {(addenda?.retrieval_warning || Boolean(addenda?.missing_information?.length)) && (
+          <div className="mb-6 p-4 rounded-2xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/70 dark:border-amber-900/40 flex items-start gap-3">
+            <Info className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+            <div className="text-[13px]">
+              <span className="font-bold text-amber-900 dark:text-amber-200 block mb-0.5">Addenda Analysis Status:</span>
+              <p className="text-amber-800/90 dark:text-amber-300/90">
+                {addenda?.retrieval_warning || addenda?.missing_information?.[0]}
+              </p>
+            </div>
+          </div>
+        )}
+
         {addenda?.items?.length ? (
           <div className="space-y-4">
-            {addenda.items.map((item: any) => (
-              <div key={item.id} className="relative pl-4 group">
+            {addenda.items.map((item: any, idx: number) => (
+              <div key={item.id ?? idx} className="relative pl-4 group">
                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 rounded-full" />
-                <div className="bg-emerald-50/30 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/50 rounded-xl p-5 relative">
+                <div className="bg-emerald-50/30 dark:bg-emerald-950/10 border border-emerald-100 dark:border-emerald-900/50 rounded-2xl p-5 relative space-y-3">
                   
                   {/* Actions hover */}
                   <div className="absolute top-4 right-4 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -96,9 +109,10 @@ export default function AddendaTab({ projectId }: Props) {
                       </>
                     )}
                   </div>
+
                   {/* Badge + date row */}
                   {(item.badge || item.date) && (
-                    <div className="flex items-center gap-3 mb-2">
+                    <div className="flex items-center gap-3">
                       {item.badge && (
                         <span className="bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">
                           {item.badge}
@@ -114,10 +128,10 @@ export default function AddendaTab({ projectId }: Props) {
                     <input
                       value={editingTitle}
                       onChange={e => setEditingTitle(e.target.value)}
-                      className="w-full px-3 py-1.5 mb-2 rounded border border-emerald-300 dark:border-emerald-700 bg-transparent text-[16px] font-bold focus:outline-none focus:border-emerald-500"
+                      className="w-full px-3 py-1.5 rounded border border-emerald-300 dark:border-emerald-700 bg-transparent text-[16px] font-bold focus:outline-none focus:border-emerald-500"
                     />
                   ) : (
-                    <h4 className="text-[16px] font-bold text-gray-900 dark:text-white mb-1">
+                    <h4 className="text-[16px] font-bold text-gray-900 dark:text-white">
                       {item.title || item.text}
                     </h4>
                   )}
@@ -127,17 +141,17 @@ export default function AddendaTab({ projectId }: Props) {
                       value={editingDescription}
                       onChange={e => setEditingDescription(e.target.value)}
                       rows={2}
-                      className="w-full px-3 py-2 mb-4 rounded border border-emerald-300 dark:border-emerald-700 bg-transparent text-[13px] resize-none focus:outline-none focus:border-emerald-500"
+                      className="w-full px-3 py-2 rounded border border-emerald-300 dark:border-emerald-700 bg-transparent text-[13px] resize-none focus:outline-none focus:border-emerald-500"
                     />
                   ) : (
                     item.description && (
-                      <p className="text-[13px] text-gray-600 dark:text-gray-400 mb-4">{item.description}</p>
+                      <p className="text-[13px] text-gray-600 dark:text-gray-400">{item.description}</p>
                     )
                   )}
 
                   {/* Impact grid */}
                   {(item.impact || item.divisions || item.scope || item.price) && (
-                    <div className="grid grid-cols-2 gap-y-4 gap-x-8 mb-4">
+                    <div className="grid grid-cols-2 gap-y-4 gap-x-8 pt-2">
                       {item.impact && (
                         <div>
                           <div className="text-[12px] font-medium text-gray-500 mb-1">Impact Type</div>
@@ -171,13 +185,10 @@ export default function AddendaTab({ projectId }: Props) {
                     </div>
                   )}
 
-                  {/* Reference */}
+                  {/* PDF Reference */}
                   {item.reference?.file && (
-                    <div className="flex items-center gap-1.5 text-[11px] font-medium text-gray-400 pt-3 border-t border-emerald-100 dark:border-emerald-900/50">
-                      <FileText className="w-3.5 h-3.5" />
-                      {item.reference.file}
-                      {item.reference.page && ` • p.${item.reference.page}`}
-                      {item.reference.section && ` • ${item.reference.section}`}
+                    <div className="pt-2 border-t border-emerald-100 dark:border-emerald-900/50">
+                      <PdfReferenceLink projectId={projectId} reference={item.reference} />
                     </div>
                   )}
                 </div>

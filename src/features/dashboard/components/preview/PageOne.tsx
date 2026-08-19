@@ -13,7 +13,7 @@ const SectionHeading = ({ label }: { label: string }) => (
 
 /* ─── PAGE 1: Tender Info + Scope + Assumptions ─── */
 export const PageOne = ({ exportMode, quoteData }: { exportMode?: boolean; quoteData?: any }) => {
-    const q = quoteData.savedQuote || {};
+    const q = quoteData?.savedQuote || quoteData?.quote || {};
     console.log(q)
     return (
         <div className={exportMode

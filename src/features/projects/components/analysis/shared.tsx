@@ -1,11 +1,71 @@
 import React from "react";
-import { AlertCircle, Loader2, Sparkles, CheckCircle2, Check, X, AlertTriangle, Edit3, Trash2 } from "lucide-react";
+import { AlertCircle, Loader2, Sparkles, CheckCircle2, Check, X, AlertTriangle, Edit3, Trash2, FileText, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { toast } from "sonner";
 import {
+  useGetProjectByIdQuery,
   useReanalyzeProjectSectionMutation,
   useUpdateProjectAnalysisSectionMutation,
+  useSaveProjectQuoteMutation,
+  useGetProjectQuoteQuery,
 } from "@/store/api/projectApi";
+import { cn } from "@/lib/utils";
+import { Modal } from "@/components/ui/Modal";
+
+export function useProjectFilesMap(projectId: string) {
+  const { data: projectData } = useGetProjectByIdQuery(projectId);
+  const files = projectData?.data?.files || [];
+
+  return (filename?: string | null) => {
+    if (!filename) return null;
+    const cleanName = filename.replace(/^S\d+:\s*/i, "").trim().toLowerCase();
+    for (const f of files) {
+      const orig = (f.originalName || f.name || "").trim().toLowerCase();
+      const fUrl = f.fileUrl || f.url;
+      if (fUrl && (orig === cleanName || cleanName.includes(orig) || orig.includes(cleanName))) {
+        return fUrl;
+      }
+    }
+    return null;
+  };
+}
+
+export function PdfReferenceLink({
+  projectId,
+  reference,
+  className,
+}: {
+  projectId: string;
+  reference?: { file?: string | null; page?: number | null; section?: string | null; sheet?: string | null; document?: string | null } | null;
+  className?: string;
+}) {
+  const getFileUrl = useProjectFilesMap(projectId);
+  const rawFilename = reference?.file || reference?.document;
+  if (!rawFilename) return null;
+
+  const url = getFileUrl(rawFilename);
+
+  return (
+    <div className={cn("inline-flex items-center gap-1.5 text-[11px] font-medium text-gray-500 dark:text-gray-400", className)}>
+      <FileText className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+      {url ? (
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 dark:text-blue-400 font-semibold hover:underline inline-flex items-center gap-1"
+        >
+          <span>{rawFilename}</span>
+          <ExternalLink className="w-3 h-3 shrink-0 inline" />
+        </a>
+      ) : (
+        <span className="font-semibold text-gray-700 dark:text-gray-300">{rawFilename}</span>
+      )}
+      {reference?.page && <span className="text-gray-400">• p.{reference.page}</span>}
+      {reference?.section && <span className="text-gray-400">• {reference.section}</span>}
+    </div>
+  );
+}
 
 // ─── Loading Skeleton ─────────────────────────────────────────────────────────
 export function SectionSkeleton() {
@@ -37,13 +97,10 @@ export function SectionError({ message, onRetry }: { message: string; onRetry?: 
 }
 
 // ─── AI Instruction Section ───────────────────────────────────────────────────
-// Used standalone OR controlled externally (via defaultInstruction + onReanalyzed)
 interface AIInstructionSectionProps {
   projectId: string;
   section: string;
-  /** Pre-fill instruction (e.g. when user clicks Edit on proposed changes) */
   defaultInstruction?: string;
-  /** Called after successful reanalyze so parent can clear the prefill */
   onReanalyzed?: () => void;
 }
 
@@ -56,7 +113,6 @@ export function AIInstructionSection({
   const [instruction, setInstruction] = React.useState(defaultInstruction ?? "");
   const [reanalyze, { isLoading }] = useReanalyzeProjectSectionMutation();
 
-  // Sync if parent pushes a new defaultInstruction
   React.useEffect(() => {
     if (defaultInstruction !== undefined) setInstruction(defaultInstruction);
   }, [defaultInstruction]);
@@ -110,15 +166,19 @@ interface ProposedChangesReviewProps {
   projectId: string;
   section: string;
   data: any;
-  /** Called when user clicks Edit — receives the original AI instruction */
   onEdit?: (instruction: string) => void;
+  onAccept?: () => void;
+  onReject?: () => void;
 }
 
-export function ProposedChangesReview({ projectId, section, data, onEdit }: ProposedChangesReviewProps) {
-  const [updateSection, { isLoading: isUpdating }] = useUpdateProjectAnalysisSectionMutation();
+export function ProposedChangesReview({ projectId, section, data, onEdit, onAccept, onReject }: ProposedChangesReviewProps) {
+  const [updateSection, { isLoading: isUpdatingSection }] = useUpdateProjectAnalysisSectionMutation();
+  const [saveQuote, { isLoading: isSavingQuote }] = useSaveProjectQuoteMutation();
+  const { data: quoteData } = useGetProjectQuoteQuery(projectId);
+  const [dismissed, setDismissed] = React.useState(false);
 
   const proposedPayload = data?.proposedPayload;
-  if (!proposedPayload) return null;
+  if (!proposedPayload || dismissed) return null;
 
   const proposedChanges = proposedPayload?.proposed_changes;
   const changes: string[] = proposedChanges?.changes ?? [];
@@ -126,32 +186,141 @@ export function ProposedChangesReview({ projectId, section, data, onEdit }: Prop
   const affectedTabs: string[] = proposedChanges?.affected_tabs ?? [];
   const aiInstruction: string | null = data?.proposedInstruction ?? null;
 
+  const isUpdating = isUpdatingSection || isSavingQuote;
+
   const handleAccept = async () => {
+    if (onAccept) {
+      onAccept();
+      setDismissed(true);
+      return;
+    }
     try {
-      await updateSection({ projectId, section, data: { payload: { action: "accept" } } }).unwrap();
-      toast.success("Proposed changes accepted!");
+      // 1. Update section analysis payload with accepted items
+      const nextPayload = proposedPayload?.updated || data?.payload || { action: "accept" };
+      await updateSection({
+        projectId,
+        section,
+        data: { payload: nextPayload, note: `Accepted AI proposed changes for ${section}` }
+      }).unwrap();
+
+      // 2. Sync to quote via PUT /api/v1/project/{projectId}/quote
+      if (quoteData?.data) {
+        const existingQuote = quoteData.data.savedQuote?.quote || {};
+        const aiDraft = quoteData.data.aiQuoteDraft || {};
+        const projectDetails = quoteData.data.projectQuoteDetails || {};
+
+        let scopeOfWork: string[] = existingQuote.scopeOfWork || aiDraft.scope_of_work?.map((s: any) => `Division ${s.division_code} - ${s.division_label}: ${s.details?.join(", ") || ""}`) || [];
+        let exclusions: string[] = existingQuote.exclusions || aiDraft.exclusions || [];
+        let assumptions: string[] = existingQuote.assumptions || aiDraft.assumptions || [];
+        let clarifications: string[] = existingQuote.clarifications || [];
+
+        if (section === "scope" || affectedTabs.includes("Scope")) {
+          if (proposedPayload?.updated?.items) {
+            scopeOfWork = proposedPayload.updated.items.map((it: any) =>
+              it.scopeItem ? `[Div ${it.division || "00"}] ${it.scopeItem}${it.notes ? `: ${it.notes}` : ""}` : String(it.text || it)
+            );
+          } else if (changes.length) {
+            scopeOfWork = Array.from(new Set([...scopeOfWork, ...changes]));
+          }
+        }
+
+        if (section === "exclusions" || affectedTabs.includes("Exclusions")) {
+          if (proposedPayload?.updated?.items) {
+            exclusions = proposedPayload.updated.items.map((it: any) => it.text || it.reason || String(it));
+          } else if (changes.length) {
+            exclusions = Array.from(new Set([...exclusions, ...changes]));
+          }
+        }
+
+        if (section === "assumptions" || affectedTabs.includes("Assumptions")) {
+          if (proposedPayload?.updated?.items) {
+            assumptions = proposedPayload.updated.items.map((it: any) => it.text || it.basis || String(it));
+          } else if (changes.length) {
+            assumptions = Array.from(new Set([...assumptions, ...changes]));
+          }
+        }
+
+        const quotePayload = {
+          quote: {
+            ...existingQuote,
+            projectName: existingQuote.projectName || projectDetails.projectName || "",
+            quoteNumber: existingQuote.quoteNumber || "Q-2026-042",
+            clientName: existingQuote.clientName || projectDetails.clientName || "",
+            scopeOfWork,
+            exclusions,
+            assumptions,
+            clarifications,
+          },
+          status: "completed"
+        };
+
+        await saveQuote({ projectId, data: quotePayload }).unwrap();
+      }
+
+      toast.success("Proposed changes accepted and saved to quote.");
+      setDismissed(true);
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to accept proposed changes.");
     }
   };
 
   const handleReject = async () => {
+    if (onReject) {
+      onReject();
+      setDismissed(true);
+      return;
+    }
     try {
-      await updateSection({ projectId, section, data: { payload: { action: "delete" } } }).unwrap();
+      // 1. Reject section payload by keeping previous payload
+      const prevPayload = proposedPayload?.previous || data?.payload || { action: "delete" };
+      await updateSection({
+        projectId,
+        section,
+        data: { payload: prevPayload, note: `Rejected AI proposed changes for ${section}` }
+      }).unwrap();
+
+      // 2. Sync to quote via PUT /api/v1/project/{projectId}/quote
+      if (quoteData?.data) {
+        const existingQuote = quoteData.data.savedQuote?.quote || {};
+        const aiDraft = quoteData.data.aiQuoteDraft || {};
+        const projectDetails = quoteData.data.projectQuoteDetails || {};
+
+        let scopeOfWork: string[] = existingQuote.scopeOfWork || aiDraft.scope_of_work?.map((s: any) => `Division ${s.division_code} - ${s.division_label}: ${s.details?.join(", ") || ""}`) || [];
+        let exclusions: string[] = existingQuote.exclusions || aiDraft.exclusions || [];
+        let assumptions: string[] = existingQuote.assumptions || aiDraft.assumptions || [];
+
+        if (changes.length) {
+          scopeOfWork = scopeOfWork.filter((item) => !changes.some(c => item.includes(c)));
+          exclusions = exclusions.filter((item) => !changes.some(c => item.includes(c)));
+          assumptions = assumptions.filter((item) => !changes.some(c => item.includes(c)));
+        }
+
+        const quotePayload = {
+          quote: {
+            ...existingQuote,
+            projectName: existingQuote.projectName || projectDetails.projectName || "",
+            quoteNumber: existingQuote.quoteNumber || "Q-2026-042",
+            clientName: existingQuote.clientName || projectDetails.clientName || "",
+            scopeOfWork,
+            exclusions,
+            assumptions,
+          },
+          status: "completed"
+        };
+
+        await saveQuote({ projectId, data: quotePayload }).unwrap();
+      }
+
       toast.success("Proposed changes rejected.");
+      setDismissed(true);
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to reject proposed changes.");
     }
   };
 
-  /**
-   * Edit = reject current proposal (clean slate) then open the
-   * AI Instruction input pre-filled with the old instruction.
-   */
   const handleEdit = async () => {
     try {
       await updateSection({ projectId, section, data: { payload: { action: "delete" } } }).unwrap();
-      // Notify parent so it can pre-fill the instruction input
       onEdit?.(aiInstruction ?? "");
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to clear proposed changes.");
@@ -167,7 +336,6 @@ export function ProposedChangesReview({ projectId, section, data, onEdit }: Prop
       </div>
 
       <div className="px-6 py-6 space-y-5">
-        {/* AI Instruction badge */}
         {aiInstruction && (
           <div className="flex items-start gap-2 bg-blue-50/80 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/30 rounded-xl px-4 py-3">
             <Sparkles className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
@@ -177,7 +345,6 @@ export function ProposedChangesReview({ projectId, section, data, onEdit }: Prop
           </div>
         )}
 
-        {/* Change list */}
         {changes.length > 0 && (
           <div>
             <p className="text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-3">
@@ -194,7 +361,6 @@ export function ProposedChangesReview({ projectId, section, data, onEdit }: Prop
           </div>
         )}
 
-        {/* Pricing Impact */}
         {pricingImpact && (
           <div className="bg-orange-50/70 dark:bg-orange-900/10 rounded-xl px-5 py-4 relative overflow-hidden">
             <div className="absolute inset-y-0 left-0 w-1 bg-orange-500" />
@@ -203,7 +369,6 @@ export function ProposedChangesReview({ projectId, section, data, onEdit }: Prop
           </div>
         )}
 
-        {/* Affected tabs */}
         {affectedTabs.length > 0 && (
           <div className="bg-[#fffdf0] dark:bg-yellow-900/10 rounded-xl px-5 py-4 relative overflow-hidden">
             <div className="absolute inset-y-0 left-0 w-1 bg-yellow-400" />
@@ -261,9 +426,11 @@ interface ReanalyzeBlockProps {
   projectId: string;
   section: string;
   data: any;
+  onAccept?: () => void;
+  onReject?: () => void;
 }
 
-export function ReanalyzeBlock({ projectId, section, data }: ReanalyzeBlockProps) {
+export function ReanalyzeBlock({ projectId, section, data, onAccept, onReject }: ReanalyzeBlockProps) {
   const [editInstruction, setEditInstruction] = React.useState<string | undefined>();
 
   return (
@@ -281,6 +448,8 @@ export function ReanalyzeBlock({ projectId, section, data }: ReanalyzeBlockProps
             section={section}
             data={data}
             onEdit={(instruction) => setEditInstruction(instruction)}
+            onAccept={onAccept}
+            onReject={onReject}
           />
         </div>
       )}
@@ -344,8 +513,6 @@ export function getRiskBadgeColor(category: string) {
 }
 
 // ─── Delete Confirmation Modal ────────────────────────────────────────────────
-import { Modal } from "@/components/ui/Modal";
-
 interface DeleteConfirmationModalProps {
   isOpen: boolean;
   onClose: () => void;

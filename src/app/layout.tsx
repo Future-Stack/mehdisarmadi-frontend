@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/providers/Providers";
-import Script from "next/script";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -27,10 +26,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning data-scroll-behavior="smooth">
-      <head>
-        <Script
+      <head suppressHydrationWarning />
+      <body suppressHydrationWarning className="min-h-screen font-sans antialiased transition-colors duration-300">
+        <script
           id="theme-script"
-          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
@@ -46,8 +45,6 @@ export default function RootLayout({
             `,
           }}
         />
-      </head>
-      <body suppressHydrationWarning className="min-h-screen font-sans antialiased transition-colors duration-300">
         <Providers>{children}</Providers>
       </body>
     </html>
