@@ -28,7 +28,8 @@ export default function AIAnalysisResultsPage({ params }: { params: Promise<{ id
 
   // Used only for the subtitle in the header
   const { data: summaryData } = useGetProjectSummaryQuery(id);
-  const divisionLabel = summaryData?.data?.selected_divisions
+  const summaryPayload = summaryData?.data?.payload;
+  const divisionLabel = summaryPayload?.selected_divisions
     ?.map((d: any) => d.name)
     .join(" • ");
 

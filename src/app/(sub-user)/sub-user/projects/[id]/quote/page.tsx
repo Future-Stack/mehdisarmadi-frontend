@@ -11,6 +11,9 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useSaveProjectQuoteMutation, useGetProjectQuoteQuery } from "@/store/api/projectApi";
 import { exportElementToPDF, exportQuoteToDocx } from "@/lib/exportUtils";
+import { PageOne } from "@/features/dashboard/components/preview/PageOne";
+import { PageTwo } from "@/features/dashboard/components/preview/PageTwo";
+import { PageThree } from "@/features/dashboard/components/preview/PageThree";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface SeparatePrice { id: string; title: string; price: string; description: string; scopeOfWork: string; assumptions: string; exclusions: string; }
@@ -80,9 +83,15 @@ function BulletListSection({
         />
       ) : (
         <div className="bg-gray-50/70 dark:bg-gray-800/50 rounded-xl p-5 border border-gray-100 dark:border-gray-800">
-          <ul className="list-disc pl-4 space-y-1.5 text-[13px] text-gray-600 dark:text-gray-300">
-            {items.map((item, i) => <li key={i}>{item}</li>)}
-          </ul>
+          {
+            items.length === 0 ? (
+              <span className="text-[13px] text-gray-500 dark:text-gray-400">No items listed</span>
+            ) : (
+              <ul className="list-disc pl-4 space-y-1.5 text-[13px] text-gray-600 dark:text-gray-300">
+                {items.map((item, i) => <li key={i}>{item}</li>)}
+              </ul>
+            )
+          }
         </div>
       )}
     </EditableSection>
@@ -99,9 +108,10 @@ export default function QuoteBuilderPage({ params }: { params: Promise<{ id: str
   const [saveQuote, { isLoading: isSaving }] = useSaveProjectQuoteMutation();
   const [isExportingPDF, setIsExportingPDF] = useState(false);
   const [isExportingDocx, setIsExportingDocx] = useState(false);
+  // const quoteData = quoteResponse?.data || {};
 
   // ─── Form State ─────────────────────────────────────────────────────────────
-  const [quoteNumber, setQuoteNumber] = useState("Q-2026-042");
+  const [quoteNumber, setQuoteNumber] = useState("");
   const [projectLocation, setProjectLocation] = useState("");
   const [projectName, setProjectName] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -117,77 +127,35 @@ export default function QuoteBuilderPage({ params }: { params: Promise<{ id: str
   const [hstPercentage, setHstPercentage] = useState("13%");
   const [currency, setCurrency] = useState("CAD");
 
-  const [companyName, setCompanyName] = useState("ABC Construction Ltd.");
-  const [companyAddress, setCompanyAddress] = useState("123 Main Street, Toronto, ON M5V 3A8");
-  const [companyPhone, setCompanyPhone] = useState("+1 (416) 555-0123");
-  const [companyEmail, setCompanyEmail] = useState("info@abcconstruction.com");
-  const [companyWebsite, setCompanyWebsite] = useState("www.abcconstruction.com");
-  const [companyHst, setCompanyHst] = useState("123456789 RT0001");
+  const [companyName, setCompanyName] = useState("");
+  const [companyAddress, setCompanyAddress] = useState("");
+  const [companyPhone, setCompanyPhone] = useState("");
+  const [companyEmail, setCompanyEmail] = useState("");
+  const [companyWebsite, setCompanyWebsite] = useState("");
+  const [companyHst, setCompanyHst] = useState("");
 
   // Editable sections state
-  const [scopeItems, setScopeItems] = useState([
-    "Division 06 - Wood, Plastics & Composites: Supply and install solid core wooden doors (40 units), 1-3/4\" thick, pre-hung, with frames, paint-grade finish, Supply and install door hardware (40 sets)",
-    "Division 08 - Openings: Install aluminum window frames with double glazing (85 sq.m), Low-E glass, thermally broken frames, white finish",
-    "Division 09 - Finishes: Apply premium acrylic paint on interior walls (1,200 sq.m), Two coats, after proper surface preparation, Install porcelain floor tiles with grouting (850 sq.m)"
-  ]);
+  const [scopeItems, setScopeItems] = useState<string[]>([]);
 
-  const [assumptionItems, setAssumptionItems] = useState([
-    "Site access provided as per tender specifications (9-11 AM for deliveries)",
-    "Temporary facilities (site office, storage, washrooms) provided by general contractor",
-    "Work area will be cleaned and protected by other trades before installation",
-    "All substrates properly prepared and ready to receive finishes",
-    "Utilities (power, water) available at no cost to contractor",
-    "Building is weathertight and secure before finish work begins",
-    "Material storage area (minimum 200 sq.ft) provided on-site or nearby",
-    "No hazardous materials or contamination in work areas",
-    "Standard construction tolerances apply as per industry standards",
-    "Shop drawings approval process will not exceed 14 business days",
-  ]);
+  const [assumptionItems, setAssumptionItems] = useState<string[]>([]);
 
-  const [exclusionItems, setExclusionItems] = useState([
-    "Electrical rough-in and fixture installation",
-    "Plumbing rough-in and fixture installation",
-    "HVAC ductwork and equipment installation",
-    "Fire protection systems and equipment",
-    "Building permits and inspection fees (owner responsibility)",
-    "Engineered drawings and structural calculations if required",
-    "Site security, hoarding, and temporary fencing",
-    "General site cleanup and waste disposal (except our trade waste)",
-    "Mobilization costs for changes in schedule beyond our control",
-    "Price escalation beyond 60 days from quote date",
-    "Work on statutory holidays unless specifically agreed",
-    "Repairs to existing damaged substrates or conditions",
-  ]);
+  const [exclusionItems, setExclusionItems] = useState<string[]>([]);
 
-  const [clarificationItems, setClarificationItems] = useState([
-    "Confirm exact working hours permitted for night work and noise restrictions",
-    "Verify if temporary lighting and power are included or contractor-supplied",
-    "Clarify responsibility for material storage - on-site or off-site required",
-    "Confirm measurement method - is site verification allowed before final pricing?",
-    "Verify coordination protocol with other trades (electrical, plumbing)",
-    "Confirm inspection schedule and notice requirements",
-    "Clarify warranty period and maintenance responsibilities post-completion",
-  ]);
+  const [clarificationItems, setClarificationItems] = useState<string[]>([]);
 
   // Separate Prices
-  const [separatePrices, setSeparatePrices] = useState<SeparatePrice[]>([
-    { id: "SP-01", title: "", price: "$15,000", description: "", scopeOfWork: "", assumptions: "", exclusions: "" }
-  ]);
+  const [separatePrices, setSeparatePrices] = useState<SeparatePrice[]>([]);
 
   // Alternative Prices
-  const [altPrices, setAltPrices] = useState<{ id: string; title: string; price: string; description: string }[]>([
-    { id: "ALT-01", title: "", price: "$8,000", description: "" }
-  ]);
+  const [altPrices, setAltPrices] = useState<{ id: string; title: string; price: string; description: string }[]>([]);
 
   // Unit Prices
-  const [unitPrices, setUnitPrices] = useState<UnitPrice[]>([
-    { id: "UP-01", description: "Additional wooden doors...", unit: "per unit", unitPrice: "$10,000", estQty: "5", notes: "Same specs as base bid..." }
-  ]);
+  const [unitPrices, setUnitPrices] = useState<UnitPrice[]>([]);
 
   // Commercial Terms
-  const [paymentTerms, setPaymentTerms] = useState("Progress payments monthly based on work completed. Net 30 days from invoice date......");
-  const [holdbackNote, setHoldbackNote] = useState("10% holdback will be retained as per Construction Act requirements until final completion and lien period expiry....");
-  const [validityPeriod, setValidityPeriod] = useState("30 days");
+  const [paymentTerms, setPaymentTerms] = useState("");
+  const [holdbackNote, setHoldbackNote] = useState("");
+  const [validityPeriod, setValidityPeriod] = useState("");
   const [termsCurrency, setTermsCurrency] = useState("CAD");
   const [isEditingTerms, setIsEditingTerms] = useState(false);
 
@@ -195,7 +163,8 @@ export default function QuoteBuilderPage({ params }: { params: Promise<{ id: str
 
   React.useEffect(() => {
     if (quoteData?.data) {
-      const { companyDetails, projectQuoteDetails, aiQuoteDraft, quote: savedQuote } = quoteData.data;
+      const { companyDetails, projectQuoteDetails, aiQuoteDraft, savedQuote: savedQuoteDirect, quote: savedQuoteAlt } = quoteData.data;
+      const savedQuote = savedQuoteDirect || savedQuoteAlt;
 
       // Populate company details
       if (companyDetails) {
@@ -333,39 +302,107 @@ export default function QuoteBuilderPage({ params }: { params: Promise<{ id: str
     router.push(`/sub-user/projects/${id}/results`);
   };
 
+  // const [isExportingPDF, setIsExportingPDF] = useState(false);
+
   const handleExportPDF = async () => {
     setIsExportingPDF(true);
     try {
-      await exportElementToPDF("quote-printable", `quote-${quoteNumber}.pdf`);
+      await exportElementToPDF("quote-preview-doc-all", "quote-preview.pdf");
       toast.success("PDF exported successfully!");
-    } catch (err) {
-      toast.error("Failed to export PDF. Please try again.");
+    } catch (err: any) {
+      console.error("PDF Export error:", err);
+      toast.error(`Failed to export PDF: ${err?.message || "Unknown error"}`);
     } finally {
       setIsExportingPDF(false);
     }
   };
 
+  // const [isExportingDocx, setIsExportingDocx] = useState(false);
   const handleExportDocx = async () => {
     setIsExportingDocx(true);
     try {
+      const scopeText = Array.isArray(scopeItems)
+        ? scopeItems.join("\n")
+        : "";
+
+      const assumptionsText = Array.isArray(assumptionItems)
+        ? assumptionItems.join("\n")
+        : "";
+
+      const exclusionsText = Array.isArray(exclusionItems)
+        ? exclusionItems.join("\n")
+        : "";
+
+      const clarificationsText = Array.isArray(clarificationItems)
+        ? clarificationItems.join("\n")
+        : "";
+
       await exportQuoteToDocx({
-        companyName,
-        companyAddress,
-        projectName, clientName, quoteNumber,
-        baseBidPrice, hstPercentage: hstPercentage.replace("%", ""), currency,
-        scopeOfWork: scopeItems.join("\n"),
-        assumptions: assumptionItems.join("\n"),
-        exclusions: exclusionItems.join("\n"),
-        clarifications: clarificationItems.join("\n"),
-        paymentTerms, holdbackNote,
-        validityPeriod, footerNotes,
-      }, `quote-${quoteNumber}.docx`);
+        companyName: companyName || "",
+        companyAddress: companyAddress || "",
+        projectName: projectName || "",
+        clientName: clientName || "",
+        quoteNumber: quoteNumber || "",
+        baseBidPrice: String(baseBidPrice || ""),
+        hstPercentage: String(hstPercentage || "13").replace("%", ""),
+        currency: currency || "CAD",
+        scopeOfWork: scopeText,
+        assumptions: assumptionsText,
+        exclusions: exclusionsText,
+        clarifications: clarificationsText,
+        paymentTerms: paymentTerms || "",
+        holdbackNote: holdbackNote || "",
+        validityPeriod: validityPeriod || "30 days",
+        footerNotes: footerNotes || "Thank you for considering our proposal."
+      }, `quote-${quoteNumber || "preview"}.docx`);
       toast.success("DOCX exported successfully!");
     } catch (err) {
-      toast.error("Failed to export DOCX. Please try again.");
+      toast.error("Failed to export DOCX.");
     } finally {
       setIsExportingDocx(false);
     }
+  };
+
+  const currentQuoteObj = {
+    quoteNumber,
+    projectName,
+    clientName,
+    baseBidPrice,
+    hstPercentage,
+    currency,
+    projectLocation,
+    startDate,
+    revisionNumber,
+    attention,
+    bidClosingDate,
+    subject,
+    gcName,
+    addendaIncluded,
+    scopeOfWork: scopeItems,
+    assumptions: assumptionItems,
+    exclusions: exclusionItems,
+    clarifications: clarificationItems,
+    separatePrices,
+    altPrices,
+    unitPrices,
+    paymentTerms,
+    holdbackNote,
+    validityPeriod,
+    termsCurrency,
+    footerNotes,
+  };
+
+  const currentQuoteData = {
+    companyDetails: {
+      name: companyName,
+      address: companyAddress,
+      phone: companyPhone,
+      email: companyEmail,
+      website: companyWebsite,
+      hstNumber: companyHst,
+    },
+    savedQuote: currentQuoteObj,
+    quote: currentQuoteObj,
   };
 
   // Separate prices helpers
@@ -465,17 +502,17 @@ export default function QuoteBuilderPage({ params }: { params: Promise<{ id: str
           <section className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
             <h2 className="text-[16px] font-bold text-gray-900 dark:text-white mb-6">Tender & Quote Details</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
-              <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Quote Number</label><input value={quoteNumber} onChange={e => setQuoteNumber(e.target.value)} className={inputCls} /></div>
-              <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Tender Location</label><input value={projectLocation} onChange={e => setProjectLocation(e.target.value)} className={inputCls} /></div>
-              <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Tender Name</label><input value={projectName} onChange={e => setProjectName(e.target.value)} className={inputCls} /></div>
-              <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Start Date</label><input value={startDate} onChange={e => setStartDate(e.target.value)} className={inputCls} /></div>
-              <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Client Name</label><input value={clientName} onChange={e => setClientName(e.target.value)} className={inputCls} /></div>
-              <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Revision Number</label><input value={revisionNumber} onChange={e => setRevisionNumber(e.target.value)} className={inputCls} /></div>
-              <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Attention</label><input value={attention} onChange={e => setAttention(e.target.value)} className={inputCls} /></div>
-              <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Bid Closing Date</label><input value={bidClosingDate} onChange={e => setBidClosingDate(e.target.value)} className={inputCls} /></div>
-              <div className="md:col-span-2"><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Subject</label><input value={subject} onChange={e => setSubject(e.target.value)} className={inputCls} /></div>
-              <div className="md:col-span-2"><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">General Contractor Name</label><input value={gcName} onChange={e => setGcName(e.target.value)} className={inputCls} /></div>
-              <div className="md:col-span-2"><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Addenda Included</label><input value={addendaIncluded} onChange={e => setAddendaIncluded(e.target.value)} className={inputCls} /></div>
+              <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Quote Number</label><input value={quoteNumber} placeholder="Enter Quote Number" onChange={e => setQuoteNumber(e.target.value)} className={inputCls} /></div>
+              <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Tender Location</label><input value={projectLocation} placeholder="Enter Tender Location" onChange={e => setProjectLocation(e.target.value)} className={inputCls} /></div>
+              <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Tender Name</label><input value={projectName} placeholder="Enter Tender Name" onChange={e => setProjectName(e.target.value)} className={inputCls} /></div>
+              <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Start Date</label><input value={startDate} placeholder="Enter Start Date" onChange={e => setStartDate(e.target.value)} className={inputCls} /></div>
+              <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Client Name</label><input value={clientName} placeholder="Enter Client Name" onChange={e => setClientName(e.target.value)} className={inputCls} /></div>
+              <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Revision Number</label><input value={revisionNumber} placeholder="Enter Revision Number" onChange={e => setRevisionNumber(e.target.value)} className={inputCls} /></div>
+              <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Attention</label><input value={attention} placeholder="Enter Attention" onChange={e => setAttention(e.target.value)} className={inputCls} /></div>
+              <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Bid Closing Date</label><input value={bidClosingDate} placeholder="Enter Bid Closing Date" onChange={e => setBidClosingDate(e.target.value)} className={inputCls} /></div>
+              <div className="md:col-span-2"><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Subject</label><input value={subject} placeholder="Enter Subject" onChange={e => setSubject(e.target.value)} className={inputCls} /></div>
+              <div className="md:col-span-2"><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">General Contractor Name</label><input value={gcName} placeholder="Enter General Contractor Name" onChange={e => setGcName(e.target.value)} className={inputCls} /></div>
+              <div className="md:col-span-2"><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Addenda Included</label><input value={addendaIncluded} placeholder="Enter Addenda Included" onChange={e => setAddendaIncluded(e.target.value)} className={inputCls} /></div>
             </div>
           </section>
 
@@ -493,10 +530,10 @@ export default function QuoteBuilderPage({ params }: { params: Promise<{ id: str
               </Link>
             </div>
             <div className="space-y-5">
-              <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Base Bid Price ( CAD )</label><input value={baseBidPrice} onChange={e => setBaseBidPrice(e.target.value)} className={inputCls} /></div>
+              <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Base Bid Price ( CAD )</label><input value={baseBidPrice} placeholder="Enter Base Bid Price" onChange={e => setBaseBidPrice(e.target.value)} className={inputCls} /></div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">HST Percentage ( % )</label><input value={hstPercentage} onChange={e => setHstPercentage(e.target.value)} className={inputCls} /></div>
-                <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Currency</label><input value={currency} onChange={e => setCurrency(e.target.value)} className={inputCls} /></div>
+                <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">HST Percentage ( % )</label><input value={hstPercentage} placeholder="Enter HST Percentage" onChange={e => setHstPercentage(e.target.value)} className={inputCls} /></div>
+                <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Currency</label><input value={currency} placeholder="Enter Currency" onChange={e => setCurrency(e.target.value)} className={inputCls} /></div>
               </div>
             </div>
           </section>
@@ -680,7 +717,7 @@ export default function QuoteBuilderPage({ params }: { params: Promise<{ id: str
               <div>
                 <label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Payment Terms</label>
                 {isEditingTerms ? (
-                  <textarea value={paymentTerms} onChange={e => setPaymentTerms(e.target.value)} rows={2} className="w-full p-3 rounded-xl border border-emerald-300 dark:border-emerald-700 bg-transparent text-[13px] resize-none focus:outline-none focus:border-emerald-500" />
+                  <textarea value={paymentTerms} placeholder="Enter Payment Terms" onChange={e => setPaymentTerms(e.target.value)} rows={2} className="w-full p-3 rounded-xl border border-emerald-300 dark:border-emerald-700 bg-transparent text-[13px] resize-none focus:outline-none focus:border-emerald-500" />
                 ) : (
                   <div className="w-full min-h-[44px] px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-[13px] text-gray-700 dark:text-gray-300">{paymentTerms}</div>
                 )}
@@ -688,7 +725,7 @@ export default function QuoteBuilderPage({ params }: { params: Promise<{ id: str
               <div>
                 <label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Holdback Note</label>
                 {isEditingTerms ? (
-                  <textarea value={holdbackNote} onChange={e => setHoldbackNote(e.target.value)} rows={2} className="w-full p-3 rounded-xl border border-emerald-300 dark:border-emerald-700 bg-transparent text-[13px] resize-none focus:outline-none focus:border-emerald-500" />
+                  <textarea value={holdbackNote} placeholder="Enter Holdback Note" onChange={e => setHoldbackNote(e.target.value)} rows={2} className="w-full p-3 rounded-xl border border-emerald-300 dark:border-emerald-700 bg-transparent text-[13px] resize-none focus:outline-none focus:border-emerald-500" />
                 ) : (
                   <div className="w-full min-h-[44px] px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-[13px] text-gray-700 dark:text-gray-300">{holdbackNote}</div>
                 )}
@@ -696,11 +733,11 @@ export default function QuoteBuilderPage({ params }: { params: Promise<{ id: str
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Validity Period (days)</label>
-                  <input value={validityPeriod} onChange={e => setValidityPeriod(e.target.value)} readOnly={!isEditingTerms} className={`${inputCls} ${!isEditingTerms ? "cursor-default" : ""}`} />
+                  <input value={validityPeriod} placeholder="Enter Validity Period" onChange={e => setValidityPeriod(e.target.value)} readOnly={!isEditingTerms} className={`${inputCls} ${!isEditingTerms ? "cursor-default" : ""}`} />
                 </div>
                 <div>
                   <label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Currency</label>
-                  <input value={termsCurrency} onChange={e => setTermsCurrency(e.target.value)} readOnly={!isEditingTerms} className={`${inputCls} ${!isEditingTerms ? "cursor-default" : ""}`} />
+                  <input value={termsCurrency} placeholder="Enter Currency" onChange={e => setTermsCurrency(e.target.value)} readOnly={!isEditingTerms} className={`${inputCls} ${!isEditingTerms ? "cursor-default" : ""}`} />
                 </div>
               </div>
             </div>
@@ -739,6 +776,15 @@ export default function QuoteBuilderPage({ params }: { params: Promise<{ id: str
           <Button onClick={handleSaveAndClose} disabled={isSaving} variant="primary" className="h-10 px-8 rounded-xl font-bold bg-emerald-600 hover:bg-emerald-700 text-white text-[13px] shadow-sm flex-1 sm:flex-none">
             Save & Close
           </Button>
+        </div>
+      </div>
+
+      {/* Hidden Document canvas for export (all pages) */}
+      <div className="fixed top-full left-0 opacity-0 pointer-events-none -z-50">
+        <div id="quote-preview-doc-all" className="flex flex-col gap-0 w-[850px] bg-white">
+          <PageOne exportMode={true} quoteData={currentQuoteData} />
+          <PageTwo exportMode={true} quoteData={currentQuoteData} />
+          <PageThree exportMode={true} quoteData={currentQuoteData} />
         </div>
       </div>
 
