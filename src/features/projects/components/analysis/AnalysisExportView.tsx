@@ -81,14 +81,14 @@ export default function AnalysisExportView({ projectId, onReady }: { projectId: 
   ]);
 
   const project = projectData?.data;
-  const summary = summaryData?.data;
-  const scope = scopeData?.data;
-  const assumptions = assumptionsData?.data;
-  const exclusions = exclusionsData?.data;
-  const risks = risksData?.data;
-  const clarifications = clarificationsData?.data;
-  const addenda = addendaData?.data;
-  const pricing = pricingData?.data;
+  const summary = summaryData?.data?.payload;
+  const scope = scopeData?.data?.payload;
+  const assumptions = assumptionsData?.data?.payload;
+  const exclusions = exclusionsData?.data?.payload;
+  const risks = risksData?.data?.payload;
+  const clarifications = clarificationsData?.data?.payload;
+  const addenda = addendaData?.data?.payload;
+  const pricing = pricingData?.data?.payload;
 
   const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 
@@ -158,10 +158,10 @@ export default function AnalysisExportView({ projectId, onReady }: { projectId: 
       <div style={{ padding: "32px 40px" }}>
 
         {/* Key Highlights */}
-        {summary?.key_highlights?.length > 0 && (
+        {Boolean(summary?.key_highlights?.length) && (
           <SectionBlock title="Summary Highlights">
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-              {summary.key_highlights.map((h: any, i: number) => (
+              {summary?.key_highlights?.map((h: any, i: number) => (
                 <div key={h.id || h.type || i} style={{
                   border: "1px solid #e5e7eb", borderRadius: 8, padding: "10px 14px",
                   borderLeftWidth: 4, borderLeftColor: "#10b981",
@@ -175,7 +175,7 @@ export default function AnalysisExportView({ projectId, onReady }: { projectId: 
         )}
 
         {/* Stats */}
-        {(summary?.estimated_value || summary?.total_items) && (
+        {(summary?.estimated_value != null || summary?.total_items != null) && (
           <SectionBlock title="Tender Stats">
             <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
               {[
@@ -196,9 +196,9 @@ export default function AnalysisExportView({ projectId, onReady }: { projectId: 
         )}
 
         {/* Scope */}
-        {scope?.items?.length > 0 && (
+        {Boolean(scope?.items?.length) && (
           <SectionBlock title="Scope of Work">
-            {scope.items.map((item: any, i: number) => (
+            {scope?.items?.map((item: any, i: number) => (
               <ItemRow
                 key={item.id || i}
                 index={i + 1}
@@ -210,27 +210,27 @@ export default function AnalysisExportView({ projectId, onReady }: { projectId: 
         )}
 
         {/* Assumptions */}
-        {assumptions?.items?.length > 0 && (
+        {Boolean(assumptions?.items?.length) && (
           <SectionBlock title="Assumptions">
-            {assumptions.items.map((item: any, i: number) => (
+            {assumptions?.items?.map((item: any, i: number) => (
               <ItemRow key={item.id || i} index={i + 1} text={item.text} reference={item.reference} />
             ))}
           </SectionBlock>
         )}
 
         {/* Exclusions */}
-        {exclusions?.items?.length > 0 && (
+        {Boolean(exclusions?.items?.length) && (
           <SectionBlock title="Exclusions">
-            {exclusions.items.map((item: any, i: number) => (
+            {exclusions?.items?.map((item: any, i: number) => (
               <ItemRow key={item.id || i} index={i + 1} text={item.text} reference={item.reference} />
             ))}
           </SectionBlock>
         )}
 
         {/* Risks */}
-        {risks?.items?.length > 0 && (
+        {Boolean(risks?.items?.length) && (
           <SectionBlock title="Risks & Coordination Items">
-            {risks.items.map((item: any, i: number) => (
+            {risks?.items?.map((item: any, i: number) => (
               <div key={item.id || i} style={{ marginBottom: 12, padding: "10px 14px", borderRadius: 8, border: "1px solid #fee2e2", borderLeft: "4px solid #ef4444", backgroundColor: "#fff5f5" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
                   <span style={{ fontSize: 11, fontWeight: 700, color: "#111827" }}>{item.title}</span>
@@ -248,9 +248,9 @@ export default function AnalysisExportView({ projectId, onReady }: { projectId: 
         )}
 
         {/* Clarifications */}
-        {clarifications?.items?.length > 0 && (
+        {Boolean(clarifications?.items?.length) && (
           <SectionBlock title="Clarifications Needed">
-            {clarifications.items.map((item: any, i: number) => (
+            {clarifications?.items?.map((item: any, i: number) => (
               <ItemRow key={item.id || i} index={i + 1} text={item.question} reference={item.reference} />
             ))}
           </SectionBlock>
@@ -270,7 +270,7 @@ export default function AnalysisExportView({ projectId, onReady }: { projectId: 
                 </div>
               </div>
             </div>
-            {pricing.additionalCostItems?.length > 0 && (
+            {Boolean(pricing.additionalCostItems?.length) && (
               <div>
                 <div style={{ fontSize: 10, fontWeight: 700, color: "#6b7280", marginBottom: 6, textTransform: "uppercase" }}>Additional Cost Items</div>
                 {pricing.additionalCostItems.map((item: any, i: number) => (
@@ -288,9 +288,9 @@ export default function AnalysisExportView({ projectId, onReady }: { projectId: 
         )}
 
         {/* Addenda */}
-        {addenda?.items?.length > 0 && (
+        {Boolean(addenda?.items?.length) && (
           <SectionBlock title="Addenda Changes">
-            {addenda.items.map((item: any, i: number) => (
+            {addenda?.items?.map((item: any, i: number) => (
               <div key={item.id || i} style={{ marginBottom: 12, paddingLeft: 12, borderLeft: "3px solid #10b981" }}>
                 <div style={{ fontWeight: 700, fontSize: 11, color: "#111827" }}>{item.title || item.text}</div>
                 {item.description && <p style={{ fontSize: 10, color: "#6b7280", margin: "2px 0 0" }}>{item.description}</p>}
