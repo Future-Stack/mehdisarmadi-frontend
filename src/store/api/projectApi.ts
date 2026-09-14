@@ -494,35 +494,35 @@ export const projectApi = baseApi.injectEndpoints({
         { type: "Project", id: `${projectId}_pricing` },
       ],
     }),
-    getProjectSummary: builder.query<ApiResponse<any>, string>({
+    getProjectSummary: builder.query<ApiResponse<ProjectSectionResponse<SummaryPayload>>, string>({
       query: (projectId) => `/project/${projectId}/summary`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_summary` }],
     }),
-    getProjectScope: builder.query<ApiResponse<any>, string>({
+    getProjectScope: builder.query<ApiResponse<ProjectSectionResponse<ScopePayload>>, string>({
       query: (projectId) => `/project/${projectId}/scope`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_scope` }],
     }),
-    getProjectPricing: builder.query<ApiResponse<any>, string>({
+    getProjectPricing: builder.query<ApiResponse<ProjectSectionResponse<PricingPayload>>, string>({
       query: (projectId) => `/project/${projectId}/pricing`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_pricing` }],
     }),
-    getProjectRisks: builder.query<ApiResponse<any>, string>({
+    getProjectRisks: builder.query<ApiResponse<ProjectSectionResponse<RiskPayload>>, string>({
       query: (projectId) => `/project/${projectId}/risks`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_risks` }],
     }),
-    getProjectClarifications: builder.query<ApiResponse<any>, string>({
+    getProjectClarifications: builder.query<ApiResponse<ProjectSectionResponse<ClarificationPayload>>, string>({
       query: (projectId) => `/project/${projectId}/clarifications`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_clarifications` }],
     }),
-    getProjectAssumptions: builder.query<ApiResponse<any>, string>({
+    getProjectAssumptions: builder.query<ApiResponse<ProjectSectionResponse<AssumptionPayload>>, string>({
       query: (projectId) => `/project/${projectId}/assumptions`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_assumptions` }],
     }),
-    getProjectExclusions: builder.query<ApiResponse<any>, string>({
+    getProjectExclusions: builder.query<ApiResponse<ProjectSectionResponse<ExclusionPayload>>, string>({
       query: (projectId) => `/project/${projectId}/exclusions`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_exclusions` }],
     }),
-    getProjectAddenda: builder.query<ApiResponse<any>, string>({
+    getProjectAddenda: builder.query<ApiResponse<ProjectSectionResponse<AddendaPayload>>, string>({
       query: (projectId) => `/project/${projectId}/addenda`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_addenda` }],
     }),

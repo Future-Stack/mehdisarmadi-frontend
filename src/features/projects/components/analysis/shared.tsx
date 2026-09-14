@@ -198,6 +198,8 @@ export function ProposedChangesReview({ projectId, section, data, onEdit, onAcce
 
   const isUpdating = isUpdatingSection || isSavingQuote;
 
+  const isUpdating = isUpdatingSection || isSavingQuote;
+
   const handleAccept = async () => {
     if (onAccept) {
       onAccept();
