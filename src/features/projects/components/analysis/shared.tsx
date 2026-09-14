@@ -12,6 +12,16 @@ import {
 import { cn } from "@/lib/utils";
 import { Modal } from "@/components/ui/Modal";
 
+export function getSectionPayload<T = any>(res: any): T | undefined {
+  if (!res) return undefined;
+  if (res.payload) return res.payload as T;
+  if (res.data?.payload) return res.data.payload as T;
+  if (res.data?.data?.payload) return res.data.data.payload as T;
+  if (res.data?.data) return res.data.data as T;
+  if (res.data) return res.data as T;
+  return res as T;
+}
+
 export function useProjectFilesMap(projectId: string) {
   const { data: projectData } = useGetProjectByIdQuery(projectId);
   const files = projectData?.data?.files || [];
@@ -177,14 +187,14 @@ export function ProposedChangesReview({ projectId, section, data, onEdit, onAcce
   const { data: quoteData } = useGetProjectQuoteQuery(projectId);
   const [dismissed, setDismissed] = React.useState(false);
 
-  const proposedPayload = data?.proposedPayload;
+  const proposedPayload = data?.proposedPayload || data?.data?.proposedPayload;
   if (!proposedPayload || dismissed) return null;
 
   const proposedChanges = proposedPayload?.proposed_changes;
   const changes: string[] = proposedChanges?.changes ?? [];
   const pricingImpact: string | null = proposedChanges?.pricing_impact ?? null;
   const affectedTabs: string[] = proposedChanges?.affected_tabs ?? [];
-  const aiInstruction: string | null = data?.proposedInstruction ?? null;
+  const aiInstruction: string | null = (data?.proposedInstruction || data?.data?.proposedInstruction) ?? null;
 
   const isUpdating = isUpdatingSection || isSavingQuote;
 
@@ -196,7 +206,7 @@ export function ProposedChangesReview({ projectId, section, data, onEdit, onAcce
     }
     try {
       // 1. Update section analysis payload with accepted items
-      const nextPayload = proposedPayload?.updated || data?.payload || { action: "accept" };
+      const nextPayload = proposedPayload?.updated || data?.payload || data?.data || { action: "accept" };
       await updateSection({
         projectId,
         section,

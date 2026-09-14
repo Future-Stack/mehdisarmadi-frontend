@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Edit3, Check, X, Loader2, Edit, HelpCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useGetProjectClarificationsQuery, useUpdateProjectAnalysisSectionMutation } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, ReanalyzeBlock, PdfReferenceLink } from "./shared";
+import { SectionSkeleton, SectionError, ReanalyzeBlock, PdfReferenceLink, getSectionPayload } from "./shared";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -24,7 +24,7 @@ function getPriorityBadge(priority?: string) {
 export default function ClarificationsTab({ projectId }: Props) {
   const { data, isLoading, isError, refetch } = useGetProjectClarificationsQuery(projectId);
   const [updateSection, { isLoading: isUpdating }] = useUpdateProjectAnalysisSectionMutation();
-  const clarifications = data?.data?.payload;
+  const clarifications = getSectionPayload(data);
 
   const [editingId, setEditingId] = useState<string | number | null>(null);
   const [editingText, setEditingText] = useState("");
@@ -40,7 +40,7 @@ export default function ClarificationsTab({ projectId }: Props) {
       i.id === item.id ? { ...i, question: editingText } : i
     );
     try {
-      await updateSection({ projectId, section: "clarifications", data: { payload: { items: newItems }, note: "Manual edits from estimator" } }).unwrap();
+      await updateSection({ projectId, section: "clarifications", data: { payload: { ...clarifications, items: newItems }, note: "Manual edits from estimator" } }).unwrap();
       toast.success("Clarification updated.");
       setEditingId(null);
     } catch {

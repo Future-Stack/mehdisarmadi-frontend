@@ -280,16 +280,23 @@ interface Props {
 }
 
 function normalizeScopeRows(section: any): { items: any[]; filters: any[] } {
-  const payload = section?.payload;
+  const payload = section?.payload || section;
   const proposedPayload = section?.proposedPayload;
   const proposedChanges = proposedPayload?.proposed_changes;
 
-  // Real shape (future-proof): backend already sends items/filters directly.
+  // Real shape: backend sends items/filters directly or in payload.
   if (Array.isArray(payload?.items)) {
-    return { items: payload.items, filters: payload.filters || [] };
+    const items = payload.items.map((item: any, i: number) => ({
+      ...item,
+      id: item.id || `scope-item-${i}`,
+      scopeItem: item.scopeItem || item.description || item.title || "",
+      division: item.division || "General",
+      include: item.include !== false,
+    }));
+    return { items, filters: payload.filters || [{ code: "all", label: "All Scope", active: true }] };
   }
 
-  // Current actual shape: derive table rows from proposed_changes.changes.
+  // Fallback shape: derive table rows from proposed_changes.changes.
   const changes: string[] = proposedChanges?.changes || [];
   const affectedTab: string = proposedChanges?.affected_tabs?.[0] || "-";
 
@@ -313,11 +320,11 @@ export default function ScopeTab({ projectId }: Props) {
   const { data: projectData } = useGetProjectByIdQuery(projectId);
   const projectFiles = projectData?.data?.files;
 
-
-  const { items, filters } = useMemo(() => normalizeScopeRows(data?.data), [data]);
+  const sectionData = data?.data?.payload || data?.data;
+  const { items, filters } = useMemo(() => normalizeScopeRows(sectionData), [sectionData]);
   const proposedChanges = data?.data?.proposedPayload?.proposed_changes;
   const aiInstructionUsed = data?.data?.proposedPayload?.ai_instructions;
-  const currentAction = data?.data?.payload?.action as string | undefined;
+  const currentAction = (data?.data?.payload?.action || sectionData?.action) as string | undefined;
   const includedCount = items.filter((item: any) => item.include !== false).length;
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -326,8 +333,9 @@ export default function ScopeTab({ projectId }: Props) {
   const filteredItems = useMemo(() => {
     return items.filter((item: any) => {
       const query = searchQuery.toLowerCase();
+      const itemText = (item.scopeItem || item.description || "").toLowerCase();
       const matchesSearch = !query ||
-        item.scopeItem?.toLowerCase().includes(query) ||
+        itemText.includes(query) ||
         item.notes?.toLowerCase().includes(query) ||
         item.division?.toLowerCase().includes(query);
       const matchesFilter = activeFilterCode === "all" || item.division === activeFilterCode;
@@ -340,21 +348,20 @@ export default function ScopeTab({ projectId }: Props) {
   const [editingScopeItem, setEditingScopeItem] = useState("");
   const [editingNotes, setEditingNotes] = useState("");
 
-  // Pass the project's files into ScopeTab as a prop, or fetch them here
-const fileUrlMap = useMemo(() => {
-  const map = new Map<string, string>();
-  projectFiles?.forEach((f: any) => {
-    if (f.originalName && f.fileUrl) map.set(f.originalName, f.fileUrl);
-  });
-  return map;
-}, [projectFiles]);
+  const fileUrlMap = useMemo(() => {
+    const map = new Map<string, string>();
+    projectFiles?.forEach((f: any) => {
+      if (f.originalName && f.fileUrl) map.set(f.originalName, f.fileUrl);
+    });
+    return map;
+  }, [projectFiles]);
 
   const handleStartEdit = (row: any) => {
     setEditingId(row.id);
-    setEditingScopeItem(row.scopeItem);
+    setEditingScopeItem(row.scopeItem || row.description || "");
     setEditingNotes(row.notes || "");
   };
-  const currentPayload = data?.data?.payload || {};
+  const currentPayload = sectionData || {};
 
 const handleSaveEdit = async (rowId: string) => {
     const newItems = items.map((item: any) =>
@@ -633,7 +640,7 @@ const handleDeleteConfirm = async () => {
                         {row.division}
                       </span>
                     </td>
-                    <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">{row.scopeItem}</td>
+                    <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">{row.scopeItem || row.description}</td>
                     <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
                       {row.quantity?.value ?? 0} {row.quantity?.unit}
                     </td>

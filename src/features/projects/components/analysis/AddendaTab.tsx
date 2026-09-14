@@ -1,6 +1,6 @@
 import { FileText, Edit3, Trash2, Check, X, Loader2, AlertCircle, Info } from "lucide-react";
 import { useGetProjectAddendaQuery, useUpdateProjectAnalysisSectionMutation } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, ReanalyzeBlock, DeleteConfirmationModal, PdfReferenceLink } from "./shared";
+import { SectionSkeleton, SectionError, ReanalyzeBlock, DeleteConfirmationModal, PdfReferenceLink, getSectionPayload } from "./shared";
 import React, { useState } from "react";
 import { toast } from "sonner";
 
@@ -11,7 +11,7 @@ interface Props {
 export default function AddendaTab({ projectId }: Props) {
   const { data, isLoading, isError, refetch } = useGetProjectAddendaQuery(projectId);
   const [updateSection, { isLoading: isUpdating }] = useUpdateProjectAnalysisSectionMutation();
-  const addenda = data?.data?.payload;
+  const addenda = getSectionPayload(data);
 
   const [deleteItemId, setDeleteItemId] = useState<string | number | null>(null);
   const [editingId, setEditingId] = useState<string | number | null>(null);
@@ -30,7 +30,7 @@ export default function AddendaTab({ projectId }: Props) {
       i.id === item.id ? { ...i, title: editingTitle, description: editingDescription } : i
     );
     try {
-      await updateSection({ projectId, section: "addenda", data: { payload: { items: newItems }, note: "Manual edits from estimator" } }).unwrap();
+      await updateSection({ projectId, section: "addenda", data: { payload: { ...addenda, items: newItems }, note: "Manual edits from estimator" } }).unwrap();
       toast.success("Addenda item updated.");
       setEditingId(null);
     } catch {
@@ -42,7 +42,7 @@ export default function AddendaTab({ projectId }: Props) {
     if (!addenda?.items || !deleteItemId) return;
     const newItems = addenda.items.filter((i: any) => i.id !== deleteItemId);
     try {
-      await updateSection({ projectId, section: "addenda", data: { payload: { items: newItems }, note: "Manual edits from estimator" } }).unwrap();
+      await updateSection({ projectId, section: "addenda", data: { payload: { ...addenda, items: newItems, total_items: newItems.length }, note: "Manual edits from estimator" } }).unwrap();
       toast.success("Addenda item deleted.");
       setDeleteItemId(null);
     } catch {

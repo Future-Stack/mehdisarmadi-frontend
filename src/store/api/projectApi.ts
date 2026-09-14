@@ -45,38 +45,39 @@ export interface SummaryPayload {
 
 export interface ScopePayload {
   items: Array<{
-    id: string;
-    notes: string;
-    source: {
-      page: number | null;
-      sheet: string | null;
-      section: string | null;
-      document: string | null;
+    id?: string;
+    description?: string;
+    scopeItem?: string;
+    include?: boolean;
+    division?: string;
+    notes?: string;
+    source?: {
+      page?: number | null;
+      sheet?: string | null;
+      section?: string | null;
+      document?: string | null;
     };
-    include: boolean;
-    division: string;
-    location: string;
-    quantity: {
-      unit: string;
-      value: number;
+    location?: string;
+    quantity?: {
+      unit?: string;
+      value?: number;
     };
-    scopeItem: string;
-    work_type: string;
-    confidence: string;
-    inclusions: string[];
-    quantity_basis: string;
-    specifications: string[];
-    trade_interfaces: string[];
+    work_type?: string;
+    confidence?: string;
+    inclusions?: string[];
+    quantity_basis?: string;
+    specifications?: string[];
+    trade_interfaces?: string[];
   }>;
-  title: string;
-  filters: Array<{ id: string; code: string; label: string; active: boolean }>;
-  showing: string;
-  warnings: string[];
-  confidence: string;
-  total_items: number;
-  completeness: string;
-  validation_errors: string[];
-  missing_information: string[];
+  title?: string;
+  filters?: Array<{ id?: string; code: string; label: string; active?: boolean }>;
+  showing?: string;
+  warnings?: string[];
+  confidence?: string;
+  total_items?: number;
+  completeness?: string;
+  validation_errors?: string[];
+  missing_information?: string[];
   action?: string;
 }
 
@@ -493,35 +494,35 @@ export const projectApi = baseApi.injectEndpoints({
         { type: "Project", id: `${projectId}_pricing` },
       ],
     }),
-    getProjectSummary: builder.query<ApiResponse<ProjectSectionResponse<SummaryPayload>>, string>({
+    getProjectSummary: builder.query<ApiResponse<any>, string>({
       query: (projectId) => `/project/${projectId}/summary`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_summary` }],
     }),
-    getProjectScope: builder.query<ApiResponse<ProjectSectionResponse<ScopePayload>>, string>({
+    getProjectScope: builder.query<ApiResponse<any>, string>({
       query: (projectId) => `/project/${projectId}/scope`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_scope` }],
     }),
-    getProjectPricing: builder.query<ApiResponse<ProjectSectionResponse<PricingPayload>>, string>({
+    getProjectPricing: builder.query<ApiResponse<any>, string>({
       query: (projectId) => `/project/${projectId}/pricing`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_pricing` }],
     }),
-    getProjectRisks: builder.query<ApiResponse<ProjectSectionResponse<RiskPayload>>, string>({
+    getProjectRisks: builder.query<ApiResponse<any>, string>({
       query: (projectId) => `/project/${projectId}/risks`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_risks` }],
     }),
-    getProjectClarifications: builder.query<ApiResponse<ProjectSectionResponse<ClarificationPayload>>, string>({
+    getProjectClarifications: builder.query<ApiResponse<any>, string>({
       query: (projectId) => `/project/${projectId}/clarifications`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_clarifications` }],
     }),
-    getProjectAssumptions: builder.query<ApiResponse<ProjectSectionResponse<AssumptionPayload>>, string>({
+    getProjectAssumptions: builder.query<ApiResponse<any>, string>({
       query: (projectId) => `/project/${projectId}/assumptions`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_assumptions` }],
     }),
-    getProjectExclusions: builder.query<ApiResponse<ProjectSectionResponse<ExclusionPayload>>, string>({
+    getProjectExclusions: builder.query<ApiResponse<any>, string>({
       query: (projectId) => `/project/${projectId}/exclusions`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_exclusions` }],
     }),
-    getProjectAddenda: builder.query<ApiResponse<ProjectSectionResponse<AddendaPayload>>, string>({
+    getProjectAddenda: builder.query<ApiResponse<any>, string>({
       query: (projectId) => `/project/${projectId}/addenda`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_addenda` }],
     }),

@@ -41,7 +41,11 @@ apiClient.interceptors.response.use(
       // Token expired — call server-side signout to clear the httpOnly
       // session cookie before redirecting to /login.
       if (typeof window !== "undefined") {
-        window.location.href = "/api/auth/signout?reason=session_expired";
+        document.cookie = `${COOKIE_NAMES.ACCESS_TOKEN}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+        document.cookie = `${COOKIE_NAMES.REFRESH_TOKEN}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+        if (!window.location.pathname.startsWith("/login") && !window.location.pathname.startsWith("/register")) {
+          window.location.href = "/api/auth/signout?reason=session_expired";
+        }
       }
     } else if (error.response?.status === 403) {
       toast.error("You don't have permission to perform this action.");

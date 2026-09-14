@@ -2,6 +2,7 @@
 import { cookies } from "next/headers";
 import type { SessionPayload } from "@/types";
 import { encrypt, decrypt } from "./session-edge";
+import { COOKIE_NAMES } from "@/constants";
 
 // Re-export so existing imports still work
 export { encrypt, decrypt };
@@ -54,4 +55,7 @@ export async function updateSession(): Promise<void> {
 export async function deleteSession(): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.delete(COOKIE_NAME);
+  cookieStore.delete(COOKIE_NAMES.ACCESS_TOKEN);
+  cookieStore.delete(COOKIE_NAMES.REFRESH_TOKEN);
 }
+

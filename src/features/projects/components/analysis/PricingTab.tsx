@@ -1,6 +1,6 @@
 import { AlertTriangle, AlertCircle, Edit3, Trash2, Check, X } from "lucide-react";
 import { useGetProjectPricingQuery } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, AIInstructionSection, DeleteConfirmationModal, ReanalyzeBlock, PdfReferenceLink } from "./shared";
+import { SectionSkeleton, SectionError, AIInstructionSection, DeleteConfirmationModal, ReanalyzeBlock, PdfReferenceLink, getSectionPayload } from "./shared";
 import { cn } from "@/lib/utils";
 import React, { useState } from "react";
 import { toast } from "sonner";
@@ -13,7 +13,7 @@ interface Props {
 export default function PricingTab({ projectId }: Props) {
   const { data, isLoading, isError, refetch } = useGetProjectPricingQuery(projectId);
   const [updateSection, { isLoading: isUpdating }] = useUpdateProjectAnalysisSectionMutation();
-  const pricing = data?.data?.payload;
+  const pricing = getSectionPayload(data);
 
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);

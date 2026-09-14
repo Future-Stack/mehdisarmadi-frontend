@@ -15,6 +15,30 @@ import {
 } from "@/store/api/authApi";
 import { handleLoginAction, handleLogoutAction } from "../actions";
 
+// ─── Error Message Helper ───────────────────────────────────────────────────
+
+function getErrorMessage(err: unknown, fallback: string): string {
+  if (!err) return fallback;
+  if (typeof err === "string") return err;
+
+  const anyErr = err as {
+    data?: {
+      message?: string;
+      error?: string;
+      data?: { message?: string };
+    };
+    message?: string;
+  };
+
+  return (
+    anyErr.data?.message ||
+    anyErr.data?.data?.message ||
+    anyErr.data?.error ||
+    anyErr.message ||
+    fallback
+  );
+}
+
 // ─── Login ────────────────────────────────────────────────────────────────
 
 export function useLogin() {
@@ -40,7 +64,7 @@ export function useLogin() {
           result.data.user.role === "USER" ? "/sub-user" : ROUTES.DASHBOARD;
         router.push(redirectPath);
       } catch (err) {
-        const errorMsg = err instanceof Error ? err.message : "Login failed. Please try again.";
+        const errorMsg = getErrorMessage(err, "Login failed. Please try again.");
         toast.error(errorMsg);
         throw err;
       }
@@ -73,7 +97,7 @@ export function useAdminLogin() {
         toast.success(`Welcome back, ${result.data.user.fullName || result.data.user.name}!`);
         router.push(ROUTES.DASHBOARD);
       } catch (err) {
-        const errorMsg = err instanceof Error ? err.message : "Admin login failed. Please try again.";
+        const errorMsg = getErrorMessage(err, "Admin login failed. Please try again.");
         toast.error(errorMsg);
         throw err;
       }
@@ -98,8 +122,7 @@ export function useRegister() {
         toast.success("Account created! Please check your email for verification code.");
         router.push(`/verify-email?email=${encodeURIComponent(result.data.user.email)}`);
       } catch (err) {
-        const errorMsg =
-          err instanceof Error ? err.message : "Registration failed. Please try again.";
+        const errorMsg = getErrorMessage(err, "Registration failed. Please try again.");
         toast.error(errorMsg);
         throw err;
       }
@@ -133,8 +156,7 @@ export function useVerifyEmail() {
           result.data.user.role === "USER" ? "/sub-user" : ROUTES.DASHBOARD;
         router.push(redirectPath);
       } catch (err) {
-        const errorMsg =
-          err instanceof Error ? err.message : "Email verification failed. Please try again.";
+        const errorMsg = getErrorMessage(err, "Email verification failed. Please try again.");
         toast.error(errorMsg);
         throw err;
       }
