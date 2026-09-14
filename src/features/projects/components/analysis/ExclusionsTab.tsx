@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Edit3, Check, X, Loader2, Edit, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useGetProjectExclusionsQuery, useUpdateProjectAnalysisSectionMutation } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, ReanalyzeBlock, DeleteConfirmationModal, PdfReferenceLink } from "./shared";
+import { SectionSkeleton, SectionError, ReanalyzeBlock, DeleteConfirmationModal, PdfReferenceLink, getSectionPayload } from "./shared";
 
 interface Props {
   projectId: string;
@@ -11,7 +11,7 @@ interface Props {
 export default function ExclusionsTab({ projectId }: Props) {
   const { data, isLoading, isError, refetch } = useGetProjectExclusionsQuery(projectId);
   const [updateSection, { isLoading: isUpdating }] = useUpdateProjectAnalysisSectionMutation();
-  const exclusions = data?.data?.payload;
+  const exclusions = getSectionPayload(data);
 
   const [editingId, setEditingId] = useState<string | number | null>(null);
   const [deleteItemId, setDeleteItemId] = useState<string | number | null>(null);
@@ -28,7 +28,7 @@ export default function ExclusionsTab({ projectId }: Props) {
       i.id === item.id ? { ...i, text: editingText } : i
     );
     try {
-      await updateSection({ projectId, section: "exclusions", data: { payload: { items: newItems }, note: "Manual edits from estimator" } }).unwrap();
+      await updateSection({ projectId, section: "exclusions", data: { payload: { ...exclusions, items: newItems }, note: "Manual edits from estimator" } }).unwrap();
       toast.success("Exclusion updated.");
       setEditingId(null);
     } catch {
@@ -40,7 +40,7 @@ export default function ExclusionsTab({ projectId }: Props) {
     if (!exclusions?.items || !deleteItemId) return;
     const newItems = exclusions.items.filter((i: any) => i.id !== deleteItemId);
     try {
-      await updateSection({ projectId, section: "exclusions", data: { payload: { items: newItems }, note: "Manual edits from estimator" } }).unwrap();
+      await updateSection({ projectId, section: "exclusions", data: { payload: { ...exclusions, items: newItems, total_items: newItems.length }, note: "Manual edits from estimator" } }).unwrap();
       toast.success("Exclusion deleted.");
       setDeleteItemId(null);
     } catch {

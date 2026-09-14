@@ -28,7 +28,11 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
     // Call the server-side signout route so the httpOnly session cookie
     // is properly deleted before redirecting to /login.
     if (typeof window !== "undefined") {
-      window.location.href = "/api/auth/signout?reason=session_expired";
+      document.cookie = "access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie = "refresh_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      if (!window.location.pathname.startsWith("/login") && !window.location.pathname.startsWith("/register")) {
+        window.location.href = "/api/auth/signout?reason=session_expired";
+      }
     }
   }
   

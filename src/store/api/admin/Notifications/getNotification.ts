@@ -32,7 +32,6 @@ export const notificationApi = baseApi.injectEndpoints({
             providesTags: ["Notifications"],
         })
     }),
-  }),
 });
 
 export const { useGetNotificationsQuery } = notificationApi;

@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { useGetProjectSummaryQuery } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, getHighlightStyle, ReanalyzeBlock, DeleteConfirmationModal } from "./shared";
+import { SectionSkeleton, SectionError, getHighlightStyle, ReanalyzeBlock, DeleteConfirmationModal, getSectionPayload } from "./shared";
 import { Edit3, Trash2, Check, X, Loader2 } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "sonner";
@@ -13,7 +13,7 @@ interface Props {
 export default function SummaryTab({ projectId }: Props) {
   const { data, isLoading, isError, refetch } = useGetProjectSummaryQuery(projectId);
   const [updateSection, { isLoading: isUpdating }] = useUpdateProjectAnalysisSectionMutation();
-  const summary = data?.data?.payload;
+  const summary = getSectionPayload(data);
 
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -33,7 +33,7 @@ export default function SummaryTab({ projectId }: Props) {
       (i.id || i.type) === highlightId ? { ...i, title: editingTitle, description: editingDescription } : i
     );
     try {
-      await updateSection({ projectId, section: "summary", data: { payload: { key_highlights: newItems }, note: "Manual edits from estimator" } }).unwrap();
+      await updateSection({ projectId, section: "summary", data: { payload: { ...summary, key_highlights: newItems }, note: "Manual edits from estimator" } }).unwrap();
       toast.success("Highlight updated.");
       setEditingId(null);
     } catch {
@@ -45,7 +45,7 @@ export default function SummaryTab({ projectId }: Props) {
     if (!summary?.key_highlights || !deleteItemId) return;
     const newItems = summary.key_highlights.filter((i: any) => (i.id || i.type) !== deleteItemId);
     try {
-      await updateSection({ projectId, section: "summary", data: { payload: { key_highlights: newItems }, note: "Manual edits from estimator" } }).unwrap();
+      await updateSection({ projectId, section: "summary", data: { payload: { ...summary, key_highlights: newItems }, note: "Manual edits from estimator" } }).unwrap();
       toast.success("Highlight deleted.");
       setDeleteItemId(null);
     } catch {

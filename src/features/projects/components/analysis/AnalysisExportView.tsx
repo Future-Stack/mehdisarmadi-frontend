@@ -81,14 +81,14 @@ export default function AnalysisExportView({ projectId, onReady }: { projectId: 
   ]);
 
   const project = projectData?.data;
-  const summary = summaryData?.data?.payload;
-  const scope = scopeData?.data?.payload;
-  const assumptions = assumptionsData?.data?.payload;
-  const exclusions = exclusionsData?.data?.payload;
-  const risks = risksData?.data?.payload;
-  const clarifications = clarificationsData?.data?.payload;
-  const addenda = addendaData?.data?.payload;
-  const pricing = pricingData?.data?.payload;
+  const summary = summaryData?.data?.payload || summaryData?.data;
+  const scope = scopeData?.data?.payload || scopeData?.data;
+  const assumptions = assumptionsData?.data?.payload || assumptionsData?.data;
+  const exclusions = exclusionsData?.data?.payload || exclusionsData?.data;
+  const risks = risksData?.data?.payload || risksData?.data;
+  const clarifications = clarificationsData?.data?.payload || clarificationsData?.data;
+  const addenda = addendaData?.data?.payload || addendaData?.data;
+  const pricing = pricingData?.data?.payload || pricingData?.data;
 
   const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 

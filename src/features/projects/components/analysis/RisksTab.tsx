@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { Edit3, Trash2, Check, X, Loader2, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
 import { useGetProjectRisksQuery, useUpdateProjectAnalysisSectionMutation } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, getRiskBadgeColor, ReanalyzeBlock, DeleteConfirmationModal, PdfReferenceLink } from "./shared";
+import { SectionSkeleton, SectionError, getRiskBadgeColor, ReanalyzeBlock, DeleteConfirmationModal, PdfReferenceLink, getSectionPayload } from "./shared";
 
 interface Props {
   projectId: string;
@@ -24,7 +24,7 @@ function getSeverityBadge(severity?: string) {
 export default function RisksTab({ projectId }: Props) {
   const { data, isLoading, isError, refetch } = useGetProjectRisksQuery(projectId);
   const [updateSection, { isLoading: isUpdating }] = useUpdateProjectAnalysisSectionMutation();
-  const risks = data?.data?.payload;
+  const risks = getSectionPayload(data);
 
   const [editingId, setEditingId] = useState<string | number | null>(null);
   const [deleteItemId, setDeleteItemId] = useState<string | number | null>(null);
@@ -44,7 +44,7 @@ export default function RisksTab({ projectId }: Props) {
       i.id === risk.id ? { ...i, title: editingTitle, description: editingDesc } : i
     );
     try {
-      await updateSection({ projectId, section: "risks", data: { payload: { items: newItems }, note: "Manual edits from estimator" } }).unwrap();
+      await updateSection({ projectId, section: "risks", data: { payload: { ...risks, items: newItems }, note: "Manual edits from estimator" } }).unwrap();
       toast.success("Risk updated.");
       setEditingId(null);
     } catch {
@@ -56,7 +56,7 @@ export default function RisksTab({ projectId }: Props) {
     if (!risks?.items || !deleteItemId) return;
     const newItems = risks.items.filter((i: any) => i.id !== deleteItemId);
     try {
-      await updateSection({ projectId, section: "risks", data: { payload: { items: newItems }, note: "Manual edits from estimator" } }).unwrap();
+      await updateSection({ projectId, section: "risks", data: { payload: { ...risks, items: newItems, total_items: newItems.length }, note: "Manual edits from estimator" } }).unwrap();
       toast.success("Risk deleted.");
       setDeleteItemId(null);
     } catch {

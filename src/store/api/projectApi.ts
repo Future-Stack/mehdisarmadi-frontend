@@ -45,38 +45,39 @@ export interface SummaryPayload {
 
 export interface ScopePayload {
   items: Array<{
-    id: string;
-    notes: string;
-    source: {
-      page: number | null;
-      sheet: string | null;
-      section: string | null;
-      document: string | null;
+    id?: string;
+    description?: string;
+    scopeItem?: string;
+    include?: boolean;
+    division?: string;
+    notes?: string;
+    source?: {
+      page?: number | null;
+      sheet?: string | null;
+      section?: string | null;
+      document?: string | null;
     };
-    include: boolean;
-    division: string;
-    location: string;
-    quantity: {
-      unit: string;
-      value: number;
+    location?: string;
+    quantity?: {
+      unit?: string;
+      value?: number;
     };
-    scopeItem: string;
-    work_type: string;
-    confidence: string;
-    inclusions: string[];
-    quantity_basis: string;
-    specifications: string[];
-    trade_interfaces: string[];
+    work_type?: string;
+    confidence?: string;
+    inclusions?: string[];
+    quantity_basis?: string;
+    specifications?: string[];
+    trade_interfaces?: string[];
   }>;
-  title: string;
-  filters: Array<{ id: string; code: string; label: string; active: boolean }>;
-  showing: string;
-  warnings: string[];
-  confidence: string;
-  total_items: number;
-  completeness: string;
-  validation_errors: string[];
-  missing_information: string[];
+  title?: string;
+  filters?: Array<{ id?: string; code: string; label: string; active?: boolean }>;
+  showing?: string;
+  warnings?: string[];
+  confidence?: string;
+  total_items?: number;
+  completeness?: string;
+  validation_errors?: string[];
+  missing_information?: string[];
   action?: string;
 }
 

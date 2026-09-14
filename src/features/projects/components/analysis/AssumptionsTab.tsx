@@ -1,7 +1,7 @@
 import { Edit3, Copy, Trash2, CheckSquare, Loader2, Square, Edit, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useGetProjectAssumptionsQuery, useUpdateProjectAnalysisSectionMutation } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, ReanalyzeBlock, DeleteConfirmationModal, PdfReferenceLink } from "./shared";
+import { SectionSkeleton, SectionError, ReanalyzeBlock, DeleteConfirmationModal, PdfReferenceLink, getSectionPayload } from "./shared";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -12,7 +12,7 @@ interface Props {
 export default function AssumptionsTab({ projectId }: Props) {
   const { data, isLoading, isError, refetch } = useGetProjectAssumptionsQuery(projectId);
   const [updateSection, { isLoading: isUpdating }] = useUpdateProjectAnalysisSectionMutation();
-  const assumptions = data?.data?.payload;
+  const assumptions = getSectionPayload(data);
 
   const [deleteItemId, setDeleteItemId] = useState<string | number | null>(null);
   const [editingId, setEditingId] = useState<string | number | null>(null);
@@ -25,7 +25,7 @@ export default function AssumptionsTab({ projectId }: Props) {
       await updateSection({
         projectId,
         section: "assumptions",
-        data: { payload: { items: newItems }, note: "Manual edits from estimator" }
+        data: { payload: { ...assumptions, items: newItems, total_items: newItems.length }, note: "Manual edits from estimator" }
       }).unwrap();
       toast.success("Assumption removed.");
     } catch {
@@ -45,7 +45,7 @@ export default function AssumptionsTab({ projectId }: Props) {
       await updateSection({
         projectId,
         section: "assumptions",
-        data: { payload: { items: newItems }, note: "Manual edits from estimator" }
+        data: { payload: { ...assumptions, items: newItems, total_items: newItems.length }, note: "Manual edits from estimator" }
       }).unwrap();
       toast.success("Assumption deleted successfully.");
       setDeleteItemId(null);
