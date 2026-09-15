@@ -106,12 +106,46 @@ export function SectionError({ message, onRetry }: { message: string; onRetry?: 
   );
 }
 
+export function getProposedPayload(data: any): any {
+  if (!data) return null;
+
+  // 1. Direct object having proposedPayload
+  if (data.proposedPayload) {
+    const res = getProposedPayload(data.proposedPayload);
+    if (res) return res;
+  }
+
+  // 2. Objects that already represent proposedPayload or proposed_changes
+  if (
+    data.proposed_changes ||
+    data.updated ||
+    (data.changes && Array.isArray(data.changes)) ||
+    data.ai_instructions ||
+    data.proposedInstruction
+  ) {
+    return data;
+  }
+
+  // 3. Check inside data.data or data.payload
+  if (data.data && typeof data.data === "object") {
+    const res = getProposedPayload(data.data);
+    if (res) return res;
+  }
+
+  if (data.payload && typeof data.payload === "object") {
+    const res = getProposedPayload(data.payload);
+    if (res) return res;
+  }
+
+  return null;
+}
+
 // ─── AI Instruction Section ───────────────────────────────────────────────────
 interface AIInstructionSectionProps {
   projectId: string;
   section: string;
   defaultInstruction?: string;
-  onReanalyzed?: () => void;
+  onReanalyzed?: (resData?: any, instruction?: string) => void;
 }
 
 export function AIInstructionSection({
@@ -128,15 +162,17 @@ export function AIInstructionSection({
   }, [defaultInstruction]);
 
   const handleReanalyze = async () => {
-    if (!instruction.trim()) {
+    const currentInstruction = instruction.trim();
+    if (!currentInstruction) {
       toast.error("Please enter an instruction before re-analyzing.");
       return;
     }
     try {
-      await reanalyze({ projectId, section, data: { instruction } }).unwrap();
-      toast.success(`${section} section re-analyzed! Review the proposed changes below.`);
+      const res = await reanalyze({ projectId, section, data: { instruction: currentInstruction } }).unwrap();
+      toast.success(`${section.charAt(0).toUpperCase() + section.slice(1)} section re-analyzed! Review the proposed changes below.`);
+      const resultData = res?.data || res;
       setInstruction("");
-      onReanalyzed?.();
+      onReanalyzed?.(resultData, currentInstruction);
     } catch (err: any) {
       toast.error(err?.data?.message || `Failed to re-analyze ${section} section.`);
     }
@@ -187,14 +223,24 @@ export function ProposedChangesReview({ projectId, section, data, onEdit, onAcce
   const { data: quoteData } = useGetProjectQuoteQuery(projectId);
   const [dismissed, setDismissed] = React.useState(false);
 
-  const proposedPayload = data?.proposedPayload || data?.data?.proposedPayload;
+  const proposedPayload = getProposedPayload(data);
   if (!proposedPayload || dismissed) return null;
 
-  const proposedChanges = proposedPayload?.proposed_changes;
-  const changes: string[] = proposedChanges?.changes ?? [];
-  const pricingImpact: string | null = proposedChanges?.pricing_impact ?? null;
-  const affectedTabs: string[] = proposedChanges?.affected_tabs ?? [];
-  const aiInstruction: string | null = (data?.proposedInstruction || data?.data?.proposedInstruction) ?? null;
+  const proposedChanges = proposedPayload?.proposed_changes || proposedPayload;
+  const rawChanges = proposedChanges?.changes || proposedPayload?.changes || (Array.isArray(proposedChanges) ? proposedChanges : []);
+  const changes: string[] = Array.isArray(rawChanges)
+    ? rawChanges.map((c: any) => typeof c === "string" ? c : c.text || c.description || c.scopeItem || JSON.stringify(c))
+    : [];
+
+  const pricingImpact: string | null = proposedChanges?.pricing_impact || proposedPayload?.pricing_impact || null;
+  const affectedTabs: string[] = proposedChanges?.affected_tabs || proposedPayload?.affected_tabs || [];
+  const aiInstruction: string | null =
+    proposedPayload?.ai_instructions ||
+    proposedPayload?.aiInstruction ||
+    proposedPayload?.instruction ||
+    data?.proposedInstruction ||
+    data?.data?.proposedInstruction ||
+    null;
 
   const isUpdating = isUpdatingSection || isSavingQuote;
 
@@ -355,7 +401,7 @@ export function ProposedChangesReview({ projectId, section, data, onEdit, onAcce
           </div>
         )}
 
-        {changes.length > 0 && (
+        {changes.length > 0 ? (
           <div>
             <p className="text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-3">
               {section.charAt(0).toUpperCase() + section.slice(1)} Changes:
@@ -369,6 +415,10 @@ export function ProposedChangesReview({ projectId, section, data, onEdit, onAcce
               ))}
             </ul>
           </div>
+        ) : (
+          <p className="text-[13px] font-medium text-gray-600 dark:text-gray-300">
+            Re-analysis complete based on your instruction. Review proposed updates and accept or reject below.
+          </p>
         )}
 
         {pricingImpact && (
@@ -442,6 +492,52 @@ interface ReanalyzeBlockProps {
 
 export function ReanalyzeBlock({ projectId, section, data, onAccept, onReject }: ReanalyzeBlockProps) {
   const [editInstruction, setEditInstruction] = React.useState<string | undefined>();
+  const [localProposedData, setLocalProposedData] = React.useState<any>(null);
+  const [reviewKey, setReviewKey] = React.useState(0);
+
+  const activeData = localProposedData || data;
+
+  const handleReanalyzed = (resultData?: any, instruction?: string) => {
+    setEditInstruction(undefined);
+
+    const rawUpdated = resultData?.updated || resultData?.payload || resultData?.data || resultData;
+    const itemsList = rawUpdated?.items || resultData?.items || [];
+
+    const changesList =
+      resultData?.proposed_changes?.changes ||
+      resultData?.changes ||
+      (Array.isArray(itemsList) && itemsList.length > 0
+        ? itemsList.map((it: any) =>
+            typeof it === "string"
+              ? it
+              : it.scopeItem || it.description || it.text || it.title || it.basis || it.reason || it.risk || it.name || JSON.stringify(it)
+          )
+        : [`Re-analyzed ${section} section with instruction: "${instruction}"`]);
+
+    const proposedObj = {
+      ai_instructions: instruction || resultData?.ai_instructions || resultData?.proposedInstruction || "",
+      proposed_changes: {
+        changes: changesList,
+        pricing_impact: resultData?.proposed_changes?.pricing_impact || resultData?.pricing_impact || null,
+        affected_tabs: resultData?.proposed_changes?.affected_tabs || resultData?.affected_tabs || [],
+      },
+      updated: rawUpdated,
+      ...resultData,
+    };
+
+    setLocalProposedData(proposedObj);
+    setReviewKey((prev) => prev + 1);
+  };
+
+  const handleAccept = () => {
+    setLocalProposedData(null);
+    onAccept?.();
+  };
+
+  const handleReject = () => {
+    setLocalProposedData(null);
+    onReject?.();
+  };
 
   return (
     <>
@@ -449,20 +545,21 @@ export function ReanalyzeBlock({ projectId, section, data, onAccept, onReject }:
         projectId={projectId}
         section={section}
         defaultInstruction={editInstruction}
-        onReanalyzed={() => setEditInstruction(undefined)}
+        onReanalyzed={handleReanalyzed}
       />
-      {data && (
+      {activeData ? (
         <div className="mt-6">
           <ProposedChangesReview
+            key={reviewKey}
             projectId={projectId}
             section={section}
-            data={data}
-            onEdit={(instruction) => setEditInstruction(instruction)}
-            onAccept={onAccept}
-            onReject={onReject}
+            data={activeData}
+            onEdit={(instr) => setEditInstruction(instr)}
+            onAccept={handleAccept}
+            onReject={handleReject}
           />
         </div>
-      )}
+      ) : null}
     </>
   );
 }
