@@ -273,7 +273,7 @@ import { CheckSquare, Edit3, Copy, Trash2, FileText, Loader2, Check, X, Square, 
 import { Button } from "@/components/ui/Button";
 import { toast } from "sonner";
 import { useGetProjectByIdQuery, useGetProjectScopeQuery, useUpdateProjectAnalysisSectionMutation, useSaveProjectQuoteMutation, useGetProjectQuoteQuery } from "@/store/api/projectApi";
-import { SectionSkeleton, SectionError, getHighlightStyle, ReanalyzeBlock, DeleteConfirmationModal, ProposedChangesReview, PdfReferenceLink } from "./shared";
+import { SectionSkeleton, SectionError, getHighlightStyle, ReanalyzeBlock, DeleteConfirmationModal, ProposedChangesReview, PdfReferenceLink, getProposedPayload } from "./shared";
 
 interface Props {
   projectId: string;
@@ -493,8 +493,8 @@ const handleDeleteConfirm = async () => {
   const [saveQuote] = useSaveProjectQuoteMutation();
 
   const handleDecision = async (decision: "accept" | "reject") => {
-    const proposedPayload = data?.data?.proposedPayload;
-    const currentPayload = data?.data?.payload || {};
+    const proposedPayload = getProposedPayload(data?.data);
+    const currentPayload = data?.data?.payload || data?.data || {};
 
     const nextPayload =
       decision === "accept" && proposedPayload?.updated
