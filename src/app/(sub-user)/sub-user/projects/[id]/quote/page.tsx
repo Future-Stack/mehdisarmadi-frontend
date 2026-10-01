@@ -9,8 +9,13 @@ import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useSaveProjectQuoteMutation, useGetProjectQuoteQuery } from "@/store/api/projectApi";
+import {
+  useSaveProjectQuoteMutation,
+  useGetProjectQuoteQuery,
+  useGetProjectClarificationsQuery,
+} from "@/store/api/projectApi";
 import { useGetCompanyProfileQuery } from "@/store/api/sub-user/company-profile/getCompanyProfile";
+import { resolveQuoteData } from "@/features/dashboard/components/preview/resolveQuoteData";
 import { exportElementToPDF, exportQuoteToDocx } from "@/lib/exportUtils";
 import { PageOne } from "@/features/dashboard/components/preview/PageOne";
 import { PageTwo } from "@/features/dashboard/components/preview/PageTwo";
@@ -107,6 +112,7 @@ export default function QuoteBuilderPage({ params }: { params: Promise<{ id: str
   // ─── API ────────────────────────────────────────────────────────────────────
   const { data: quoteData, isLoading: isLoadingQuote } = useGetProjectQuoteQuery(id);
   const { data: companyProfileResponse } = useGetCompanyProfileQuery();
+  const { data: clarificationsResponse } = useGetProjectClarificationsQuery(id);
   const [saveQuote, { isLoading: isSaving }] = useSaveProjectQuoteMutation();
   const [isExportingPDF, setIsExportingPDF] = useState(false);
   const [isExportingDocx, setIsExportingDocx] = useState(false);
@@ -159,123 +165,85 @@ export default function QuoteBuilderPage({ params }: { params: Promise<{ id: str
 
   const [footerNotes, setFooterNotes] = useState("Thank you for considering our proposal. We look forward to working with you on this project.");
 
+  const isInitializedRef = useRef(false);
+
   React.useEffect(() => {
     if (quoteData?.data) {
-      const {
-        companyDetails: companyDetailsFromQuote,
-        projectQuoteDetails,
-        aiQuoteDraft,
-        savedQuote: savedQuoteDirect,
-        quote: savedQuoteAlt,
-        commercialTerms,
-        footerNotes: serverFooterNotes,
-      } = quoteData.data;
+      const fallbackClarifications = clarificationsResponse?.data?.items
+        ?.map((c: any) => c.question || c.reason)
+        .filter(Boolean);
 
-      const savedQuote = savedQuoteDirect || savedQuoteAlt;
-      const company = companyDetailsFromQuote || companyProfileResponse?.data;
+      const resolved = resolveQuoteData(
+        quoteData,
+        companyProfileResponse?.data,
+        fallbackClarifications
+      );
 
-      // Populate company details
-      if (company) {
-        setCompanyName(company.name || companyName);
-        setCompanyAddress(company.address || companyAddress);
-        setCompanyPhone(company.phone || companyPhone);
-        setCompanyEmail(company.email || companyEmail);
-        setCompanyWebsite(company.website || companyWebsite);
-        setCompanyHst(company.hstNumber || companyHst);
-      }
+      if (!isInitializedRef.current) {
+        setQuoteNumber(resolved.quoteNumber);
+        setProjectLocation(resolved.projectLocation);
+        setProjectName(resolved.projectName);
+        setStartDate(resolved.startDate);
+        setClientName(resolved.clientName);
+        setRevisionNumber(resolved.revisionNumber);
+        setAttention(resolved.attention);
+        setBidClosingDate(resolved.bidClosingDate);
+        setSubject(resolved.subject);
+        setGcName(resolved.gcName);
+        setAddendaIncluded(resolved.addendaIncluded);
 
-      if (savedQuote) {
-        setQuoteNumber(savedQuote.quoteNumber || (projectQuoteDetails?.projectId ? `Q-${new Date().getFullYear()}-${projectQuoteDetails.projectId.slice(0, 4).toUpperCase()}` : "Q-2026-001"));
-        setProjectLocation(savedQuote.projectLocation || projectQuoteDetails?.address || "");
-        setProjectName(savedQuote.projectName || projectQuoteDetails?.projectName || "");
-        setStartDate(savedQuote.startDate || new Date().toISOString().split("T")[0]);
-        setClientName(savedQuote.clientName || projectQuoteDetails?.clientName || "");
-        setRevisionNumber(savedQuote.revisionNumber || "00");
-        setAttention(savedQuote.attention || projectQuoteDetails?.clientContact || "");
-        setBidClosingDate(savedQuote.bidClosingDate || (projectQuoteDetails?.closingDate ? new Date(projectQuoteDetails.closingDate).toLocaleDateString() : ""));
-        setSubject(savedQuote.subject || projectQuoteDetails?.instruction || projectQuoteDetails?.description || "");
-        setGcName(savedQuote.gcName || "");
-        setAddendaIncluded(savedQuote.addendaIncluded || "");
+        setBaseBidPrice(resolved.numericBase > 0 ? `$${resolved.numericBase.toLocaleString()}` : "$0");
+        setHstPercentage(`${resolved.numericHstPct}%`);
+        setCurrency(resolved.currency);
 
-        const rawBase = savedQuote.baseBidPrice || (aiQuoteDraft?.pricing_summary?.base_bid_price && aiQuoteDraft.pricing_summary.base_bid_price !== "Not found" ? String(aiQuoteDraft.pricing_summary.base_bid_price) : "$0");
-        setBaseBidPrice(rawBase);
-        setHstPercentage(savedQuote.hstPercentage || "13%");
-        setCurrency(savedQuote.currency || aiQuoteDraft?.pricing_summary?.currency || "CAD");
+        setCompanyName(resolved.companyName);
+        setCompanyAddress(resolved.companyAddress);
+        setCompanyPhone(resolved.companyPhone);
+        setCompanyEmail(resolved.companyEmail);
+        setCompanyWebsite(resolved.companyWebsite);
+        setCompanyHst(resolved.companyHst);
 
-        if (savedQuote.scopeOfWork) setScopeItems(savedQuote.scopeOfWork);
-        if (savedQuote.assumptions) setAssumptionItems(savedQuote.assumptions);
-        if (savedQuote.exclusions) setExclusionItems(savedQuote.exclusions);
-        if (savedQuote.clarifications) setClarificationItems(savedQuote.clarifications);
+        setScopeItems(resolved.scopeOfWork);
+        setAssumptionItems(resolved.assumptions);
+        setExclusionItems(resolved.exclusions);
+        setClarificationItems(resolved.clarifications);
 
-        if (savedQuote.separatePrices) setSeparatePrices(savedQuote.separatePrices);
-        if (savedQuote.altPrices) setAltPrices(savedQuote.altPrices);
-        if (savedQuote.unitPrices) setUnitPrices(savedQuote.unitPrices);
+        setSeparatePrices(resolved.separatePrices);
+        setAltPrices(resolved.altPrices);
+        setUnitPrices(resolved.unitPrices);
 
-        if (savedQuote.paymentTerms) setPaymentTerms(savedQuote.paymentTerms);
-        if (savedQuote.holdbackNote) setHoldbackNote(savedQuote.holdbackNote);
-        if (savedQuote.validityPeriod) setValidityPeriod(savedQuote.validityPeriod);
-        if (savedQuote.termsCurrency) setTermsCurrency(savedQuote.termsCurrency);
-        if (savedQuote.footerNotes) setFooterNotes(savedQuote.footerNotes);
+        setPaymentTerms(resolved.paymentTerms);
+        setHoldbackNote(resolved.holdbackNote);
+        setValidityPeriod(resolved.validityPeriod);
+        setTermsCurrency(resolved.termsCurrency);
+        setFooterNotes(resolved.footerNotes);
+
+        isInitializedRef.current = true;
       } else {
-        const defaultQuoteNo = projectQuoteDetails?.projectId
-          ? `Q-${new Date().getFullYear()}-${projectQuoteDetails.projectId.slice(0, 4).toUpperCase()}`
-          : `Q-${new Date().getFullYear()}-001`;
-        setQuoteNumber(defaultQuoteNo);
-        setStartDate(new Date().toISOString().split("T")[0]);
-        setRevisionNumber("00");
-        setProjectLocation(projectQuoteDetails?.address || "");
-        setProjectName(projectQuoteDetails?.projectName || "");
-        setClientName(projectQuoteDetails?.clientName || "");
-        setAttention(projectQuoteDetails?.clientContact || "");
-        setBidClosingDate(projectQuoteDetails?.closingDate ? new Date(projectQuoteDetails.closingDate).toLocaleDateString() : "");
-        setSubject(projectQuoteDetails?.instruction || projectQuoteDetails?.description || "");
-
-        const rawBase = aiQuoteDraft?.pricing_summary?.base_bid_price;
-        setBaseBidPrice(rawBase && rawBase !== "Not found" ? String(rawBase) : "$0");
-        setCurrency(aiQuoteDraft?.pricing_summary?.currency || "CAD");
-
-        if (aiQuoteDraft?.scope_of_work) {
-          setScopeItems(aiQuoteDraft.scope_of_work.map((s: any) => {
-            const div = s.division_label || (s.division_code ? `Division ${s.division_code}` : "");
-            const details = Array.isArray(s.details) ? s.details.join(", ") : (s.details || "");
-            return div && details ? `${div}: ${details}` : (details || div);
-          }));
+        // Late-arriving clarifications or company profile updates:
+        if (clarificationItems.length === 0 && resolved.clarifications.length > 0) {
+          setClarificationItems(resolved.clarifications);
         }
-        if (aiQuoteDraft?.assumptions) setAssumptionItems(aiQuoteDraft.assumptions);
-        if (aiQuoteDraft?.exclusions) setExclusionItems(aiQuoteDraft.exclusions);
-
-        if (aiQuoteDraft?.separate_prices) {
-          setSeparatePrices(aiQuoteDraft.separate_prices.map((sp: any) => ({
-            id: sp.code, title: sp.title, price: sp.amount, description: sp.description || sp.summary, scopeOfWork: sp.scope_of_work?.join(", ") || "", assumptions: sp.assumptions?.join(", ") || "", exclusions: sp.exclusions?.join(", ") || ""
-          })));
+        if (scopeItems.length === 0 && resolved.scopeOfWork.length > 0) {
+          setScopeItems(resolved.scopeOfWork);
         }
-        if (aiQuoteDraft?.alternative_prices) {
-          setAltPrices(aiQuoteDraft.alternative_prices.map((ap: any) => ({
-            id: ap.code, title: ap.title, price: ap.amount, description: ap.description || ap.summary
-          })));
+        if (assumptionItems.length === 0 && resolved.assumptions.length > 0) {
+          setAssumptionItems(resolved.assumptions);
         }
-        if (aiQuoteDraft?.unit_prices) {
-          setUnitPrices(aiQuoteDraft.unit_prices.map((up: any) => ({
-            id: up.code, description: up.description, unit: up.type, unitPrice: up.unit_price, estQty: "1", notes: ""
-          })));
+        if (exclusionItems.length === 0 && resolved.exclusions.length > 0) {
+          setExclusionItems(resolved.exclusions);
         }
-
-        const resolvedPaymentTerms = commercialTerms?.paymentTerms || (aiQuoteDraft?.terms_and_conditions?.payment_terms && aiQuoteDraft.terms_and_conditions.payment_terms !== "Not found" ? aiQuoteDraft.terms_and_conditions.payment_terms : "") || "Progress payments monthly based on work completed. Net 30 days from invoice date.";
-        const resolvedHoldback = commercialTerms?.holdbackTerms || (aiQuoteDraft?.terms_and_conditions?.holdback && aiQuoteDraft.terms_and_conditions.holdback !== "Not found" ? aiQuoteDraft.terms_and_conditions.holdback : "") || "10% holdback as per Construction Act requirements until final completion.";
-        const resolvedValidity = commercialTerms?.quoteValidity || (aiQuoteDraft?.terms_and_conditions?.quote_validity && aiQuoteDraft.terms_and_conditions.quote_validity !== "Not found" ? aiQuoteDraft.terms_and_conditions.quote_validity : "") || "30 days from date of issue";
-        const resolvedTermsCurrency = aiQuoteDraft?.terms_and_conditions?.currency || "Canadian Dollars (CAD)";
-
-        setPaymentTerms(resolvedPaymentTerms);
-        setHoldbackNote(resolvedHoldback);
-        setValidityPeriod(resolvedValidity);
-        setTermsCurrency(resolvedTermsCurrency);
-
-        if (serverFooterNotes?.footerText || serverFooterNotes?.defaultNotes) {
-          setFooterNotes(serverFooterNotes.footerText || serverFooterNotes.defaultNotes);
+        if ((!companyName || companyName === "Renofield Ltd.") && resolved.companyName && resolved.companyName !== "Renofield Ltd.") {
+          setCompanyName(resolved.companyName);
+          setCompanyAddress(resolved.companyAddress);
+          setCompanyPhone(resolved.companyPhone);
+          setCompanyEmail(resolved.companyEmail);
+          setCompanyWebsite(resolved.companyWebsite);
+          setCompanyHst(resolved.companyHst);
         }
       }
     }
-  }, [quoteData, companyProfileResponse]);
+  }, [quoteData, companyProfileResponse, clarificationsResponse]);
 
   // ─── Handlers ────────────────────────────────────────────────────────────────
   const [lastSaved, setLastSaved] = useState<string | null>(null);
