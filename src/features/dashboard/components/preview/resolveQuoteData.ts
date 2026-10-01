@@ -76,7 +76,7 @@ export interface ResolvedQuote {
   warnings?: string[];
 }
 
-export function resolveQuoteData(quoteData: any, companyProfile?: any): ResolvedQuote {
+export function resolveQuoteData(quoteData: any, companyProfile?: any, fallbackClarifications?: string[]): ResolvedQuote {
   const raw = quoteData?.data || quoteData || {};
   const saved = raw.savedQuote || raw.quote || {};
   const project = raw.projectQuoteDetails || {};
@@ -87,34 +87,72 @@ export function resolveQuoteData(quoteData: any, companyProfile?: any): Resolved
 
   // 1. Company Information
   const companyName =
-    saved.companyName || company.name || "Renofield Ltd.";
-  const companyAddress = saved.companyAddress || company.address || "";
-  const companyPhone = saved.companyPhone || company.phone || "";
-  const companyEmail = saved.companyEmail || company.email || "";
-  const companyWebsite = saved.companyWebsite || company.website || "";
-  const companyHst = saved.companyHst || company.hstNumber || "";
+    (saved.companyName && saved.companyName.trim() !== "" ? saved.companyName : null) ||
+    company.name ||
+    "Renofield Ltd.";
+  const companyAddress =
+    (saved.companyAddress && saved.companyAddress.trim() !== "" ? saved.companyAddress : null) ||
+    company.address ||
+    "";
+  const companyPhone =
+    (saved.companyPhone && saved.companyPhone.trim() !== "" ? saved.companyPhone : null) ||
+    company.phone ||
+    "";
+  const companyEmail =
+    (saved.companyEmail && saved.companyEmail.trim() !== "" ? saved.companyEmail : null) ||
+    company.email ||
+    "";
+  const companyWebsite =
+    (saved.companyWebsite && saved.companyWebsite.trim() !== "" ? saved.companyWebsite : null) ||
+    company.website ||
+    "";
+  const companyHst =
+    (saved.companyHst && saved.companyHst.trim() !== "" ? saved.companyHst : null) ||
+    company.hstNumber ||
+    "";
 
   // 2. Project / Tender Information
-  const projectName = saved.projectName || project.projectName || "";
-  const projectLocation = saved.projectLocation || project.address || "";
-  const clientName = saved.clientName || project.clientName || "";
-  const attention = saved.attention || project.clientContact || "";
-  const gcName = saved.gcName || project.gcName || "";
+  const projectName =
+    (saved.projectName && saved.projectName.trim() !== "" ? saved.projectName : null) ||
+    project.projectName ||
+    "";
+  const projectLocation =
+    (saved.projectLocation && saved.projectLocation.trim() !== "" ? saved.projectLocation : null) ||
+    project.address ||
+    "";
+  const clientName =
+    (saved.clientName && saved.clientName.trim() !== "" ? saved.clientName : null) ||
+    project.clientName ||
+    "";
+  const attention =
+    (saved.attention && saved.attention.trim() !== "" ? saved.attention : null) ||
+    project.clientContact ||
+    "";
+  const gcName =
+    (saved.gcName && saved.gcName.trim() !== "" ? saved.gcName : null) ||
+    project.gcName ||
+    "";
 
   const defaultQuoteNo = project.projectId
     ? `Q-${new Date().getFullYear()}-${project.projectId.slice(0, 4).toUpperCase()}`
     : `Q-${new Date().getFullYear()}-001`;
-  const quoteNumber = saved.quoteNumber || defaultQuoteNo;
+  const quoteNumber =
+    (saved.quoteNumber && saved.quoteNumber.trim() !== "" ? saved.quoteNumber : null) ||
+    defaultQuoteNo;
   const revisionNumber = saved.revisionNumber || "00";
   const startDate =
-    saved.startDate || new Date().toISOString().split("T")[0];
+    (saved.startDate && saved.startDate.trim() !== "" ? saved.startDate : null) ||
+    new Date().toISOString().split("T")[0];
   const bidClosingDate =
-    saved.bidClosingDate ||
+    (saved.bidClosingDate && saved.bidClosingDate.trim() !== "" ? saved.bidClosingDate : null) ||
     (project.closingDate
       ? new Date(project.closingDate).toLocaleDateString()
       : "");
   const subject =
-    saved.subject || project.instruction || project.description || "";
+    (saved.subject && saved.subject.trim() !== "" ? saved.subject : null) ||
+    project.instruction ||
+    project.description ||
+    "";
   const addendaIncluded = saved.addendaIncluded || "";
 
   // 3. Scope of Work
@@ -130,6 +168,14 @@ export function resolveQuoteData(quoteData: any, companyProfile?: any): Resolved
       if (div && details) return `${div}: ${details}`;
       return details || div || "";
     }).filter(Boolean);
+  }
+  if (scopeOfWork.length === 0 && Array.isArray(project.divisions) && project.divisions.length > 0) {
+    scopeOfWork = project.divisions
+      .filter((d: any) => d.isEnabled !== false)
+      .map((d: any) => {
+        const code = d.code ? `Division ${d.code} - ` : "";
+        return `${code}${d.name}${d.description ? `: ${d.description}` : ""}`;
+      });
   }
 
   // 4. Assumptions
@@ -152,6 +198,10 @@ export function resolveQuoteData(quoteData: any, companyProfile?: any): Resolved
   let clarifications: string[] = [];
   if (Array.isArray(saved.clarifications) && saved.clarifications.length > 0) {
     clarifications = saved.clarifications;
+  } else if (Array.isArray(fallbackClarifications) && fallbackClarifications.length > 0) {
+    clarifications = fallbackClarifications;
+  } else if (Array.isArray(aiDraft.missing_information) && aiDraft.missing_information.length > 0) {
+    clarifications = aiDraft.missing_information;
   }
 
   // 7. Separate Prices
@@ -223,7 +273,7 @@ export function resolveQuoteData(quoteData: any, companyProfile?: any): Resolved
 
   // 11. Commercial Terms
   const paymentTerms =
-    saved.paymentTerms ||
+    (saved.paymentTerms && saved.paymentTerms.trim() !== "" ? saved.paymentTerms : null) ||
     commercial.paymentTerms ||
     (aiDraft.terms_and_conditions?.payment_terms &&
     aiDraft.terms_and_conditions.payment_terms !== "Not found"
@@ -232,7 +282,7 @@ export function resolveQuoteData(quoteData: any, companyProfile?: any): Resolved
     "Progress payments monthly based on work completed. Net 30 days from invoice date.";
 
   const holdbackNote =
-    saved.holdbackNote ||
+    (saved.holdbackNote && saved.holdbackNote.trim() !== "" ? saved.holdbackNote : null) ||
     commercial.holdbackTerms ||
     (aiDraft.terms_and_conditions?.holdback &&
     aiDraft.terms_and_conditions.holdback !== "Not found"
@@ -241,7 +291,7 @@ export function resolveQuoteData(quoteData: any, companyProfile?: any): Resolved
     "10% holdback as per Construction Act requirements until final completion.";
 
   const validityPeriod =
-    saved.validityPeriod ||
+    (saved.validityPeriod && saved.validityPeriod.trim() !== "" ? saved.validityPeriod : null) ||
     commercial.quoteValidity ||
     (aiDraft.terms_and_conditions?.quote_validity &&
     aiDraft.terms_and_conditions.quote_validity !== "Not found"
@@ -250,7 +300,7 @@ export function resolveQuoteData(quoteData: any, companyProfile?: any): Resolved
     "30 days from date of issue";
 
   const termsCurrency =
-    saved.termsCurrency ||
+    (saved.termsCurrency && saved.termsCurrency.trim() !== "" ? saved.termsCurrency : null) ||
     (aiDraft.terms_and_conditions?.currency
       ? aiDraft.terms_and_conditions.currency
       : currency === "CAD"
@@ -259,7 +309,7 @@ export function resolveQuoteData(quoteData: any, companyProfile?: any): Resolved
 
   // 12. Footer Notes
   const footerNotesText =
-    saved.footerNotes ||
+    (saved.footerNotes && saved.footerNotes.trim() !== "" ? saved.footerNotes : null) ||
     footer.footerText ||
     footer.defaultNotes ||
     "Thank you for considering our proposal. We look forward to working with you on this project.";
