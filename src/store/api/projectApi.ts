@@ -494,7 +494,7 @@ export const projectApi = baseApi.injectEndpoints({
         { type: "Project", id: `${projectId}_pricing` },
       ],
     }),
-    getProjectSummary: builder.query<ApiResponse<any>, string>({
+    getProjectSummary: builder.query<ApiResponse<ProjectSectionResponse<SummaryPayload>>, string>({
       query: (projectId) => `/project/${projectId}/summary`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_summary` }],
     }),
@@ -522,7 +522,7 @@ export const projectApi = baseApi.injectEndpoints({
       query: (projectId) => `/project/${projectId}/exclusions`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_exclusions` }],
     }),
-    getProjectAddenda: builder.query<ApiResponse<any>, string>({
+    getProjectAddenda: builder.query<ApiResponse<ProjectSectionResponse<AddendaPayload>>, string>({
       query: (projectId) => `/project/${projectId}/addenda`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_addenda` }],
     }),
