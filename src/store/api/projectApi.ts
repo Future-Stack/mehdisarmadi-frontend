@@ -502,11 +502,11 @@ export const projectApi = baseApi.injectEndpoints({
       query: (projectId) => `/project/${projectId}/scope`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_scope` }],
     }),
-    getProjectPricing: builder.query<ApiResponse<any>, string>({
+    getProjectPricing: builder.query<ApiResponse<PricingPayload>, string>({
       query: (projectId) => `/project/${projectId}/pricing`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_pricing` }],
     }),
-    getProjectRisks: builder.query<ApiResponse<any>, string>({
+    getProjectRisks: builder.query<ApiResponse<RiskPayload>, string>({
       query: (projectId) => `/project/${projectId}/risks`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_risks` }],
     }),

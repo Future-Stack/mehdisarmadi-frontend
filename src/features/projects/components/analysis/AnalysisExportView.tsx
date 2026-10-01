@@ -85,10 +85,10 @@ export default function AnalysisExportView({ projectId, onReady }: { projectId: 
   const scope = scopeData?.data?.payload || scopeData?.data;
   const assumptions = assumptionsData?.data?.payload || assumptionsData?.data;
   const exclusions = exclusionsData?.data?.payload || exclusionsData?.data;
-  const risks = risksData?.data?.payload || risksData?.data;
+  const risks = (risksData?.data as any)?.payload || risksData?.data;
   const clarifications = clarificationsData?.data?.payload || clarificationsData?.data;
   const addenda = addendaData?.data?.payload || addendaData?.data;
-  const pricing = pricingData?.data?.payload || pricingData?.data;
+  const pricing = (pricingData?.data as any)?.payload || pricingData?.data;
 
   const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 
@@ -229,17 +229,33 @@ export default function AnalysisExportView({ projectId, onReady }: { projectId: 
 
         {/* Risks */}
         {Boolean(risks?.items?.length) && (
-          <SectionBlock title="Risks & Coordination Items">
-            {risks?.items?.map((item: any, i: number) => (
+          <SectionBlock title={risks?.title || "Risks & Coordination Items"}>
+            {risks.items.map((item: any, i: number) => (
               <div key={item.id || i} style={{ marginBottom: 12, padding: "10px 14px", borderRadius: 8, border: "1px solid #fee2e2", borderLeft: "4px solid #ef4444", backgroundColor: "#fff5f5" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
                   <span style={{ fontSize: 11, fontWeight: 700, color: "#111827" }}>{item.title}</span>
-                  <span style={{ fontSize: 9, fontWeight: 700, color: "#ef4444", backgroundColor: "#fee2e2", padding: "2px 8px", borderRadius: 4 }}>{item.category}</span>
+                  <div>
+                    {item.severity && (
+                      <span style={{ fontSize: 9, fontWeight: 700, color: "#b91c1c", backgroundColor: "#fee2e2", padding: "2px 6px", borderRadius: 4, marginRight: 6, textTransform: "uppercase" }}>
+                        {item.severity}
+                      </span>
+                    )}
+                    {item.category && (
+                      <span style={{ fontSize: 9, fontWeight: 700, color: "#1d4ed8", backgroundColor: "#dbeafe", padding: "2px 6px", borderRadius: 4 }}>
+                        {item.category}
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <p style={{ fontSize: 10, color: "#6b7280", margin: 0 }}>{item.description}</p>
+                <p style={{ fontSize: 10, color: "#374151", margin: 0 }}>{item.description}</p>
+                {item.mitigation && (
+                  <p style={{ fontSize: 9, color: "#065f46", margin: "4px 0 0" }}>
+                    <strong>Mitigation:</strong> {item.mitigation}
+                  </p>
+                )}
                 {item.reference?.file && (
                   <p style={{ fontSize: 9, color: "#9ca3af", margin: "4px 0 0", fontStyle: "italic" }}>
-                    📄 {item.reference.file}{item.reference.page ? ` • p.${item.reference.page}` : ""}
+                    📄 {item.reference.file}{item.reference.page ? ` • p.${item.reference.page}` : ""}{item.reference.section ? ` • ${item.reference.section}` : ""}
                   </p>
                 )}
               </div>
@@ -257,7 +273,7 @@ export default function AnalysisExportView({ projectId, onReady }: { projectId: 
         )}
 
         {/* Pricing Summary */}
-        {pricing?.comparison && (
+        {pricing && (
           <SectionBlock title="Pricing Summary">
             <div style={{ display: "flex", gap: 16, marginBottom: 16 }}>
               <div style={{
@@ -266,10 +282,37 @@ export default function AnalysisExportView({ projectId, onReady }: { projectId: 
               }}>
                 <div style={{ fontSize: 10, color: "#3b82f6", fontWeight: 700 }}>AI Draft Estimate</div>
                 <div style={{ fontSize: 20, fontWeight: 900, color: "#1d4ed8" }}>
-                  {pricing.comparison.aiDraftEstimate != null ? `$${pricing.comparison.aiDraftEstimate.toLocaleString()}` : "—"}
+                  {pricing.comparison?.aiDraftEstimate != null
+                    ? `$${pricing.comparison.aiDraftEstimate.toLocaleString()}`
+                    : pricing.priced_scope_total != null
+                    ? `$${pricing.priced_scope_total.toLocaleString()} (Priced Scope)`
+                    : "$0"}
                 </div>
               </div>
             </div>
+
+            {Boolean(pricing.aiDraftEstimateBreakdown?.length) && (
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: "#6b7280", marginBottom: 6, textTransform: "uppercase" }}>Scope Breakdown</div>
+                {pricing.aiDraftEstimateBreakdown.map((item: any, i: number) => (
+                  <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "6px 10px", borderBottom: "1px solid #f3f4f6", fontSize: 11 }}>
+                    <div>
+                      {item.division && <span style={{ fontWeight: 700, color: "#059669", marginRight: 6 }}>Div {item.division}</span>}
+                      <span style={{ fontWeight: 600 }}>{item.name}</span>
+                      {item.calculation && <span style={{ color: "#9ca3af", marginLeft: 8, fontSize: 10 }}>({item.calculation})</span>}
+                    </div>
+                    <div>
+                      {item.amount != null ? (
+                        <span style={{ fontWeight: 700, color: "#111827" }}>${item.amount.toLocaleString()}</span>
+                      ) : (
+                        <span style={{ color: "#d97706", fontSize: 10, fontWeight: 600 }}>$0</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
             {Boolean(pricing.additionalCostItems?.length) && (
               <div>
                 <div style={{ fontSize: 10, fontWeight: 700, color: "#6b7280", marginBottom: 6, textTransform: "uppercase" }}>Additional Cost Items</div>
@@ -279,7 +322,11 @@ export default function AnalysisExportView({ projectId, onReady }: { projectId: 
                       <span style={{ fontWeight: 600 }}>{item.name}</span>
                       {item.description && <span style={{ color: "#9ca3af", marginLeft: 8, fontSize: 10 }}>{item.description}</span>}
                     </div>
-                    {item.amount && <span style={{ fontWeight: 700, color: "#111827" }}>${item.amount}</span>}
+                    {item.amount != null ? (
+                      <span style={{ fontWeight: 700, color: "#111827" }}>${item.amount.toLocaleString()}</span>
+                    ) : (
+                      <span style={{ color: "#d97706", fontSize: 10, fontWeight: 600 }}>$0</span>
+                    )}
                   </div>
                 ))}
               </div>
