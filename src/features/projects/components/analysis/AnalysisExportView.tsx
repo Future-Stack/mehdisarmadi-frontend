@@ -81,13 +81,13 @@ export default function AnalysisExportView({ projectId, onReady }: { projectId: 
   ]);
 
   const project = projectData?.data;
-  const summary = summaryData?.data?.payload || summaryData?.data;
-  const scope = scopeData?.data?.payload || scopeData?.data;
-  const assumptions = assumptionsData?.data?.payload || assumptionsData?.data;
-  const exclusions = exclusionsData?.data?.payload || exclusionsData?.data;
+  const summary = (summaryData?.data as any)?.payload || summaryData?.data;
+  const scope = (scopeData?.data as any)?.payload || scopeData?.data;
+  const assumptions = (assumptionsData?.data as any)?.payload || assumptionsData?.data;
+  const exclusions = (exclusionsData?.data as any)?.payload || exclusionsData?.data;
   const risks = (risksData?.data as any)?.payload || risksData?.data;
-  const clarifications = clarificationsData?.data?.payload || clarificationsData?.data;
-  const addenda = addendaData?.data?.payload || addendaData?.data;
+  const clarifications = (clarificationsData?.data as any)?.payload || clarificationsData?.data;
+  const addenda = (addendaData?.data as any)?.payload || addendaData?.data;
   const pricing = (pricingData?.data as any)?.payload || pricingData?.data;
 
   const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });

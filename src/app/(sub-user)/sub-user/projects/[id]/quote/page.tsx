@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useSaveProjectQuoteMutation, useGetProjectQuoteQuery } from "@/store/api/projectApi";
+import { useGetCompanyProfileQuery } from "@/store/api/sub-user/company-profile/getCompanyProfile";
 import { exportElementToPDF, exportQuoteToDocx } from "@/lib/exportUtils";
 import { PageOne } from "@/features/dashboard/components/preview/PageOne";
 import { PageTwo } from "@/features/dashboard/components/preview/PageTwo";
@@ -105,10 +106,10 @@ export default function QuoteBuilderPage({ params }: { params: Promise<{ id: str
 
   // ─── API ────────────────────────────────────────────────────────────────────
   const { data: quoteData, isLoading: isLoadingQuote } = useGetProjectQuoteQuery(id);
+  const { data: companyProfileResponse } = useGetCompanyProfileQuery();
   const [saveQuote, { isLoading: isSaving }] = useSaveProjectQuoteMutation();
   const [isExportingPDF, setIsExportingPDF] = useState(false);
   const [isExportingDocx, setIsExportingDocx] = useState(false);
-  // const quoteData = quoteResponse?.data || {};
 
   // ─── Form State ─────────────────────────────────────────────────────────────
   const [quoteNumber, setQuoteNumber] = useState("");
@@ -136,11 +137,8 @@ export default function QuoteBuilderPage({ params }: { params: Promise<{ id: str
 
   // Editable sections state
   const [scopeItems, setScopeItems] = useState<string[]>([]);
-
   const [assumptionItems, setAssumptionItems] = useState<string[]>([]);
-
   const [exclusionItems, setExclusionItems] = useState<string[]>([]);
-
   const [clarificationItems, setClarificationItems] = useState<string[]>([]);
 
   // Separate Prices
@@ -159,37 +157,48 @@ export default function QuoteBuilderPage({ params }: { params: Promise<{ id: str
   const [termsCurrency, setTermsCurrency] = useState("CAD");
   const [isEditingTerms, setIsEditingTerms] = useState(false);
 
-  const [footerNotes, setFooterNotes] = useState("Thank you for considering our proposal. We look forward to working with you on this project......");
+  const [footerNotes, setFooterNotes] = useState("Thank you for considering our proposal. We look forward to working with you on this project.");
 
   React.useEffect(() => {
     if (quoteData?.data) {
-      const { companyDetails, projectQuoteDetails, aiQuoteDraft, savedQuote: savedQuoteDirect, quote: savedQuoteAlt } = quoteData.data;
+      const {
+        companyDetails: companyDetailsFromQuote,
+        projectQuoteDetails,
+        aiQuoteDraft,
+        savedQuote: savedQuoteDirect,
+        quote: savedQuoteAlt,
+        commercialTerms,
+        footerNotes: serverFooterNotes,
+      } = quoteData.data;
+
       const savedQuote = savedQuoteDirect || savedQuoteAlt;
+      const company = companyDetailsFromQuote || companyProfileResponse?.data;
 
       // Populate company details
-      if (companyDetails) {
-        setCompanyName(companyDetails.name || companyName);
-        setCompanyAddress(companyDetails.address || companyAddress);
-        setCompanyPhone(companyDetails.phone || companyPhone);
-        setCompanyEmail(companyDetails.email || companyEmail);
-        setCompanyWebsite(companyDetails.website || companyWebsite);
-        setCompanyHst(companyDetails.hstNumber || companyHst);
+      if (company) {
+        setCompanyName(company.name || companyName);
+        setCompanyAddress(company.address || companyAddress);
+        setCompanyPhone(company.phone || companyPhone);
+        setCompanyEmail(company.email || companyEmail);
+        setCompanyWebsite(company.website || companyWebsite);
+        setCompanyHst(company.hstNumber || companyHst);
       }
 
       if (savedQuote) {
-        setQuoteNumber(savedQuote.quoteNumber || "Q-2026-042");
+        setQuoteNumber(savedQuote.quoteNumber || (projectQuoteDetails?.projectId ? `Q-${new Date().getFullYear()}-${projectQuoteDetails.projectId.slice(0, 4).toUpperCase()}` : "Q-2026-001"));
         setProjectLocation(savedQuote.projectLocation || projectQuoteDetails?.address || "");
         setProjectName(savedQuote.projectName || projectQuoteDetails?.projectName || "");
-        setStartDate(savedQuote.startDate || "");
+        setStartDate(savedQuote.startDate || new Date().toISOString().split("T")[0]);
         setClientName(savedQuote.clientName || projectQuoteDetails?.clientName || "");
         setRevisionNumber(savedQuote.revisionNumber || "00");
         setAttention(savedQuote.attention || projectQuoteDetails?.clientContact || "");
         setBidClosingDate(savedQuote.bidClosingDate || (projectQuoteDetails?.closingDate ? new Date(projectQuoteDetails.closingDate).toLocaleDateString() : ""));
-        setSubject(savedQuote.subject || projectQuoteDetails?.description || "");
+        setSubject(savedQuote.subject || projectQuoteDetails?.instruction || projectQuoteDetails?.description || "");
         setGcName(savedQuote.gcName || "");
         setAddendaIncluded(savedQuote.addendaIncluded || "");
 
-        setBaseBidPrice(savedQuote.baseBidPrice || (aiQuoteDraft?.pricing_summary?.base_bid_price ? String(aiQuoteDraft.pricing_summary.base_bid_price) : ""));
+        const rawBase = savedQuote.baseBidPrice || (aiQuoteDraft?.pricing_summary?.base_bid_price && aiQuoteDraft.pricing_summary.base_bid_price !== "Not found" ? String(aiQuoteDraft.pricing_summary.base_bid_price) : "$0");
+        setBaseBidPrice(rawBase);
         setHstPercentage(savedQuote.hstPercentage || "13%");
         setCurrency(savedQuote.currency || aiQuoteDraft?.pricing_summary?.currency || "CAD");
 
@@ -208,18 +217,29 @@ export default function QuoteBuilderPage({ params }: { params: Promise<{ id: str
         if (savedQuote.termsCurrency) setTermsCurrency(savedQuote.termsCurrency);
         if (savedQuote.footerNotes) setFooterNotes(savedQuote.footerNotes);
       } else {
+        const defaultQuoteNo = projectQuoteDetails?.projectId
+          ? `Q-${new Date().getFullYear()}-${projectQuoteDetails.projectId.slice(0, 4).toUpperCase()}`
+          : `Q-${new Date().getFullYear()}-001`;
+        setQuoteNumber(defaultQuoteNo);
+        setStartDate(new Date().toISOString().split("T")[0]);
+        setRevisionNumber("00");
         setProjectLocation(projectQuoteDetails?.address || "");
         setProjectName(projectQuoteDetails?.projectName || "");
         setClientName(projectQuoteDetails?.clientName || "");
         setAttention(projectQuoteDetails?.clientContact || "");
         setBidClosingDate(projectQuoteDetails?.closingDate ? new Date(projectQuoteDetails.closingDate).toLocaleDateString() : "");
-        setSubject(projectQuoteDetails?.description || "");
+        setSubject(projectQuoteDetails?.instruction || projectQuoteDetails?.description || "");
 
-        setBaseBidPrice(aiQuoteDraft?.pricing_summary?.base_bid_price ? String(aiQuoteDraft.pricing_summary.base_bid_price) : "");
+        const rawBase = aiQuoteDraft?.pricing_summary?.base_bid_price;
+        setBaseBidPrice(rawBase && rawBase !== "Not found" ? String(rawBase) : "$0");
         setCurrency(aiQuoteDraft?.pricing_summary?.currency || "CAD");
 
         if (aiQuoteDraft?.scope_of_work) {
-          setScopeItems(aiQuoteDraft.scope_of_work.map((s: any) => `Division ${s.division_code} - ${s.division_label}: ${s.details?.join(", ") || ""}`));
+          setScopeItems(aiQuoteDraft.scope_of_work.map((s: any) => {
+            const div = s.division_label || (s.division_code ? `Division ${s.division_code}` : "");
+            const details = Array.isArray(s.details) ? s.details.join(", ") : (s.details || "");
+            return div && details ? `${div}: ${details}` : (details || div);
+          }));
         }
         if (aiQuoteDraft?.assumptions) setAssumptionItems(aiQuoteDraft.assumptions);
         if (aiQuoteDraft?.exclusions) setExclusionItems(aiQuoteDraft.exclusions);
@@ -239,18 +259,26 @@ export default function QuoteBuilderPage({ params }: { params: Promise<{ id: str
             id: up.code, description: up.description, unit: up.type, unitPrice: up.unit_price, estQty: "1", notes: ""
           })));
         }
-        if (aiQuoteDraft?.terms_and_conditions) {
-          setPaymentTerms(aiQuoteDraft.terms_and_conditions.payment_terms || paymentTerms);
-          setHoldbackNote(aiQuoteDraft.terms_and_conditions.holdback || holdbackNote);
-          setValidityPeriod(aiQuoteDraft.terms_and_conditions.quote_validity || validityPeriod);
-          setTermsCurrency(aiQuoteDraft.terms_and_conditions.currency || termsCurrency);
+
+        const resolvedPaymentTerms = commercialTerms?.paymentTerms || (aiQuoteDraft?.terms_and_conditions?.payment_terms && aiQuoteDraft.terms_and_conditions.payment_terms !== "Not found" ? aiQuoteDraft.terms_and_conditions.payment_terms : "") || "Progress payments monthly based on work completed. Net 30 days from invoice date.";
+        const resolvedHoldback = commercialTerms?.holdbackTerms || (aiQuoteDraft?.terms_and_conditions?.holdback && aiQuoteDraft.terms_and_conditions.holdback !== "Not found" ? aiQuoteDraft.terms_and_conditions.holdback : "") || "10% holdback as per Construction Act requirements until final completion.";
+        const resolvedValidity = commercialTerms?.quoteValidity || (aiQuoteDraft?.terms_and_conditions?.quote_validity && aiQuoteDraft.terms_and_conditions.quote_validity !== "Not found" ? aiQuoteDraft.terms_and_conditions.quote_validity : "") || "30 days from date of issue";
+        const resolvedTermsCurrency = aiQuoteDraft?.terms_and_conditions?.currency || "Canadian Dollars (CAD)";
+
+        setPaymentTerms(resolvedPaymentTerms);
+        setHoldbackNote(resolvedHoldback);
+        setValidityPeriod(resolvedValidity);
+        setTermsCurrency(resolvedTermsCurrency);
+
+        if (serverFooterNotes?.footerText || serverFooterNotes?.defaultNotes) {
+          setFooterNotes(serverFooterNotes.footerText || serverFooterNotes.defaultNotes);
         }
       }
     }
-  }, [quoteData]);
+  }, [quoteData, companyProfileResponse]);
 
   // ─── Handlers ────────────────────────────────────────────────────────────────
-  const [lastSaved, setLastSaved] = useState("14:30:52");
+  const [lastSaved, setLastSaved] = useState<string | null>(null);
   const router = useRouter();
 
   const handleSaveDraft = async () => {
@@ -285,6 +313,12 @@ export default function QuoteBuilderPage({ params }: { params: Promise<{ id: str
           validityPeriod,
           termsCurrency,
           footerNotes,
+          companyName,
+          companyAddress,
+          companyPhone,
+          companyEmail,
+          companyWebsite,
+          companyHst,
         },
         status: "completed"
       };
@@ -295,6 +329,15 @@ export default function QuoteBuilderPage({ params }: { params: Promise<{ id: str
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to save quote.");
     }
+  };
+
+  const handlePreviewQuote = async () => {
+    try {
+      await handleSaveDraft();
+    } catch {
+      // continue to preview even if network issue
+    }
+    router.push(`/sub-user/projects/${id}/quote/preview`);
   };
 
   const handleSaveAndClose = async () => {
@@ -449,9 +492,11 @@ export default function QuoteBuilderPage({ params }: { params: Promise<{ id: str
           <p className="text-[13px] text-gray-500 dark:text-gray-400 font-medium mt-1">{projectName} • {projectLocation}</p>
         </div>
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5 text-[13px] text-gray-500 font-medium">
-            <Clock className="w-4 h-4" /> Last saved: {lastSaved}
-          </div>
+          {lastSaved && (
+            <div className="flex items-center gap-1.5 text-[13px] text-gray-500 font-medium">
+              <Clock className="w-4 h-4" /> Last saved: {lastSaved}
+            </div>
+          )}
           <Button onClick={handleSaveDraft} disabled={isSaving} variant="primary"
             className="h-9 px-5 rounded-lg font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm">
             {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
@@ -523,11 +568,9 @@ export default function QuoteBuilderPage({ params }: { params: Promise<{ id: str
                 <h2 className="text-[16px] font-bold text-gray-900 dark:text-white">Pricing</h2>
                 <p className="text-[13px] text-gray-500">Choose pricing structure</p>
               </div>
-              <Link href={`/sub-user/projects/${id}/quote/preview`}>
-                <Button variant="primary" className="h-8 px-4 rounded-lg font-bold bg-emerald-600 hover:bg-emerald-700 text-white text-[12px]">
-                  Itemized Breakdown
-                </Button>
-              </Link>
+              <Button onClick={handlePreviewQuote} variant="primary" className="h-8 px-4 rounded-lg font-bold bg-emerald-600 hover:bg-emerald-700 text-white text-[12px]">
+                Itemized Breakdown & Preview
+              </Button>
             </div>
             <div className="space-y-5">
               <div><label className="block text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">Base Bid Price ( CAD )</label><input value={baseBidPrice} placeholder="Enter Base Bid Price" onChange={e => setBaseBidPrice(e.target.value)} className={inputCls} /></div>
@@ -762,11 +805,9 @@ export default function QuoteBuilderPage({ params }: { params: Promise<{ id: str
           <Button onClick={handleSaveDraft} disabled={isSaving} variant="secondary" className="h-10 px-6 rounded-xl font-bold bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-[13px] hover:bg-gray-50 dark:hover:bg-gray-700 shadow-sm flex-1 sm:flex-none">
             {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />} Save Draft
           </Button>
-          <Link href={`/sub-user/projects/${id}/quote/preview`} className="flex-1 sm:flex-none">
-            <Button variant="secondary" className="w-full h-10 px-6 rounded-xl font-bold bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-[13px] hover:bg-gray-50 dark:hover:bg-gray-700 shadow-sm">
-              <FileText className="w-4 h-4 mr-2" /> Preview Quote
-            </Button>
-          </Link>
+          <Button onClick={handlePreviewQuote} variant="secondary" className="w-full sm:w-auto h-10 px-6 rounded-xl font-bold bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-[13px] hover:bg-gray-50 dark:hover:bg-gray-700 shadow-sm">
+            <FileText className="w-4 h-4 mr-2" /> Preview Quote
+          </Button>
           <Button onClick={handleExportPDF} disabled={isExportingPDF} variant="secondary" className="h-10 px-6 rounded-xl font-bold bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-[13px] hover:bg-gray-50 dark:hover:bg-gray-700 shadow-sm flex-1 sm:flex-none">
             {isExportingPDF ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />} Export PDF
           </Button>

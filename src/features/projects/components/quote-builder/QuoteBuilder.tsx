@@ -30,39 +30,38 @@ import { saveAs } from "file-saver";
 
 // --- Mock Data ---
 const INITIAL_DATA = {
-  quoteNumber: "Q-2026-042",
-  projectLocation: "United States",
-  projectName: "Residential Complex",
-  startDate: "May 15, 2026",
-  clientName: "Green Valley Developers Inc.",
-  revisionNumber: "00",
-  attention: "John Smith, Project Manager",
-  bidClosingDate: "May 15, 2026",
-  subject: "Interior Finishing - Divisions 06, 08, 09",
-  gcName: "Prime Construction Ltd.",
-  addendaIncluded:
-    "Addendum 01 (Window Spec Change), Addendum 02 (Closing Date Extension)",
-  baseBidPrice: "485,000",
+  quoteNumber: "",
+  projectLocation: "",
+  projectName: "",
+  startDate: "",
+  clientName: "",
+  revisionNumber: "",
+  attention: "",
+  bidClosingDate: "",
+  subject: "",
+  gcName: "",
+  addendaIncluded: "",
+  baseBidPrice: "",
   hstPercentage: "13%",
   currency: "CAD",
   scopeOfWork: [
     {
-      division: "Division 06 - Wood, Plastics & Composites:",
+      division: "",
       items: [
-        "Supply and install solid core wooden doors (40 units)",
-        '1-3/4" thick, pre-hung with frames, paint-grade finish',
-        "Supply and install door hardware (40 sets)",
+        "",
+        "",
+        "",
       ],
     },
     {
-      division: "Division 08 - Openings:",
+      division: "",
       items: [
         "Install aluminum window frames with double glazing (85 sq.m)",
         "Low-E glass, thermally broken frames, white finish",
       ],
     },
     {
-      division: "Division 09 - Finishes:",
+      division: "",
       items: [
         "Apply premium acrylic paint on interior walls (1,200 sq.m)",
         "Two coats, after proper surface preparation",
@@ -354,7 +353,7 @@ export default function QuoteBuilder() {
             <div className="space-y-6">
               <div className="space-y-1">
                 <p className="text-sm font-black text-[#1F2937]">
-                  ABC Construction Ltd.
+                  Renofield Ltd.
                 </p>
                 <p className="text-sm text-gray-500 font-medium leading-relaxed">
                   123 Main Street, Toronto, ON M5V 3A8

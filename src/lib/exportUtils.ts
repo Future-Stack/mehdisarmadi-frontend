@@ -363,13 +363,13 @@ export async function exportQuoteToDocx(
   filename: string = "quote.docx"
 ) {
   const {
-    companyName = "ABC Construction Ltd.",
-    companyAddress = "123 Main Street, Toronto, ON M5V 3A8",
+    companyName = "Renofield Ltd.",
+    companyAddress = "",
     projectName = "",
     clientName = "",
-    quoteNumber = "Q-2026-042",
+    quoteNumber = "",
     baseBidPrice = "0",
-    hstPercentage = "13",
+    hstPercentage = "0",
     currency = "CAD",
     scopeOfWork = "",
     assumptions = "",

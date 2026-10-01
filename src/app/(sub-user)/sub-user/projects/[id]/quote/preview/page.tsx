@@ -1,29 +1,35 @@
 "use client";
 
 import React, { useState } from "react";
-import { ArrowLeft, Edit3, FileText, Download, Loader2 } from "lucide-react";
+import { ArrowLeft, Edit3, FileText, Download, Loader2, AlertCircle, Info } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
-import Logo from "@/components/Reuseable/Logo";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { PageOne } from "@/features/dashboard/components/preview/PageOne";
 import { PageTwo } from "@/features/dashboard/components/preview/PageTwo";
 import { PageThree } from "@/features/dashboard/components/preview/PageThree";
+import { resolveQuoteData } from "@/features/dashboard/components/preview/resolveQuoteData";
 import { exportElementToPDF, exportQuoteToDocx } from "@/lib/exportUtils";
 import { useGetProjectQuoteQuery } from "@/store/api/projectApi";
+import { useGetCompanyProfileQuery } from "@/store/api/sub-user/company-profile/getCompanyProfile";
 
 export default function QuotePreviewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = React.use(params);
   const { data: quoteResponse, isLoading: isLoadingQuote } = useGetProjectQuoteQuery(id);
-  const quoteData = quoteResponse?.data || {};
+  const { data: companyProfileResponse } = useGetCompanyProfileQuery();
+  const rawQuoteData = quoteResponse?.data || quoteResponse || {};
+  const companyProfile = companyProfileResponse?.data;
+
+  // Resolved dynamic quote data
+  const resolved = resolveQuoteData(rawQuoteData, companyProfile);
 
   const [isExportingPDF, setIsExportingPDF] = useState(false);
 
   const handleExportPDF = async () => {
     setIsExportingPDF(true);
     try {
-      await exportElementToPDF("quote-preview-doc-all", "quote-preview.pdf");
+      await exportElementToPDF("quote-preview-doc-all", `quote-${resolved.quoteNumber || "preview"}.pdf`);
       toast.success("PDF exported successfully!");
     } catch (err: any) {
       console.error("PDF Export error:", err);
@@ -37,52 +43,33 @@ export default function QuotePreviewPage({ params }: { params: Promise<{ id: str
   const handleExportDocx = async () => {
     setIsExportingDocx(true);
     try {
-      const q = quoteData?.quote || {};
-      const companyDetails = quoteData?.companyDetails || {};
-      const projectDetails = quoteData?.projectQuoteDetails || {};
-      const aiDraft = quoteData?.aiQuoteDraft || {};
-
-      const scopeText = Array.isArray(q.scopeOfWork)
-        ? q.scopeOfWork.join("\n")
-        : (aiDraft.scope_of_work ? aiDraft.scope_of_work.map((s: any) => `Division ${s.division_code} - ${s.division_label}: ${s.details?.join(", ")}`).join("\n") : "");
-
-      const assumptionsText = Array.isArray(q.assumptions)
-        ? q.assumptions.join("\n")
-        : (aiDraft.assumptions?.join("\n") || "");
-
-      const exclusionsText = Array.isArray(q.exclusions)
-        ? q.exclusions.join("\n")
-        : (aiDraft.exclusions?.join("\n") || "");
-
-      const clarificationsText = Array.isArray(q.clarifications)
-        ? q.clarifications.join("\n")
-        : "";
-
       await exportQuoteToDocx({
-        companyName: companyDetails.name || "ABC Construction Ltd.",
-        companyAddress: companyDetails.address || "123 Main Street, Toronto, ON M5V 3A8",
-        projectName: q.projectName || projectDetails.projectName || "",
-        clientName: q.clientName || projectDetails.clientName || "",
-        quoteNumber: q.quoteNumber || "Q-2026-042",
-        baseBidPrice: String(q.baseBidPrice || aiDraft.pricing_summary?.base_bid_price || "0"),
-        hstPercentage: String(q.hstPercentage || "13").replace("%", ""),
-        currency: q.currency || aiDraft.pricing_summary?.currency || "CAD",
-        scopeOfWork: scopeText,
-        assumptions: assumptionsText,
-        exclusions: exclusionsText,
-        clarifications: clarificationsText,
-        paymentTerms: q.paymentTerms || aiDraft.terms_and_conditions?.payment_terms || "",
-        holdbackNote: q.holdbackNote || aiDraft.terms_and_conditions?.holdback || "",
-        validityPeriod: q.validityPeriod || aiDraft.terms_and_conditions?.quote_validity || "30 days",
-        footerNotes: q.footerNotes || "Thank you for considering our proposal."
-      }, `quote-${q.quoteNumber || "preview"}.docx`);
+        companyName: resolved.companyName,
+        companyAddress: resolved.companyAddress,
+        projectName: resolved.projectName,
+        clientName: resolved.clientName,
+        quoteNumber: resolved.quoteNumber,
+        baseBidPrice: String(resolved.numericBase),
+        hstPercentage: String(resolved.numericHstPct),
+        currency: resolved.currency,
+        scopeOfWork: resolved.scopeOfWork.join("\n"),
+        assumptions: resolved.assumptions.join("\n"),
+        exclusions: resolved.exclusions.join("\n"),
+        clarifications: resolved.clarifications.join("\n"),
+        paymentTerms: resolved.paymentTerms,
+        holdbackNote: resolved.holdbackNote,
+        validityPeriod: resolved.validityPeriod,
+        footerNotes: resolved.footerNotes,
+      }, `quote-${resolved.quoteNumber || "preview"}.docx`);
       toast.success("DOCX exported successfully!");
     } catch (err) {
+      console.error("DOCX Export error:", err);
       toast.error("Failed to export DOCX.");
     } finally {
       setIsExportingDocx(false);
     }
   };
+
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = 3;
 
@@ -95,8 +82,29 @@ export default function QuotePreviewPage({ params }: { params: Promise<{ id: str
           <Link href={`/sub-user/projects/${id}/quote`} className="inline-flex items-center gap-1 text-sm font-bold text-gray-500 hover:text-gray-900 dark:hover:text-white mb-4 transition-colors">
             <ArrowLeft className="w-4 h-4" /> Back to Quote Builder
           </Link>
-          <h1 className="text-[28px] font-bold text-gray-900 dark:text-white leading-tight">Quote Preview</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Final review before export</p>
+          <div className="flex items-center gap-3">
+            <h1 className="text-[28px] font-bold text-gray-900 dark:text-white leading-tight">Quote Preview</h1>
+            {resolved.confidence && (
+              <span className={cn(
+                "text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full border",
+                resolved.confidence === "high"
+                  ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400"
+                  : resolved.confidence === "medium"
+                  ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400"
+                  : "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400"
+              )}>
+                {resolved.confidence} confidence
+              </span>
+            )}
+            {resolved.completeness && (
+              <span className="text-[10px] font-bold text-gray-500 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full border border-gray-200 dark:border-gray-700 capitalize">
+                {resolved.completeness}
+              </span>
+            )}
+          </div>
+          <p className="text-sm text-gray-500 dark:text-gray-400 font-medium mt-1">
+            {resolved.projectName ? `${resolved.projectName} • ` : ""}Final review before export
+          </p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -114,15 +122,30 @@ export default function QuotePreviewPage({ params }: { params: Promise<{ id: str
         </div>
       </div>
 
+      {/* Estimator Advisory banner for missing items if any */}
+      {(resolved.missingInformation && resolved.missingInformation.length > 0) && (
+        <div className="mb-6 p-4 rounded-2xl bg-amber-50/80 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-800/50 text-[12px] text-amber-800 dark:text-amber-300">
+          <div className="font-bold flex items-center gap-2 mb-1.5 text-[13px]">
+            <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+            <span>AI Estimation Notice</span>
+          </div>
+          <ul className="list-disc pl-5 space-y-1 text-amber-700/90 dark:text-amber-300/80">
+            {resolved.missingInformation.map((info, idx) => (
+              <li key={idx}>{info}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {/* Visual Document canvas (single page) */}
       <div className="mb-12 rounded-3xl p-6 md:p-10 ">
         {isLoadingQuote ? (
           <div className="flex justify-center items-center h-64"><Loader2 className="w-8 h-8 animate-spin text-emerald-600" /></div>
         ) : (
           <>
-            {currentPage === 1 && <PageOne quoteData={quoteData} />}
-            {currentPage === 2 && <PageTwo quoteData={quoteData} />}
-            {currentPage === 3 && <PageThree quoteData={quoteData} />}
+            {currentPage === 1 && <PageOne quoteData={rawQuoteData} />}
+            {currentPage === 2 && <PageTwo quoteData={rawQuoteData} />}
+            {currentPage === 3 && <PageThree quoteData={rawQuoteData} />}
           </>
         )}
       </div>
@@ -130,9 +153,9 @@ export default function QuotePreviewPage({ params }: { params: Promise<{ id: str
       {/* Hidden Document canvas for export (all pages) */}
       <div className="fixed top-full left-0 opacity-0 pointer-events-none -z-50">
         <div id="quote-preview-doc-all" className="flex flex-col gap-0 w-[850px] bg-white">
-          <PageOne exportMode={true} quoteData={quoteData} />
-          <PageTwo exportMode={true} quoteData={quoteData} />
-          <PageThree exportMode={true} quoteData={quoteData} />
+          <PageOne exportMode={true} quoteData={rawQuoteData} />
+          <PageTwo exportMode={true} quoteData={rawQuoteData} />
+          <PageThree exportMode={true} quoteData={rawQuoteData} />
         </div>
       </div>
 

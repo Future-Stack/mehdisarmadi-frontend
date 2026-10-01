@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import { DocFooter } from "./DocFooter";
 import { DocumentHeader } from "./DocumentHeader";
+import { resolveQuoteData } from "./resolveQuoteData";
 
 const SectionHeading = ({ label }: { label: string }) => (
     <div className="flex items-center gap-3 mb-4">
@@ -18,7 +19,8 @@ const Badge = ({ text, color = "emerald" }: { text: string; color?: "emerald" | 
 );
 
 export const PageTwo = ({ exportMode, quoteData }: { exportMode?: boolean; quoteData?: any }) => {
-    const q = quoteData?.savedQuote || {};
+    const resolved = resolveQuoteData(quoteData);
+
     return (
         <div className={exportMode
             ? "bg-white text-gray-900 font-sans"
@@ -27,41 +29,37 @@ export const PageTwo = ({ exportMode, quoteData }: { exportMode?: boolean; quote
             {!exportMode && <DocumentHeader showFull quoteData={quoteData} />}
 
             {/* Exclusions */}
-            {/* <div className={`mb-8 px-12 ${exportMode ? 'export-section pt-10' : ''}`}> */}
             <div
                 className={cn(
                     exportMode ? "export-section px-0 mb-0" : "export-section px-12 mb-6"
                 )}
             >
-
                 <SectionHeading label="Exclusions" />
                 <div className="bg-red-50/50 border border-red-100 rounded-xl p-5">
                     <ul className="space-y-2 text-[11px] leading-relaxed text-gray-600">
-                        {q.exclusions && Array.isArray(q.exclusions) ? (
-                            q.exclusions.map((item: string, i: number) => (
+                        {resolved.exclusions && resolved.exclusions.length > 0 ? (
+                            resolved.exclusions.map((item: string, i: number) => (
                                 <li key={i} className="flex gap-2.5">
                                     <span className="text-red-400 mt-0.5 flex-shrink-0 font-bold">✕</span>
                                     <span>{item}</span>
                                 </li>
                             ))
                         ) : (
-                            <span className="text-[11px] text-gray-600">No exclusions listed</span>
+                            <span className="text-[11px] text-gray-400 italic">No exclusions listed</span>
                         )}
                     </ul>
                 </div>
             </div>
 
             {/* Separate Prices */}
-            {/* <div className={`mb-8 px-12 ${exportMode ? 'export-section' : ''}`}> */}
             <div
                 className={cn(
                     exportMode ? "export-section px-0 mb-0" : "export-section px-12 mb-6"
                 )}
             >
-
                 <SectionHeading label="Separate Prices" />
-                {q.separatePrices && Array.isArray(q.separatePrices) && q.separatePrices.length > 0 ? (
-                    q.separatePrices.map((sp: any, i: number) => (
+                {resolved.separatePrices && resolved.separatePrices.length > 0 ? (
+                    resolved.separatePrices.map((sp: any, i: number) => (
                         <div key={i} className="border border-gray-200 rounded-xl mb-4 overflow-hidden">
                             <div className="flex justify-between items-center px-5 py-3 bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-gray-200">
                                 <div className="flex gap-2.5 items-center">
@@ -101,20 +99,21 @@ export const PageTwo = ({ exportMode, quoteData }: { exportMode?: boolean; quote
                         </div>
                     ))
                 ) : (
-                    <span className="text-[11px] text-gray-600">No separate prices listed</span>
+                    <div className="bg-gray-50/50 border border-dashed border-gray-200 rounded-xl p-4 text-center text-[11px] text-gray-500">
+                        No separate prices requested for this tender
+                    </div>
                 )}
             </div>
 
             {/* Alternative Prices */}
-            {/* <div className={`flex-1 px-12 ${exportMode ? 'export-section' : ''}`}> */}
             <div
                 className={cn(
                     exportMode ? "export-section px-0 mb-0" : "export-section px-12 mb-6"
                 )}
             >
                 <SectionHeading label="Alternative Prices" />
-                {q.altPrices && Array.isArray(q.altPrices) && q.altPrices.length > 0 ? (
-                    q.altPrices.map((ap: any, i: number) => (
+                {resolved.altPrices && resolved.altPrices.length > 0 ? (
+                    resolved.altPrices.map((ap: any, i: number) => (
                         <div key={i} className="border border-gray-200 rounded-xl mb-4 overflow-hidden">
                             <div className="flex justify-between items-center px-5 py-3 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
                                 <div className="flex gap-2.5 items-center">
@@ -131,7 +130,9 @@ export const PageTwo = ({ exportMode, quoteData }: { exportMode?: boolean; quote
                         </div>
                     ))
                 ) : (
-                    <span className="text-[11px] text-gray-600">No alternative prices listed</span>
+                    <div className="bg-gray-50/50 border border-dashed border-gray-200 rounded-xl p-4 text-center text-[11px] text-gray-500">
+                        No alternative prices requested for this tender
+                    </div>
                 )}
             </div>
 
@@ -142,4 +143,4 @@ export const PageTwo = ({ exportMode, quoteData }: { exportMode?: boolean; quote
             )}
         </div>
     );
-}
+};

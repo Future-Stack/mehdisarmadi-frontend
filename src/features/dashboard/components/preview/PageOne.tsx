@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import { DocFooter } from "./DocFooter";
 import { DocumentHeader } from "./DocumentHeader";
+import { resolveQuoteData } from "./resolveQuoteData";
 
 /* ─── Shared section heading component ─── */
 const SectionHeading = ({ label }: { label: string }) => (
@@ -13,8 +14,8 @@ const SectionHeading = ({ label }: { label: string }) => (
 
 /* ─── PAGE 1: Tender Info + Scope + Assumptions ─── */
 export const PageOne = ({ exportMode, quoteData }: { exportMode?: boolean; quoteData?: any }) => {
-    const q = quoteData?.savedQuote || quoteData?.quote || {};
-    console.log(q)
+    const resolved = resolveQuoteData(quoteData);
+
     return (
         <div className={exportMode
             ? "bg-white text-gray-900 font-sans"
@@ -36,36 +37,35 @@ export const PageOne = ({ exportMode, quoteData }: { exportMode?: boolean; quote
             >
                 <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 rounded-xl p-5">
                     <div className="text-[9px] font-black text-emerald-600 uppercase tracking-[0.12em] mb-2">Prepared For</div>
-                    <div className="text-[14px] font-bold text-gray-900">{q.clientName || "Client Name"}</div>
-                    {q.attention && <div className="text-[11px] text-gray-500 mt-1">Attn: {q.attention}</div>}
-                    {q.gcName && <div className="text-[11px] text-gray-500">General Contractor: {q.gcName}</div>}
+                    <div className="text-[14px] font-bold text-gray-900">{resolved.clientName || "Client Name"}</div>
+                    {resolved.attention && <div className="text-[11px] text-gray-500 mt-1">Attn: {resolved.attention}</div>}
+                    {resolved.gcName && <div className="text-[11px] text-gray-500">General Contractor: {resolved.gcName}</div>}
                 </div>
             </div>
 
             {/* Tender Information Table */}
-            {/* <div className={`mb-6 px-12 ${exportMode ? 'export-section' : ''}`}> */}
-                <div
-                    className={cn(
-                        exportMode ? "export-section px-0 mb-0" : "export-section px-12 mb-6"
-                    )}
-                >
-
+            <div
+                className={cn(
+                    exportMode ? "export-section px-0 mb-0" : "export-section px-12 mb-6"
+                )}
+            >
                 <SectionHeading label="Tender Information" />
                 <div className="border border-gray-200 rounded-xl overflow-hidden">
                     <table className="w-full text-[11px] border-collapse">
                         <tbody>
                             {[
-                                { label: "Tender Name", value: q.projectName },
-                                { label: "Tender Address", value: q.projectLocation },
-                                { label: "Client Name", value: q.clientName },
-                                { label: "General Contractor", value: q.gcName },
-                                { label: "Quote Number", value: q.quoteNumber },
-                                { label: "Issue Date", value: q.startDate },
-                                { label: "Revision Number", value: q.revisionNumber },
-                                { label: "Bid Closing Date", value: q.bidClosingDate },
-                                { label: "Addenda Included", value: q.addendaIncluded },
-                                { label: "Subject", value: q.subject },
-                            ].filter(r => r.value).map((row, i) => (
+                                { label: "Tender Name", value: resolved.projectName },
+                                { label: "Tender Address", value: resolved.projectLocation },
+                                { label: "Client Name", value: resolved.clientName },
+                                { label: "Attention", value: resolved.attention },
+                                { label: "General Contractor", value: resolved.gcName },
+                                { label: "Quote Number", value: resolved.quoteNumber },
+                                { label: "Issue Date", value: resolved.startDate },
+                                { label: "Revision Number", value: resolved.revisionNumber },
+                                { label: "Bid Closing Date", value: resolved.bidClosingDate },
+                                { label: "Addenda Included", value: resolved.addendaIncluded },
+                                { label: "Scope / Subject", value: resolved.subject },
+                            ].filter(r => Boolean(r.value)).map((row, i) => (
                                 <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-gray-50/60"}>
                                     <td className="py-2.5 px-4 font-bold text-gray-500 w-44 text-[10px] uppercase tracking-wider">{row.label}</td>
                                     <td className="py-2.5 px-4 font-medium text-gray-900">{row.value}</td>
@@ -77,30 +77,27 @@ export const PageOne = ({ exportMode, quoteData }: { exportMode?: boolean; quote
             </div>
 
             {/* Scope of Work */}
-            {/* <div className={`mb-6 px-12 ${exportMode ? 'export-section' : ''}`}> */}
             <div
                 className={cn(
                     exportMode ? "export-section px-0 mb-0" : "export-section px-12 mb-6"
                 )}
             >
-
                 <SectionHeading label="Scope of Work" />
                 <div className="text-[11px] text-gray-600 leading-relaxed space-y-3">
-                    {q.scopeOfWork && Array.isArray(q.scopeOfWork) ? (
-                        q.scopeOfWork.map((item: string, i: number) => (
+                    {resolved.scopeOfWork && resolved.scopeOfWork.length > 0 ? (
+                        resolved.scopeOfWork.map((item: string, i: number) => (
                             <div key={i} className="flex gap-3">
                                 <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0" />
                                 <div>{item}</div>
                             </div>
                         ))
                     ) : (
-                        <span>No Scope of Work</span>
+                        <span className="text-gray-400 italic">No Scope of Work items listed</span>
                     )}
                 </div>
             </div>
 
             {/* Assumptions */}
-            {/* <div className={`flex-1 px-12 ${exportMode ? 'export-section' : ''}`}> */}
             <div
                 className={cn(
                     exportMode ? "export-section px-0 mb-0" : "export-section px-12 mb-6"
@@ -108,15 +105,15 @@ export const PageOne = ({ exportMode, quoteData }: { exportMode?: boolean; quote
             >
                 <SectionHeading label="Assumptions" />
                 <ul className="space-y-1.5 text-[11px] leading-relaxed text-gray-600">
-                    {q.assumptions && Array.isArray(q.assumptions) ? (
-                        q.assumptions.map((item: string, i: number) => (
+                    {resolved.assumptions && resolved.assumptions.length > 0 ? (
+                        resolved.assumptions.map((item: string, i: number) => (
                             <li key={i} className="flex gap-2.5">
                                 <span className="text-emerald-500 mt-0.5 flex-shrink-0">✓</span>
                                 <span>{item}</span>
                             </li>
                         ))
                     ) : (
-                        <span>No Assumptions</span>
+                        <span className="text-gray-400 italic">No Assumptions listed</span>
                     )}
                 </ul>
             </div>
@@ -128,4 +125,4 @@ export const PageOne = ({ exportMode, quoteData }: { exportMode?: boolean; quote
             )}
         </div>
     );
-}
+};

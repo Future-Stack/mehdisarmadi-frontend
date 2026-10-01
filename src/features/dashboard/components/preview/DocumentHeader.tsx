@@ -1,9 +1,10 @@
 import Logo from "@/components/Reuseable/Logo";
+import { resolveQuoteData } from "./resolveQuoteData";
 
 /* ─── Shared Document Header ─── */
 export const DocumentHeader = ({ showFull = false, quoteData }: { showFull?: boolean; quoteData?: any }) => {
-    const q = quoteData?.savedQuote || quoteData?.quote || {};
-    const c = quoteData?.companyDetails || {};
+    const resolved = resolveQuoteData(quoteData);
+
     return (
     <div className="relative overflow-hidden mb-6">
         {/* Green gradient accent strip */}
@@ -18,20 +19,20 @@ export const DocumentHeader = ({ showFull = false, quoteData }: { showFull?: boo
                 {showFull && (
                     <>
                         <div className="text-[9px] font-black text-emerald-600 uppercase tracking-[0.12em] mb-2">Submitted By</div>
-                        {(c.name || q.companyName) && (
-                            <div className="text-[13px] font-bold text-gray-900 mb-1">{c.name || q.companyName}</div>
+                        {resolved.companyName && (
+                            <div className="text-[13px] font-bold text-gray-900 mb-1">{resolved.companyName}</div>
                         )}
                         <div className="text-[11px] text-gray-500 leading-relaxed space-y-0.5">
-                            {(c.address || q.companyAddress) && <div>{c.address || q.companyAddress}</div>}
-                            {(c.phone || q.companyPhone) && <div>Phone: {c.phone || q.companyPhone}</div>}
-                            {(c.email || q.companyEmail) && <div>Email: {c.email || q.companyEmail}</div>}
-                            {(c.hstNumber || q.companyHst) && <div>HST #: {c.hstNumber || q.companyHst}</div>}
+                            {resolved.companyAddress && <div>{resolved.companyAddress}</div>}
+                            {resolved.companyPhone && <div>Phone: {resolved.companyPhone}</div>}
+                            {resolved.companyEmail && <div>Email: {resolved.companyEmail}</div>}
+                            {resolved.companyHst && <div>HST #: {resolved.companyHst}</div>}
                         </div>
                     </>
                 )}
-                {!showFull && (q.quoteNumber || q.clientName) && (
+                {!showFull && (resolved.quoteNumber || resolved.clientName) && (
                     <div className="text-[10px] text-gray-400 font-semibold mt-1">
-                        {[q.quoteNumber, q.clientName].filter(Boolean).join(" | ")}
+                        {[resolved.quoteNumber, resolved.clientName].filter(Boolean).join(" | ")}
                     </div>
                 )}
             </div>
@@ -41,10 +42,10 @@ export const DocumentHeader = ({ showFull = false, quoteData }: { showFull?: boo
                 <div className="text-[22px] font-black text-gray-900 tracking-tight mb-3">QUOTATION</div>
                 <div className="bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 rounded-xl p-4 w-64 text-[11px] shadow-sm">
                     {[
-                        { label: "Quote No.", value: q.quoteNumber },
-                        { label: "Revision", value: q.revisionNumber },
-                        { label: "Issue Date", value: q.startDate },
-                        { label: "Valid Until", value: q.validityPeriod },
+                        { label: "Quote No.", value: resolved.quoteNumber },
+                        { label: "Revision", value: resolved.revisionNumber },
+                        { label: "Issue Date", value: resolved.startDate },
+                        { label: "Valid Until", value: resolved.validityPeriod },
                     ].filter(r => r.value).map((row, i, arr) => (
                         <div key={i} className={`flex justify-between items-center py-1.5 ${i < arr.length - 1 ? "border-b border-gray-200" : ""}`}>
                             <span className="font-semibold text-gray-400 uppercase tracking-wider text-[9px]">{row.label}</span>
@@ -59,4 +60,4 @@ export const DocumentHeader = ({ showFull = false, quoteData }: { showFull?: boo
         <div className="mx-12 h-px bg-gradient-to-r from-emerald-500/30 via-gray-200 to-transparent" />
     </div>
     );
-}
+};
