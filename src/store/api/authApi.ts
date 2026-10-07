@@ -7,7 +7,7 @@ import type {
   RegisterResponse,
   VerifyEmailResponse,
 } from "@/services/auth.service";
-import type { ApiResponse, User } from "@/types";
+import type { ApiResponse, User, AuthTokens } from "@/types";
 
 export const authApi = baseApi.injectEndpoints({
   overrideExisting: true,
@@ -61,11 +61,12 @@ export const authApi = baseApi.injectEndpoints({
       providesTags: ["User"],
     }),
 
-    refreshToken: builder.mutation<ApiResponse<{ accessToken: string }>, string>({
-      query: (refreshToken) => ({
+    refreshToken: builder.mutation<ApiResponse<AuthTokens>, string | { refreshToken: string }>({
+      query: (arg) => ({
         url: "/auth/refresh",
         method: "POST",
-        body: { refreshToken },
+        body: typeof arg === "string" ? { refreshToken: arg } : arg,
+        headers: { "skip-auth": "true" },
       }),
       invalidatesTags: ["Auth"],
     }),

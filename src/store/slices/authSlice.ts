@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { User, AuthTokens } from "@/types";
+import type { User } from "@/types";
 import {
   loginThunk,
   registerThunk,
@@ -39,6 +39,18 @@ const authSlice = createSlice({
       state.user = action.payload.user;
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
+      state.isAuthenticated = true;
+      state.isLoading = false;
+      state.error = null;
+    },
+    setTokens(
+      state,
+      action: PayloadAction<{ accessToken: string; refreshToken?: string | null }>
+    ) {
+      state.accessToken = action.payload.accessToken;
+      if (action.payload.refreshToken) {
+        state.refreshToken = action.payload.refreshToken;
+      }
       state.isAuthenticated = true;
       state.isLoading = false;
       state.error = null;
@@ -150,7 +162,11 @@ const authSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(refreshTokenThunk.fulfilled, (state, action) => {
-        state.accessToken = action.payload;
+        state.accessToken = action.payload.accessToken;
+        if (action.payload.refreshToken) {
+          state.refreshToken = action.payload.refreshToken;
+        }
+        state.isAuthenticated = true;
         state.isLoading = false;
         state.error = null;
       })
@@ -167,6 +183,7 @@ const authSlice = createSlice({
 
 export const {
   setCredentials,
+  setTokens,
   setUser,
   clearCredentials,
   setAuthLoading,

@@ -1,7 +1,8 @@
 // ─── App-wide constants ────────────────────────────────────────────────────
 
 export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME ?? "Dashboard";
-export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
+export const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "https://mehdisarmadi.duckdns.org/api/v1";
 
 export const ROUTES = {
   HOME: "/",

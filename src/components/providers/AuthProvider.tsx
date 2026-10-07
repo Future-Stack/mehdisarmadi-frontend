@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
 import { useGetMeQuery } from "@/store/api/authApi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setCredentials, setAuthLoading } from "@/store/slices/authSlice";
-import { getAccessTokenFromCookie } from "@/lib/axios";
+import {
+  getAccessTokenFromCookie,
+  getRefreshTokenFromCookie,
+  clearAuthCookies,
+} from "@/lib/axios";
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
   const dispatch = useAppDispatch();
@@ -16,7 +20,10 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   //   RTK Query re-fires → dispatch(setCredentials) → Redux update → repeat.
   // By using useState, hasToken is computed only once and never changes.
   const [hasToken] = useState<boolean>(
-    () => typeof window !== "undefined" ? !!getAccessTokenFromCookie() : false
+    () =>
+      typeof window !== "undefined"
+        ? !!(getAccessTokenFromCookie() || getRefreshTokenFromCookie())
+        : false
   );
 
   // Only fetch /auth/me when we have a cookie token but aren't yet authenticated in Redux
@@ -37,14 +44,11 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         setCredentials({
           user: data.data,
           accessToken: getAccessTokenFromCookie() || "",
-          refreshToken: "",
+          refreshToken: getRefreshTokenFromCookie() || "",
         })
       );
     } else if (isError) {
-      if (typeof window !== "undefined") {
-        document.cookie = "access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        document.cookie = "refresh_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      }
+      clearAuthCookies();
       dispatch(setAuthLoading(false));
     }
   }, [data, isError, hasToken, dispatch]);

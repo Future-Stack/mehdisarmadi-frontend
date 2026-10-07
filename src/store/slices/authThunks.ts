@@ -4,11 +4,9 @@ import {
   type LoginPayload,
   type RegisterPayload,
   type VerifyEmailPayload,
-  type LoginResponse,
-  type VerifyEmailResponse,
-  type RegisterResponse,
 } from "@/services/auth.service";
 import type { User, AuthTokens } from "@/types";
+import { getRefreshTokenFromCookie, setAuthCookies } from "@/lib/axios";
 
 export interface LoginThunkResponse {
   user: User;
@@ -112,18 +110,30 @@ export const logoutThunk = createAsyncThunk<
 });
 
 export const refreshTokenThunk = createAsyncThunk<
-  string,
-  string,
+  AuthTokens,
+  string | undefined,
   {
     rejectValue: string;
   }
->("auth/refreshToken", async (refreshToken, { rejectWithValue }) => {
+>("auth/refreshToken", async (tokenArg, { getState, rejectWithValue }) => {
   try {
-    const response = await authService.refreshToken(refreshToken);
-    if (!response.success) {
+    const state = getState() as { auth?: { refreshToken?: string | null } };
+    const token =
+      tokenArg ||
+      state?.auth?.refreshToken ||
+      getRefreshTokenFromCookie();
+
+    if (!token) {
+      return rejectWithValue("No refresh token available");
+    }
+
+    const response = await authService.refreshToken(token);
+    if (!response.success || !response.data) {
       return rejectWithValue(response.message || "Token refresh failed");
     }
-    return response.data.accessToken;
+
+    setAuthCookies(response.data.accessToken, response.data.refreshToken);
+    return response.data;
   } catch (error) {
     return rejectWithValue(
       error instanceof Error ? error.message : "Token refresh failed"

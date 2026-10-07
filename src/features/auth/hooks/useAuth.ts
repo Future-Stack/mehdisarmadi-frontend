@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useAppDispatch } from "@/store/hooks";
 import { setCredentials, clearCredentials, setRegistrationEmail } from "@/store/slices/authSlice";
 import { ROUTES, COOKIE_NAMES } from "@/constants";
+import { setAuthCookies, clearAuthCookies } from "@/lib/axios";
 import {
   useRegisterMutation,
   useVerifyEmailMutation,
@@ -58,7 +59,7 @@ export function useLogin() {
             refreshToken: result.data.refreshToken,
           })
         );
-        document.cookie = `${COOKIE_NAMES.ACCESS_TOKEN}=${encodeURIComponent(result.data.accessToken)}; path=/; max-age=604800; samesite=lax`;
+        setAuthCookies(result.data.accessToken, result.data.refreshToken);
         toast.success(`Welcome back, ${result.data.user.fullName || result.data.user.name}!`);
         const redirectPath =
           result.data.user.role === "USER" ? "/sub-user" : ROUTES.DASHBOARD;
@@ -93,7 +94,7 @@ export function useAdminLogin() {
             refreshToken: result.data.refreshToken,
           })
         );
-        document.cookie = `${COOKIE_NAMES.ACCESS_TOKEN}=${encodeURIComponent(result.data.accessToken)}; path=/; max-age=604800; samesite=lax`;
+        setAuthCookies(result.data.accessToken, result.data.refreshToken);
         toast.success(`Welcome back, ${result.data.user.fullName || result.data.user.name}!`);
         router.push(ROUTES.DASHBOARD);
       } catch (err) {
@@ -151,6 +152,7 @@ export function useVerifyEmail() {
             refreshToken: result.data.refreshToken,
           })
         );
+        setAuthCookies(result.data.accessToken, result.data.refreshToken);
         toast.success("Email verified successfully!");
         const redirectPath =
           result.data.user.role === "USER" ? "/sub-user" : ROUTES.DASHBOARD;
@@ -182,7 +184,7 @@ export function useLogout() {
         // Ignore API errors for logout, we still want to log them out locally
       } finally {
         // Always clear cookie and local state, even on network failure
-        document.cookie = `${COOKIE_NAMES.ACCESS_TOKEN}=; path=/; max-age=0; samesite=lax`;
+        clearAuthCookies();
         await handleLogoutAction();
         dispatch(clearCredentials());
         router.push(ROUTES.LOGIN);

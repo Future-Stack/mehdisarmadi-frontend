@@ -38,7 +38,7 @@ export const useAuthActions = () => {
     login: (email: string, password: string) =>
       dispatch(loginThunk({ email, password })),
     logout: () => dispatch(logoutThunk()),
-    refreshToken: (refreshToken: string) =>
+    refreshToken: (refreshToken?: string) =>
       dispatch(refreshTokenThunk(refreshToken)),
   };
 };
