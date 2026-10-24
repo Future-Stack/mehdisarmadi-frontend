@@ -19,6 +19,7 @@ import {
   useGetDivisionsQuery,
   useUpdateProjectMutation,
 } from "@/store/api/projectApi";
+import { deduplicateDivisions, DeduplicatedDivision } from "@/lib/divisions";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -65,33 +66,23 @@ useEffect(() => {
   }
 }, [project]);
 
-// ── File validation helper ────────────────────────────────
-// Moved ABOVE the early returns so it always runs
-const processFiles = useCallback(
-  (files: File[]): { valid: NewFile[]; invalid: string[] } => {
-    const valid: NewFile[] = [];
-    const invalid: string[] = [];
+  // ── File validation helper ────────────────────────────────
+  const processFiles = useCallback(
+    (files: File[]): { valid: NewFile[]; invalid: string[] } => {
+      const valid: NewFile[] = [];
+      const invalid: string[] = [];
 
-    files.forEach((f) => {
-      if (isValidFile(f.name)) {
-        valid.push({ file: f, name: f.name });
-      } else {
-        invalid.push(f.name);
-      }
-    });
+      files.forEach((f) => {
+        if (isValidFile(f.name)) {
+          valid.push({ file: f, name: f.name });
+        } else {
+          invalid.push(f.name);
+        }
+      });
 
-    return { valid, invalid };
-  },
-  []
-);
-
-if (isLoading)
-  return (
-    <div className="p-8 text-center text-gray-500">Loading tender details...</div>
-  );
-if (error || !project)
-  return (
-    <div className="p-8 text-center text-red-500">Failed to load tender details.</div>
+      return { valid, invalid };
+    },
+    []
   );
 
   const addTenderFiles = (files: File[]) => {
@@ -139,13 +130,36 @@ if (error || !project)
   };
 
   // ── Division helpers ──────────────────────────────────────
+  const uniqueDivisions = React.useMemo(() => {
+    return deduplicateDivisions(divisionsData?.data);
+  }, [divisionsData?.data]);
+
   const handleSelectAllDivisions = () => {
-    if (divisionsData?.data) setSelectedDivisions(divisionsData.data.map((d) => d.id));
+    setSelectedDivisions(uniqueDivisions.map((d) => d.id));
   };
+
   const handleClearAllDivisions = () => setSelectedDivisions([]);
+
+  const toggleDivision = (div: DeduplicatedDivision) => {
+    setSelectedDivisions((prev) => {
+      const isCurrentlySelected = div.allIds.some((id) => prev.includes(id));
+      if (isCurrentlySelected) {
+        return prev.filter((id) => !div.allIds.includes(id));
+      } else {
+        return [...prev, div.id];
+      }
+    });
+  };
+
+  const selectedCount = React.useMemo(() => {
+    return uniqueDivisions.filter((d) =>
+      d.allIds.some((id) => selectedDivisions.includes(id))
+    ).length;
+  }, [uniqueDivisions, selectedDivisions]);
 
   // ── Analyze ───────────────────────────────────────────────
   const handleAnalyze = async () => {
+    if (!project) return;
     setAnalyzeError(null);
     const toastId = toast.loading("Saving changes before analysis...");
     try {
@@ -183,16 +197,28 @@ if (error || !project)
   };
 
   const existingTenderFiles =
-  project?.files?.filter((f: any) => f.kind === "tender") ?? [];
+    project?.files?.filter((f: any) => f.kind === "tender") ?? [];
 
-const existingAddendaFiles =
-  project?.files?.filter((f: any) => f.kind === "addendum") ?? [];
+  const existingAddendaFiles =
+    project?.files?.filter((f: any) => f.kind === "addendum") ?? [];
 
   const totalFiles =
     existingTenderFiles.length +
     existingAddendaFiles.length +
     uploadedTenderFiles.length +
     uploadedAddendaFiles.length;
+
+  if (isLoading) {
+    return (
+      <div className="p-8 text-center text-gray-500">Loading tender details...</div>
+    );
+  }
+
+  if (error || !project) {
+    return (
+      <div className="p-8 text-center text-red-500">Failed to load tender details.</div>
+    );
+  }
 
 
 
@@ -424,18 +450,12 @@ const existingAddendaFiles =
           <p className="text-xs text-gray-500">Loading divisions...</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
-            {divisionsData?.data?.map((div) => {
-              const isSelected = selectedDivisions.includes(div.id);
+            {uniqueDivisions.map((div) => {
+              const isSelected = div.allIds.some((id) => selectedDivisions.includes(id));
               return (
                 <div
                   key={div.id}
-                  onClick={() =>
-                    setSelectedDivisions((prev) =>
-                      prev.includes(div.id)
-                        ? prev.filter((id) => id !== div.id)
-                        : [...prev, div.id]
-                    )
-                  }
+                  onClick={() => toggleDivision(div)}
                   className={cn(
                     "p-3 rounded-xl border-2 cursor-pointer transition-colors flex flex-col justify-between h-20 select-none",
                     isSelected
@@ -469,7 +489,7 @@ const existingAddendaFiles =
         )}
 
         <div className="bg-[#EFF6FF] text-[#1D4ED8] text-[12px] font-bold px-4 py-3 rounded-xl border border-[#EFF6FF]">
-          {selectedDivisions.length} division(s) selected
+          {selectedCount} division(s) selected
         </div>
       </div>
 

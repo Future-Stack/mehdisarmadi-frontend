@@ -101,8 +101,8 @@ export default function AnalysisResults({ dashboardPath = "/admin" }: { dashboar
           </div>
         </div>
 
-        {/* Tab Content Container - All Dynamic! */}
-        <div className="bg-white dark:bg-[#111827] rounded-[32px] border border-gray-100 dark:border-gray-800 p-6 md:p-8 shadow-sm min-h-[600px] transition-colors duration-300">
+        {/* Tab Content Container - All Dynamic ChatGPT AI Tabs */}
+        <div className="transition-colors duration-300">
           {activeTab === "summary" && <SummaryTab projectId={projectId} />}
           {activeTab === "scope" && <ScopeTab projectId={projectId} />}
           {activeTab === "pricing" && <PricingTab projectId={projectId} />}

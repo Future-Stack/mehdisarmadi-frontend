@@ -15,7 +15,7 @@ import {
   useGetProjectClarificationsQuery,
 } from "@/store/api/projectApi";
 import { useGetCompanyProfileQuery } from "@/store/api/sub-user/company-profile/getCompanyProfile";
-import { resolveQuoteData } from "@/features/dashboard/components/preview/resolveQuoteData";
+import { resolveQuoteData, resolvedToDocxData } from "@/features/dashboard/components/preview/resolveQuoteData";
 import { exportElementToPDF, exportQuoteToDocx } from "@/lib/exportUtils";
 import { PageOne } from "@/features/dashboard/components/preview/PageOne";
 import { PageTwo } from "@/features/dashboard/components/preview/PageTwo";
@@ -313,67 +313,6 @@ export default function QuoteBuilderPage({ params }: { params: Promise<{ id: str
     router.push(`/sub-user/projects/${id}/results`);
   };
 
-  // const [isExportingPDF, setIsExportingPDF] = useState(false);
-
-  const handleExportPDF = async () => {
-    setIsExportingPDF(true);
-    try {
-      await exportElementToPDF("quote-preview-doc-all", "quote-preview.pdf");
-      toast.success("PDF exported successfully!");
-    } catch (err: any) {
-      console.error("PDF Export error:", err);
-      toast.error(`Failed to export PDF: ${err?.message || "Unknown error"}`);
-    } finally {
-      setIsExportingPDF(false);
-    }
-  };
-
-  // const [isExportingDocx, setIsExportingDocx] = useState(false);
-  const handleExportDocx = async () => {
-    setIsExportingDocx(true);
-    try {
-      const scopeText = Array.isArray(scopeItems)
-        ? scopeItems.join("\n")
-        : "";
-
-      const assumptionsText = Array.isArray(assumptionItems)
-        ? assumptionItems.join("\n")
-        : "";
-
-      const exclusionsText = Array.isArray(exclusionItems)
-        ? exclusionItems.join("\n")
-        : "";
-
-      const clarificationsText = Array.isArray(clarificationItems)
-        ? clarificationItems.join("\n")
-        : "";
-
-      await exportQuoteToDocx({
-        companyName: companyName || "",
-        companyAddress: companyAddress || "",
-        projectName: projectName || "",
-        clientName: clientName || "",
-        quoteNumber: quoteNumber || "",
-        baseBidPrice: String(baseBidPrice || ""),
-        hstPercentage: String(hstPercentage || "13").replace("%", ""),
-        currency: currency || "CAD",
-        scopeOfWork: scopeText,
-        assumptions: assumptionsText,
-        exclusions: exclusionsText,
-        clarifications: clarificationsText,
-        paymentTerms: paymentTerms || "",
-        holdbackNote: holdbackNote || "",
-        validityPeriod: validityPeriod || "30 days",
-        footerNotes: footerNotes || "Thank you for considering our proposal."
-      }, `quote-${quoteNumber || "preview"}.docx`);
-      toast.success("DOCX exported successfully!");
-    } catch (err) {
-      toast.error("Failed to export DOCX.");
-    } finally {
-      setIsExportingDocx(false);
-    }
-  };
-
   const currentQuoteObj = {
     quoteNumber,
     projectName,
@@ -401,6 +340,12 @@ export default function QuoteBuilderPage({ params }: { params: Promise<{ id: str
     validityPeriod,
     termsCurrency,
     footerNotes,
+    companyName,
+    companyAddress,
+    companyPhone,
+    companyEmail,
+    companyWebsite,
+    companyHst,
   };
 
   const currentQuoteData = {
@@ -414,6 +359,39 @@ export default function QuoteBuilderPage({ params }: { params: Promise<{ id: str
     },
     savedQuote: currentQuoteObj,
     quote: currentQuoteObj,
+  };
+
+  const currentResolved = React.useMemo(() => {
+    return resolveQuoteData(currentQuoteData);
+  }, [currentQuoteData]);
+
+  const handleExportPDF = async () => {
+    setIsExportingPDF(true);
+    try {
+      await exportElementToPDF("quote-preview-doc-all", `quote-${currentResolved.quoteNumber || "preview"}.pdf`);
+      toast.success("PDF exported successfully!");
+    } catch (err: any) {
+      console.error("PDF Export error:", err);
+      toast.error(`Failed to export PDF: ${err?.message || "Unknown error"}`);
+    } finally {
+      setIsExportingPDF(false);
+    }
+  };
+
+  const handleExportDocx = async () => {
+    setIsExportingDocx(true);
+    try {
+      await exportQuoteToDocx(
+        resolvedToDocxData(currentResolved),
+        `quote-${currentResolved.quoteNumber || "preview"}.docx`
+      );
+      toast.success("DOCX exported successfully!");
+    } catch (err) {
+      console.error("DOCX Export error:", err);
+      toast.error("Failed to export DOCX.");
+    } finally {
+      setIsExportingDocx(false);
+    }
   };
 
   // Separate prices helpers
@@ -791,9 +769,9 @@ export default function QuoteBuilderPage({ params }: { params: Promise<{ id: str
       {/* Hidden Document canvas for export (all pages) */}
       <div className="fixed top-full left-0 opacity-0 pointer-events-none -z-50">
         <div id="quote-preview-doc-all" className="flex flex-col gap-0 w-[850px] bg-white">
-          <PageOne exportMode={true} quoteData={currentQuoteData} />
-          <PageTwo exportMode={true} quoteData={currentQuoteData} />
-          <PageThree exportMode={true} quoteData={currentQuoteData} />
+          <PageOne exportMode={true} resolvedData={currentResolved} quoteData={currentQuoteData} />
+          <PageTwo exportMode={true} resolvedData={currentResolved} quoteData={currentQuoteData} />
+          <PageThree exportMode={true} resolvedData={currentResolved} quoteData={currentQuoteData} />
         </div>
       </div>
 

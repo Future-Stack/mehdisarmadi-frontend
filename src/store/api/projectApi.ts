@@ -243,6 +243,22 @@ export interface AddendaPayload {
   missing_information: string[];
 }
 
+export interface ResourceItem {
+  id: number;
+  filename: string;
+  pages: number | null;
+  uploaded_at: string | null;
+  file_size: number | null;
+  document_type: string | null;
+}
+
+export interface ResourcesPayload {
+  title: string;
+  subtitle: string;
+  total_items: number;
+  items: ResourceItem[];
+}
+
 export interface AdminProjectListItem {
   id: string;
   name: string;
@@ -526,6 +542,10 @@ export const projectApi = baseApi.injectEndpoints({
       query: (projectId) => `/project/${projectId}/addenda`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_addenda` }],
     }),
+    getProjectResources: builder.query<ApiResponse<ResourcesPayload> | ResourcesPayload, string>({
+      query: (projectId) => `/project/${projectId}/resources`,
+      providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_resources` }],
+    }),
     getProjectQuote: builder.query<ApiResponse<any>, string>({
       query: (projectId) => `/project/${projectId}/quote`,
       providesTags: (result, error, projectId) => [{ type: "Project", id: `${projectId}_quote` }],
@@ -632,6 +652,7 @@ export const {
   useGetProjectAssumptionsQuery,
   useGetProjectExclusionsQuery,
   useGetProjectAddendaQuery,
+  useGetProjectResourcesQuery,
   useGetProjectQuoteQuery,
   useDeleteProjectAnalysisItemMutation,
   useReanalyzeProjectSectionMutation,

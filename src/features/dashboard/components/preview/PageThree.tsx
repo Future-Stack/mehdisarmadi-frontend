@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { DocFooter } from "./DocFooter";
 import { DocumentHeader } from "./DocumentHeader";
-import { resolveQuoteData } from "./resolveQuoteData";
+import { resolveQuoteData, ResolvedQuote } from "./resolveQuoteData";
 
 const SectionHeading = ({ label }: { label: string }) => (
     <div className="flex items-center gap-3 mb-4">
@@ -11,8 +11,16 @@ const SectionHeading = ({ label }: { label: string }) => (
     </div>
 );
 
-export const PageThree = ({ exportMode, quoteData }: { exportMode?: boolean; quoteData?: any }) => {
-    const resolved = resolveQuoteData(quoteData);
+export const PageThree = ({
+    exportMode,
+    quoteData,
+    resolvedData,
+}: {
+    exportMode?: boolean;
+    quoteData?: any;
+    resolvedData?: ResolvedQuote;
+}) => {
+    const resolved = resolvedData || resolveQuoteData(quoteData);
     const unitPrices = resolved.unitPrices;
 
     return (
@@ -20,7 +28,7 @@ export const PageThree = ({ exportMode, quoteData }: { exportMode?: boolean; quo
             ? "bg-white text-gray-900 font-sans"
             : "bg-white text-gray-900 shadow-2xl border border-gray-200 mx-auto w-full max-w-[850px] min-h-[1100px] flex flex-col font-sans rounded-xl overflow-hidden"
         }>
-            {!exportMode && <DocumentHeader showFull quoteData={quoteData} />}
+            {!exportMode && <DocumentHeader showFull quoteData={quoteData} resolvedData={resolved} />}
 
             {/* Unit Prices */}
             <div
@@ -139,9 +147,13 @@ export const PageThree = ({ exportMode, quoteData }: { exportMode?: boolean; quo
                 </div>
             )}
 
-            {!exportMode && (
+            {exportMode ? (
+                <div id="export-footer" className="mt-6">
+                    <DocFooter quoteData={quoteData} resolvedData={resolved} />
+                </div>
+            ) : (
                 <div className="mt-6">
-                    <DocFooter quoteData={quoteData} />
+                    <DocFooter quoteData={quoteData} resolvedData={resolved} />
                 </div>
             )}
         </div>

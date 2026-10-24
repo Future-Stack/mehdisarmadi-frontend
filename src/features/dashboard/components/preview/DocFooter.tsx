@@ -1,8 +1,14 @@
-import { resolveQuoteData } from "./resolveQuoteData";
+import { resolveQuoteData, ResolvedQuote } from "./resolveQuoteData";
 
 /* ─── Premium Document Footer ─── */
-export const DocFooter = ({ quoteData }: { quoteData?: any }) => {
-    const resolved = resolveQuoteData(quoteData);
+export const DocFooter = ({
+    quoteData,
+    resolvedData,
+}: {
+    quoteData?: any;
+    resolvedData?: ResolvedQuote;
+}) => {
+    const resolved = resolvedData || resolveQuoteData(quoteData);
 
     return (
     <div className="mt-auto">

@@ -9,20 +9,27 @@ import { toast } from "sonner";
 import { PageOne } from "@/features/dashboard/components/preview/PageOne";
 import { PageTwo } from "@/features/dashboard/components/preview/PageTwo";
 import { PageThree } from "@/features/dashboard/components/preview/PageThree";
-import { resolveQuoteData } from "@/features/dashboard/components/preview/resolveQuoteData";
+import { resolveQuoteData, resolvedToDocxData } from "@/features/dashboard/components/preview/resolveQuoteData";
 import { exportElementToPDF, exportQuoteToDocx } from "@/lib/exportUtils";
-import { useGetProjectQuoteQuery } from "@/store/api/projectApi";
+import { useGetProjectQuoteQuery, useGetProjectClarificationsQuery } from "@/store/api/projectApi";
 import { useGetCompanyProfileQuery } from "@/store/api/sub-user/company-profile/getCompanyProfile";
 
 export default function QuotePreviewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = React.use(params);
   const { data: quoteResponse, isLoading: isLoadingQuote } = useGetProjectQuoteQuery(id);
   const { data: companyProfileResponse } = useGetCompanyProfileQuery();
+  const { data: clarificationsResponse } = useGetProjectClarificationsQuery(id);
+
   const rawQuoteData = quoteResponse?.data || quoteResponse || {};
   const companyProfile = companyProfileResponse?.data;
+  const fallbackClarifications = clarificationsResponse?.data?.items
+    ?.map((c: any) => c.question || c.reason)
+    .filter(Boolean);
 
-  // Resolved dynamic quote data
-  const resolved = resolveQuoteData(rawQuoteData, companyProfile);
+  // Resolved dynamic quote data - unified across quote builder, preview, docx, and pdf
+  const resolved = React.useMemo(() => {
+    return resolveQuoteData(rawQuoteData, companyProfile, fallbackClarifications);
+  }, [rawQuoteData, companyProfile, fallbackClarifications]);
 
   const [isExportingPDF, setIsExportingPDF] = useState(false);
 
@@ -43,24 +50,10 @@ export default function QuotePreviewPage({ params }: { params: Promise<{ id: str
   const handleExportDocx = async () => {
     setIsExportingDocx(true);
     try {
-      await exportQuoteToDocx({
-        companyName: resolved.companyName,
-        companyAddress: resolved.companyAddress,
-        projectName: resolved.projectName,
-        clientName: resolved.clientName,
-        quoteNumber: resolved.quoteNumber,
-        baseBidPrice: String(resolved.numericBase),
-        hstPercentage: String(resolved.numericHstPct),
-        currency: resolved.currency,
-        scopeOfWork: resolved.scopeOfWork.join("\n"),
-        assumptions: resolved.assumptions.join("\n"),
-        exclusions: resolved.exclusions.join("\n"),
-        clarifications: resolved.clarifications.join("\n"),
-        paymentTerms: resolved.paymentTerms,
-        holdbackNote: resolved.holdbackNote,
-        validityPeriod: resolved.validityPeriod,
-        footerNotes: resolved.footerNotes,
-      }, `quote-${resolved.quoteNumber || "preview"}.docx`);
+      await exportQuoteToDocx(
+        resolvedToDocxData(resolved),
+        `quote-${resolved.quoteNumber || "preview"}.docx`
+      );
       toast.success("DOCX exported successfully!");
     } catch (err) {
       console.error("DOCX Export error:", err);
@@ -143,9 +136,9 @@ export default function QuotePreviewPage({ params }: { params: Promise<{ id: str
           <div className="flex justify-center items-center h-64"><Loader2 className="w-8 h-8 animate-spin text-emerald-600" /></div>
         ) : (
           <>
-            {currentPage === 1 && <PageOne quoteData={rawQuoteData} />}
-            {currentPage === 2 && <PageTwo quoteData={rawQuoteData} />}
-            {currentPage === 3 && <PageThree quoteData={rawQuoteData} />}
+            {currentPage === 1 && <PageOne resolvedData={resolved} quoteData={rawQuoteData} />}
+            {currentPage === 2 && <PageTwo resolvedData={resolved} quoteData={rawQuoteData} />}
+            {currentPage === 3 && <PageThree resolvedData={resolved} quoteData={rawQuoteData} />}
           </>
         )}
       </div>
@@ -153,9 +146,9 @@ export default function QuotePreviewPage({ params }: { params: Promise<{ id: str
       {/* Hidden Document canvas for export (all pages) */}
       <div className="fixed top-full left-0 opacity-0 pointer-events-none -z-50">
         <div id="quote-preview-doc-all" className="flex flex-col gap-0 w-[850px] bg-white">
-          <PageOne exportMode={true} quoteData={rawQuoteData} />
-          <PageTwo exportMode={true} quoteData={rawQuoteData} />
-          <PageThree exportMode={true} quoteData={rawQuoteData} />
+          <PageOne exportMode={true} resolvedData={resolved} quoteData={rawQuoteData} />
+          <PageTwo exportMode={true} resolvedData={resolved} quoteData={rawQuoteData} />
+          <PageThree exportMode={true} resolvedData={resolved} quoteData={rawQuoteData} />
         </div>
       </div>
 

@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { DocFooter } from "./DocFooter";
 import { DocumentHeader } from "./DocumentHeader";
-import { resolveQuoteData } from "./resolveQuoteData";
+import { resolveQuoteData, ResolvedQuote } from "./resolveQuoteData";
 
 const SectionHeading = ({ label }: { label: string }) => (
     <div className="flex items-center gap-3 mb-4">
@@ -18,15 +18,23 @@ const Badge = ({ text, color = "emerald" }: { text: string; color?: "emerald" | 
         }`}>{text}</span>
 );
 
-export const PageTwo = ({ exportMode, quoteData }: { exportMode?: boolean; quoteData?: any }) => {
-    const resolved = resolveQuoteData(quoteData);
+export const PageTwo = ({
+    exportMode,
+    quoteData,
+    resolvedData,
+}: {
+    exportMode?: boolean;
+    quoteData?: any;
+    resolvedData?: ResolvedQuote;
+}) => {
+    const resolved = resolvedData || resolveQuoteData(quoteData);
 
     return (
         <div className={exportMode
             ? "bg-white text-gray-900 font-sans"
             : "bg-white text-gray-900 shadow-2xl border border-gray-200 mx-auto w-full max-w-[850px] min-h-[1100px] flex flex-col font-sans rounded-xl overflow-hidden"
         }>
-            {!exportMode && <DocumentHeader showFull quoteData={quoteData} />}
+            {!exportMode && <DocumentHeader showFull quoteData={quoteData} resolvedData={resolved} />}
 
             {/* Exclusions */}
             <div
@@ -46,6 +54,29 @@ export const PageTwo = ({ exportMode, quoteData }: { exportMode?: boolean; quote
                             ))
                         ) : (
                             <span className="text-[11px] text-gray-400 italic">No exclusions listed</span>
+                        )}
+                    </ul>
+                </div>
+            </div>
+
+            {/* Clarifications */}
+            <div
+                className={cn(
+                    exportMode ? "export-section px-0 mb-0" : "export-section px-12 mb-6"
+                )}
+            >
+                <SectionHeading label="Clarifications" />
+                <div className="bg-amber-50/50 border border-amber-100 rounded-xl p-5">
+                    <ul className="space-y-2 text-[11px] leading-relaxed text-gray-600">
+                        {resolved.clarifications && resolved.clarifications.length > 0 ? (
+                            resolved.clarifications.map((item: string, i: number) => (
+                                <li key={i} className="flex gap-2.5">
+                                    <span className="text-amber-500 mt-0.5 flex-shrink-0 font-bold">•</span>
+                                    <span>{item}</span>
+                                </li>
+                            ))
+                        ) : (
+                            <span className="text-[11px] text-gray-400 italic">No clarifications listed</span>
                         )}
                     </ul>
                 </div>
@@ -138,7 +169,7 @@ export const PageTwo = ({ exportMode, quoteData }: { exportMode?: boolean; quote
 
             {!exportMode && (
                 <div className="mt-6">
-                    <DocFooter quoteData={quoteData} />
+                    <DocFooter quoteData={quoteData} resolvedData={resolved} />
                 </div>
             )}
         </div>

@@ -1,9 +1,17 @@
 import Logo from "@/components/Reuseable/Logo";
-import { resolveQuoteData } from "./resolveQuoteData";
+import { resolveQuoteData, ResolvedQuote } from "./resolveQuoteData";
 
 /* ─── Shared Document Header ─── */
-export const DocumentHeader = ({ showFull = false, quoteData }: { showFull?: boolean; quoteData?: any }) => {
-    const resolved = resolveQuoteData(quoteData);
+export const DocumentHeader = ({
+    showFull = false,
+    quoteData,
+    resolvedData,
+}: {
+    showFull?: boolean;
+    quoteData?: any;
+    resolvedData?: ResolvedQuote;
+}) => {
+    const resolved = resolvedData || resolveQuoteData(quoteData);
 
     return (
     <div className="relative overflow-hidden mb-6">

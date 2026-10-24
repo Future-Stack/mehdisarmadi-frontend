@@ -13,13 +13,14 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useGetDivisionsQuery, useCreateProjectMutation } from "@/store/api/projectApi";
+import { deduplicateDivisions, DeduplicatedDivision } from "@/lib/divisions";
 import { toast } from "sonner";
 
 export default function ProjectSetup({ dashboardPath = "/admin" }: { dashboardPath?: string }) {
   const router = useRouter();
   const { data: divisionsData, isLoading: isDivisionsLoading } = useGetDivisionsQuery();
   const [createProject, { isLoading: isCreating }] = useCreateProjectMutation();
-  const divisions = divisionsData?.data || [];
+  const divisions = React.useMemo(() => deduplicateDivisions(divisionsData?.data), [divisionsData?.data]);
 
   const originalInputRef = useRef<HTMLInputElement>(null);
   const addendaInputRef = useRef<HTMLInputElement>(null);
@@ -61,10 +62,15 @@ export default function ProjectSetup({ dashboardPath = "/admin" }: { dashboardPa
     if (addendaInputRef.current) addendaInputRef.current.value = "";
   };
 
-  const toggleDivision = (id: string) => {
-    setSelectedDivs(prev => 
-      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
-    );
+  const toggleDivision = (div: DeduplicatedDivision) => {
+    setSelectedDivs(prev => {
+      const isCurrentlySelected = div.allIds.some(id => prev.includes(id));
+      if (isCurrentlySelected) {
+        return prev.filter(id => !div.allIds.includes(id));
+      } else {
+        return [...prev, div.id];
+      }
+    });
   };
 
   const selectAllDivs = () => setSelectedDivs(divisions.map(d => d.id));
@@ -221,9 +227,9 @@ export default function ProjectSetup({ dashboardPath = "/admin" }: { dashboardPa
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {divisions.map((div) => {
-                const isSelected = selectedDivs.includes(div.id);
+                const isSelected = div.allIds.some(id => selectedDivs.includes(id));
                 return (
-                  <div key={div.id} onClick={() => toggleDivision(div.id)} className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col gap-2 group ${isSelected ? "bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800" : "bg-white dark:bg-gray-800/50 border-gray-100 dark:border-gray-700 hover:border-emerald-100 dark:hover:border-emerald-800"}`}>
+                  <div key={div.id} onClick={() => toggleDivision(div)} className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col gap-2 group ${isSelected ? "bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800" : "bg-white dark:bg-gray-800/50 border-gray-100 dark:border-gray-700 hover:border-emerald-100 dark:hover:border-emerald-800"}`}>
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider group-hover:text-[#059669]">Div {div.code}</span>
                       {isSelected && <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />}

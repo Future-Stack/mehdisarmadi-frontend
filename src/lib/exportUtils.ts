@@ -127,24 +127,7 @@ export async function exportElementToPDF(
 }
 
 // ─── DOCX Export ────────────────────────────────────────────────────────────
-interface QuoteData {
-  companyName?: string;
-  companyAddress?: string;
-  projectName?: string;
-  clientName?: string;
-  quoteNumber?: string;
-  baseBidPrice?: string;
-  hstPercentage?: string;
-  currency?: string;
-  scopeOfWork?: string;
-  assumptions?: string;
-  exclusions?: string;
-  clarifications?: string;
-  paymentTerms?: string;
-  holdbackNote?: string;
-  validityPeriod?: string;
-  footerNotes?: string;
-}
+import { QuoteDocxData } from "@/features/dashboard/components/preview/resolveQuoteData";
 
 // ── Color Palette ──────────────────────────────────────────────────────────
 const COLOR = {
@@ -212,16 +195,6 @@ const bulletItem = (text: string) =>
     spacing: { after: 60 },
   });
 
-// ── Helper: Key-Value pair (label: value) ─────────────────────────────────
-const kvRow = (label: string, value: string) =>
-  new Paragraph({
-    children: [
-      new TextRun({ text: `${label}: `, bold: true, size: 20, color: COLOR.gray900 }),
-      new TextRun({ text: value || "—", size: 20, color: COLOR.gray700 }),
-    ],
-    spacing: { after: 100 },
-  });
-
 // ── Helper: 2-column Table ────────────────────────────────────────────────
 const infoTable = (rows: { label: string; value: string }[]) =>
   new Table({
@@ -234,7 +207,7 @@ const infoTable = (rows: { label: string; value: string }[]) =>
       insideHorizontal: { style: BorderStyle.SINGLE, size: 2, color: COLOR.gray100 },
       insideVertical: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
     },
-    rows: rows.map((row, idx) =>
+    rows: rows.map((row) =>
       new TableRow({
         children: [
           new TableCell({
@@ -246,7 +219,7 @@ const infoTable = (rows: { label: string; value: string }[]) =>
               left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
               right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
             },
-            margins: { top: 100, bottom: 100, left: 0, right: 160 },
+            margins: { top: 100, bottom: 100, left: 160, right: 160 },
             children: [
               new Paragraph({
                 children: [
@@ -276,6 +249,240 @@ const infoTable = (rows: { label: string; value: string }[]) =>
       })
     ),
   });
+
+// ── Helper: Unit Prices Table ─────────────────────────────────────────────
+const headerCell = (
+  text: string,
+  widthPct: number,
+  align: (typeof AlignmentType)[keyof typeof AlignmentType] = AlignmentType.LEFT
+) =>
+  new TableCell({
+    width: { size: widthPct, type: WidthType.PERCENTAGE },
+    shading: { type: ShadingType.SOLID, color: COLOR.gray900, fill: COLOR.gray900 },
+    margins: { top: 100, bottom: 100, left: 140, right: 140 },
+    children: [
+      new Paragraph({
+        children: [
+          new TextRun({ text, bold: true, size: 18, color: COLOR.white }),
+        ],
+        alignment: align,
+      }),
+    ],
+  });
+
+const dataCell = (
+  text: string,
+  widthPct: number,
+  bold = false,
+  align: (typeof AlignmentType)[keyof typeof AlignmentType] = AlignmentType.LEFT,
+  highlight = false
+) =>
+  new TableCell({
+    width: { size: widthPct, type: WidthType.PERCENTAGE },
+    shading: highlight ? { type: ShadingType.SOLID, color: COLOR.brandLight, fill: COLOR.brandLight } : undefined,
+    margins: { top: 80, bottom: 80, left: 140, right: 140 },
+    children: [
+      new Paragraph({
+        children: [
+          new TextRun({ text: text || "—", bold, size: 18, color: highlight ? COLOR.brandDark : COLOR.gray700 }),
+        ],
+        alignment: align,
+      }),
+    ],
+  });
+
+const unitPricesDocxTable = (items: any[]) =>
+  new Table({
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    borders: {
+      top: { style: BorderStyle.SINGLE, size: 4, color: COLOR.gray300 },
+      bottom: { style: BorderStyle.SINGLE, size: 4, color: COLOR.gray300 },
+      left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+      right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+      insideHorizontal: { style: BorderStyle.SINGLE, size: 2, color: COLOR.gray100 },
+      insideVertical: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+    },
+    rows: [
+      new TableRow({
+        children: [
+          headerCell("Item", 15),
+          headerCell("Description", 45),
+          headerCell("Unit", 15),
+          headerCell("Unit Price", 25, AlignmentType.RIGHT),
+        ],
+      }),
+      ...items.map((up: any, i: number) =>
+        new TableRow({
+          children: [
+            dataCell(up.id || `UP-0${i + 1}`, 15, true, AlignmentType.LEFT, true),
+            dataCell(up.description || "—", 45),
+            dataCell(up.unit || up.type || "—", 15),
+            dataCell(up.unitPrice || up.price || "—", 25, true, AlignmentType.RIGHT),
+          ],
+        })
+      ),
+    ],
+  });
+
+// ── Helper: Separate Prices blocks ─────────────────────────────────────────
+const separatePricesDocxElements = (items: any[]) => {
+  const elements: (Paragraph | Table)[] = [];
+  items.forEach((sp: any, i: number) => {
+    const detailRows: { label: string; value: string }[] = [];
+    if (sp.description) detailRows.push({ label: "Description", value: sp.description });
+    if (sp.scopeOfWork) detailRows.push({ label: "Scope of Work", value: sp.scopeOfWork });
+    if (sp.assumptions) detailRows.push({ label: "Assumptions", value: sp.assumptions });
+    if (sp.exclusions) detailRows.push({ label: "Exclusions", value: sp.exclusions });
+
+    elements.push(
+      new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        borders: {
+          top: { style: BorderStyle.SINGLE, size: 4, color: COLOR.brand },
+          bottom: { style: BorderStyle.SINGLE, size: 4, color: COLOR.gray300 },
+          left: { style: BorderStyle.SINGLE, size: 4, color: COLOR.gray300 },
+          right: { style: BorderStyle.SINGLE, size: 4, color: COLOR.gray300 },
+          insideHorizontal: { style: BorderStyle.SINGLE, size: 2, color: COLOR.gray100 },
+          insideVertical: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+        },
+        rows: [
+          new TableRow({
+            children: [
+              new TableCell({
+                width: { size: 70, type: WidthType.PERCENTAGE },
+                shading: { type: ShadingType.SOLID, color: COLOR.brandLight, fill: COLOR.brandLight },
+                margins: { top: 100, bottom: 100, left: 140, right: 140 },
+                children: [
+                  new Paragraph({
+                    children: [
+                      new TextRun({ text: `[${sp.id || `SP-0${i + 1}`}] `, bold: true, size: 18, color: COLOR.brandDark }),
+                      new TextRun({ text: sp.title || "Separate Price Item", bold: true, size: 18, color: COLOR.gray900 }),
+                    ],
+                  }),
+                ],
+              }),
+              new TableCell({
+                width: { size: 30, type: WidthType.PERCENTAGE },
+                shading: { type: ShadingType.SOLID, color: COLOR.brandLight, fill: COLOR.brandLight },
+                margins: { top: 100, bottom: 100, left: 140, right: 140 },
+                children: [
+                  new Paragraph({
+                    children: [
+                      new TextRun({ text: sp.price || "$0", bold: true, size: 20, color: COLOR.brandDark }),
+                    ],
+                    alignment: AlignmentType.RIGHT,
+                  }),
+                ],
+              }),
+            ],
+          }),
+          ...detailRows.map((dr) =>
+            new TableRow({
+              children: [
+                new TableCell({
+                  width: { size: 25, type: WidthType.PERCENTAGE },
+                  margins: { top: 80, bottom: 80, left: 140, right: 140 },
+                  children: [
+                    new Paragraph({
+                      children: [
+                        new TextRun({ text: dr.label, bold: true, size: 17, color: COLOR.gray700 }),
+                      ],
+                    }),
+                  ],
+                }),
+                new TableCell({
+                  width: { size: 75, type: WidthType.PERCENTAGE },
+                  margins: { top: 80, bottom: 80, left: 140, right: 140 },
+                  children: [
+                    new Paragraph({
+                      children: [
+                        new TextRun({ text: dr.value, size: 17, color: COLOR.gray700 }),
+                      ],
+                    }),
+                  ],
+                }),
+              ],
+            })
+          ),
+        ],
+      })
+    );
+    elements.push(new Paragraph({ spacing: { after: 100 }, children: [] }));
+  });
+  return elements;
+};
+
+// ── Helper: Alternative Prices blocks ──────────────────────────────────────
+const altPricesDocxElements = (items: any[]) => {
+  const elements: (Paragraph | Table)[] = [];
+  items.forEach((ap: any, i: number) => {
+    elements.push(
+      new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        borders: {
+          top: { style: BorderStyle.SINGLE, size: 4, color: "2563EB" },
+          bottom: { style: BorderStyle.SINGLE, size: 4, color: COLOR.gray300 },
+          left: { style: BorderStyle.SINGLE, size: 4, color: COLOR.gray300 },
+          right: { style: BorderStyle.SINGLE, size: 4, color: COLOR.gray300 },
+          insideHorizontal: { style: BorderStyle.SINGLE, size: 2, color: COLOR.gray100 },
+          insideVertical: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+        },
+        rows: [
+          new TableRow({
+            children: [
+              new TableCell({
+                width: { size: 70, type: WidthType.PERCENTAGE },
+                shading: { type: ShadingType.SOLID, color: "EFF6FF", fill: "EFF6FF" },
+                margins: { top: 100, bottom: 100, left: 140, right: 140 },
+                children: [
+                  new Paragraph({
+                    children: [
+                      new TextRun({ text: `[${ap.id || `ALT-0${i + 1}`}] `, bold: true, size: 18, color: "1D4ED8" }),
+                      new TextRun({ text: ap.title || "Alternative Price Item", bold: true, size: 18, color: COLOR.gray900 }),
+                    ],
+                  }),
+                ],
+              }),
+              new TableCell({
+                width: { size: 30, type: WidthType.PERCENTAGE },
+                shading: { type: ShadingType.SOLID, color: "EFF6FF", fill: "EFF6FF" },
+                margins: { top: 100, bottom: 100, left: 140, right: 140 },
+                children: [
+                  new Paragraph({
+                    children: [
+                      new TextRun({ text: ap.price || "$0", bold: true, size: 20, color: "1D4ED8" }),
+                    ],
+                    alignment: AlignmentType.RIGHT,
+                  }),
+                ],
+              }),
+            ],
+          }),
+          ...(ap.description ? [
+            new TableRow({
+              children: [
+                new TableCell({
+                  width: { size: 100, type: WidthType.PERCENTAGE },
+                  columnSpan: 2,
+                  margins: { top: 80, bottom: 80, left: 140, right: 140 },
+                  children: [
+                    new Paragraph({
+                      children: [
+                        new TextRun({ text: ap.description, size: 17, color: COLOR.gray700 }),
+                      ],
+                    }),
+                  ],
+                }),
+              ],
+            }),
+          ] : []),
+        ],
+      })
+    );
+    elements.push(new Paragraph({ spacing: { after: 100 }, children: [] }));
+  });
+  return elements;
+};
 
 // ── Helper: Pricing total table ───────────────────────────────────────────
 const pricingTable = (base: string, hstPct: string, currency: string) => {
@@ -359,32 +566,59 @@ const pricingTable = (base: string, hstPct: string, currency: string) => {
 };
 
 export async function exportQuoteToDocx(
-  quoteData: QuoteData,
+  quoteData: QuoteDocxData,
   filename: string = "quote.docx"
 ) {
   const {
     companyName = "Renofield Ltd.",
     companyAddress = "",
+    companyPhone = "",
+    companyEmail = "",
+    companyWebsite = "",
+    companyHst = "",
+
     projectName = "",
+    projectLocation = "",
     clientName = "",
+    attention = "",
+    gcName = "",
     quoteNumber = "",
+    revisionNumber = "00",
+    startDate = "",
+    bidClosingDate = "",
+    subject = "",
+    addendaIncluded = "",
+
     baseBidPrice = "0",
-    hstPercentage = "0",
+    hstPercentage = "13",
     currency = "CAD",
-    scopeOfWork = "",
-    assumptions = "",
-    exclusions = "",
-    clarifications = "",
-    paymentTerms = "",
-    holdbackNote = "",
-    validityPeriod = "30 days",
+
+    scopeOfWork = [],
+    assumptions = [],
+    exclusions = [],
+    clarifications = [],
+
+    separatePrices = [],
+    altPrices = [],
+    unitPrices = [],
+
+    paymentTerms = "Progress payments monthly based on work completed. Net 30 days from invoice date.",
+    holdbackNote = "10% holdback as per Construction Act requirements until final completion.",
+    validityPeriod = "30 days from date of issue",
+    termsCurrency = "",
     footerNotes = "",
   } = quoteData;
 
-  const scopeLines = scopeOfWork.split("\n").filter(Boolean);
-  const assumptionLines = assumptions.split("\n").filter(Boolean);
-  const exclusionLines = exclusions.split("\n").filter(Boolean);
-  const clarificationLines = clarifications.split("\n").filter(Boolean);
+  const toLines = (val: string | string[] | undefined): string[] => {
+    if (!val) return [];
+    if (Array.isArray(val)) return val.map((s) => String(s).trim()).filter(Boolean);
+    return String(val).split("\n").map((s) => s.trim()).filter(Boolean);
+  };
+
+  const scopeLines = toLines(scopeOfWork);
+  const assumptionLines = toLines(assumptions);
+  const exclusionLines = toLines(exclusions);
+  const clarificationLines = toLines(clarifications);
 
   const doc = new Document({
     creator: companyName,
@@ -437,11 +671,24 @@ export async function exportQuoteToDocx(
                               new TextRun({ text: companyName, bold: true, size: 22, color: COLOR.brand }),
                             ],
                           }),
-                          new Paragraph({
-                            children: [
-                              new TextRun({ text: companyAddress, size: 16, color: COLOR.gray500 }),
-                            ],
-                          }),
+                          ...(companyAddress ? [
+                            new Paragraph({
+                              children: [
+                                new TextRun({ text: companyAddress, size: 16, color: COLOR.gray500 }),
+                              ],
+                            }),
+                          ] : []),
+                          ...(companyPhone || companyEmail ? [
+                            new Paragraph({
+                              children: [
+                                new TextRun({
+                                  text: [companyPhone ? `Tel: ${companyPhone}` : "", companyEmail ? `Email: ${companyEmail}` : ""].filter(Boolean).join(" · "),
+                                  size: 15,
+                                  color: COLOR.gray500,
+                                }),
+                              ],
+                            }),
+                          ] : []),
                         ],
                       }),
                       new TableCell({
@@ -461,10 +708,18 @@ export async function exportQuoteToDocx(
                           }),
                           new Paragraph({
                             children: [
-                              new TextRun({ text: `#${quoteNumber}`, size: 18, color: COLOR.gray500 }),
+                              new TextRun({ text: `#${quoteNumber || "Q-001"}`, bold: true, size: 18, color: COLOR.gray700 }),
                             ],
                             alignment: AlignmentType.RIGHT,
                           }),
+                          ...(revisionNumber ? [
+                            new Paragraph({
+                              children: [
+                                new TextRun({ text: `Rev. ${revisionNumber}`, size: 16, color: COLOR.gray500 }),
+                              ],
+                              alignment: AlignmentType.RIGHT,
+                            }),
+                          ] : []),
                         ],
                       }),
                     ],
@@ -549,51 +804,99 @@ export async function exportQuoteToDocx(
               new TextRun({
                 text: "QUOTATION / BID SUBMISSION",
                 bold: true,
-                size: 52,
+                size: 44,
                 color: COLOR.brand,
               }),
             ],
-            spacing: { before: 480, after: 100 },
+            spacing: { before: 240, after: 100 },
           }),
           new Paragraph({
             children: [
-              new TextRun({ text: projectName || "Project Quotation", size: 26, color: COLOR.gray700 }),
+              new TextRun({ text: projectName || "Project Quotation", bold: true, size: 26, color: COLOR.gray900 }),
+              ...(projectLocation ? [new TextRun({ text: ` • ${projectLocation}`, size: 22, color: COLOR.gray500 })] : []),
             ],
-            spacing: { after: 40 },
-          }),
-          new Paragraph({
-            children: [
-              new TextRun({ text: `Prepared for: `, bold: true, size: 22, color: COLOR.gray500 }),
-              new TextRun({ text: clientName, size: 22, color: COLOR.gray700 }),
-            ],
-            spacing: { after: 480 },
+            spacing: { after: 120 },
           }),
 
-          // ── Quote Meta Block ──────────────────────────────────────────
+          // Prepared For Block
+          new Table({
+            width: { size: 100, type: WidthType.PERCENTAGE },
+            borders: {
+              top: { style: BorderStyle.SINGLE, size: 4, color: COLOR.brand },
+              bottom: { style: BorderStyle.SINGLE, size: 4, color: COLOR.brand },
+              left: { style: BorderStyle.SINGLE, size: 4, color: COLOR.brand },
+              right: { style: BorderStyle.SINGLE, size: 4, color: COLOR.brand },
+              insideHorizontal: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+              insideVertical: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+            },
+            rows: [
+              new TableRow({
+                children: [
+                  new TableCell({
+                    shading: { type: ShadingType.SOLID, color: COLOR.brandLight, fill: COLOR.brandLight },
+                    margins: { top: 120, bottom: 120, left: 160, right: 160 },
+                    children: [
+                      new Paragraph({
+                        children: [
+                          new TextRun({ text: "PREPARED FOR", bold: true, size: 16, color: COLOR.brandDark, characterSpacing: 40 }),
+                        ],
+                      }),
+                      new Paragraph({
+                        children: [
+                          new TextRun({ text: clientName || "Client Name", bold: true, size: 22, color: COLOR.gray900 }),
+                        ],
+                        spacing: { before: 60, after: 40 },
+                      }),
+                      ...(attention ? [
+                        new Paragraph({
+                          children: [
+                            new TextRun({ text: `Attention: ${attention}`, size: 18, color: COLOR.gray700 }),
+                          ],
+                        }),
+                      ] : []),
+                      ...(gcName ? [
+                        new Paragraph({
+                          children: [
+                            new TextRun({ text: `General Contractor: ${gcName}`, size: 18, color: COLOR.gray700 }),
+                          ],
+                        }),
+                      ] : []),
+                    ],
+                  }),
+                ],
+              }),
+            ],
+          }),
+
+          // ── Tender / Project Meta Block ───────────────────────────────────
+          sectionHeading("Tender Information"),
           infoTable([
-            { label: "Quote Number", value: quoteNumber },
-            { label: "Project Name", value: projectName },
+            { label: "Tender Name", value: projectName },
+            { label: "Tender Address", value: projectLocation },
             { label: "Client Name", value: clientName },
-            { label: "Submitted By", value: companyName },
+            { label: "Attention", value: attention },
+            { label: "General Contractor", value: gcName },
+            { label: "Quote Number", value: quoteNumber },
+            { label: "Issue Date", value: startDate },
+            { label: "Revision Number", value: revisionNumber },
+            { label: "Bid Closing Date", value: bidClosingDate },
+            { label: "Addenda Included", value: addendaIncluded },
+            { label: "Scope / Subject", value: subject },
             { label: "Quote Validity", value: validityPeriod },
             { label: "Currency", value: currency },
-          ]),
+          ].filter((r) => Boolean(r.value))),
 
           // ── Scope of Work ─────────────────────────────────────────────
           sectionHeading("Scope of Work"),
-          ...(scopeLines.length > 0 ? scopeLines.map(bulletItem) : [bodyText("—")]),
-
-          // ── Pricing ───────────────────────────────────────────────────
-          sectionHeading("Pricing Summary"),
-          pricingTable(baseBidPrice, hstPercentage, currency),
+          ...(scopeLines.length > 0 ? scopeLines.map(bulletItem) : [bodyText("No Scope of Work items listed")]),
 
           // ── Assumptions ───────────────────────────────────────────────
           sectionHeading("Assumptions"),
-          ...(assumptionLines.length > 0 ? assumptionLines.map(bulletItem) : [bodyText("—")]),
+          ...(assumptionLines.length > 0 ? assumptionLines.map(bulletItem) : [bodyText("No Assumptions listed")]),
 
           // ── Exclusions ────────────────────────────────────────────────
           sectionHeading("Exclusions"),
-          ...(exclusionLines.length > 0 ? exclusionLines.map(bulletItem) : [bodyText("—")]),
+          ...(exclusionLines.length > 0 ? exclusionLines.map(bulletItem) : [bodyText("No Exclusions listed")]),
 
           // ── Clarifications ────────────────────────────────────────────
           ...(clarificationLines.length > 0
@@ -603,13 +906,41 @@ export async function exportQuoteToDocx(
             ]
             : []),
 
+          // ── Separate Prices ───────────────────────────────────────────
+          ...(separatePrices && separatePrices.length > 0
+            ? [
+              sectionHeading("Separate Prices"),
+              ...separatePricesDocxElements(separatePrices),
+            ]
+            : []),
+
+          // ── Alternative Prices ────────────────────────────────────────
+          ...(altPrices && altPrices.length > 0
+            ? [
+              sectionHeading("Alternative Prices"),
+              ...altPricesDocxElements(altPrices),
+            ]
+            : []),
+
+          // ── Unit Prices ───────────────────────────────────────────────
+          ...(unitPrices && unitPrices.length > 0
+            ? [
+              sectionHeading("Unit Prices"),
+              unitPricesDocxTable(unitPrices),
+            ]
+            : []),
+
+          // ── Pricing Summary ───────────────────────────────────────────
+          sectionHeading("Pricing Summary"),
+          pricingTable(baseBidPrice, hstPercentage, currency),
+
           // ── Commercial Terms ──────────────────────────────────────────
           sectionHeading("Commercial Terms"),
           infoTable([
             { label: "Payment Terms", value: paymentTerms },
             { label: "Holdback", value: holdbackNote },
             { label: "Quote Validity", value: validityPeriod },
-            { label: "Currency", value: currency },
+            { label: "Currency", value: termsCurrency || currency },
           ]),
 
           // ── Footer Notes ──────────────────────────────────────────────
@@ -621,19 +952,19 @@ export async function exportQuoteToDocx(
             : []),
 
           // ── Closing Statement ─────────────────────────────────────────
-          ...spacer(2),
+          ...spacer(1),
           divider(),
           new Paragraph({
             children: [
               new TextRun({
-                text: "Thank you for considering our proposal. We look forward to the opportunity to work with you on this project.",
+                text: "Thank you for considering our proposal. We look forward to working with you on this project.",
                 size: 20,
                 color: COLOR.gray500,
                 italics: true,
               }),
             ],
             alignment: AlignmentType.CENTER,
-            spacing: { before: 200, after: 120 },
+            spacing: { before: 160, after: 100 },
           }),
           new Paragraph({
             children: [
@@ -641,12 +972,26 @@ export async function exportQuoteToDocx(
             ],
             alignment: AlignmentType.CENTER,
           }),
-          new Paragraph({
-            children: [
-              new TextRun({ text: companyAddress, size: 18, color: COLOR.gray500 }),
-            ],
-            alignment: AlignmentType.CENTER,
-          }),
+          ...(companyAddress ? [
+            new Paragraph({
+              children: [
+                new TextRun({ text: companyAddress, size: 18, color: COLOR.gray500 }),
+              ],
+              alignment: AlignmentType.CENTER,
+            }),
+          ] : []),
+          ...([companyPhone, companyEmail, companyHst ? `HST: ${companyHst}` : ""].filter(Boolean).length > 0 ? [
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: [companyPhone, companyEmail, companyHst ? `HST: ${companyHst}` : ""].filter(Boolean).join(" · "),
+                  size: 16,
+                  color: COLOR.gray500,
+                }),
+              ],
+              alignment: AlignmentType.CENTER,
+            }),
+          ] : []),
         ],
       },
     ],
@@ -660,3 +1005,4 @@ export async function exportQuoteToDocx(
   a.click();
   URL.revokeObjectURL(url);
 }
+

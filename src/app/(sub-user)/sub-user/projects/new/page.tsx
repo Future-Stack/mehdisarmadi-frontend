@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useGetDivisionsQuery, useCreateProjectMutation } from "@/store/api/projectApi";
+import { deduplicateDivisions, DeduplicatedDivision } from "@/lib/divisions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -46,6 +47,21 @@ export default function NewProjectWizard() {
   const { data: divisionsData, isLoading: isDivLoading } = useGetDivisionsQuery();
   const [createProject, { isLoading: isCreating }] = useCreateProjectMutation();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const uniqueDivisions = React.useMemo(() => {
+    return deduplicateDivisions(divisionsData?.data);
+  }, [divisionsData?.data]);
+
+  const toggleDivision = (div: DeduplicatedDivision) => {
+    setSelectedDivisions((prev) => {
+      const isCurrentlySelected = div.allIds.some((id) => prev.includes(id));
+      if (isCurrentlySelected) {
+        return prev.filter((id) => !div.allIds.includes(id));
+      } else {
+        return [...prev, div.id];
+      }
+    });
+  };
 
   const handleNext = () => {
     if (currentStep < 4) setCurrentStep(prev => prev + 1);
@@ -324,12 +340,12 @@ export default function NewProjectWizard() {
                     <p className="text-xs text-gray-500">Loading divisions...</p>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-5">
-                      {divisionsData?.data?.map(div => {
-                        const isSelected = selectedDivisions.includes(div.id);
+                      {uniqueDivisions.map((div) => {
+                        const isSelected = div.allIds.some((id) => selectedDivisions.includes(id));
                         return (
                           <div
                             key={div.id}
-                            onClick={() => setSelectedDivisions(prev => prev.includes(div.id) ? prev.filter(id => id !== div.id) : [...prev, div.id])}
+                            onClick={() => toggleDivision(div)}
                             className={cn(
                               "p-3 rounded-xl border-2 cursor-pointer flex justify-between h-auto transition-all",
                               isSelected
@@ -338,9 +354,9 @@ export default function NewProjectWizard() {
                             )}
                           >
                             <span className={cn("text-[13px] font-semibold line-clamp-1 mt-1", isSelected ? "text-gray-900 dark:text-white" : "text-gray-600 dark:text-gray-300")}>
-                              {div.name}
+                              {div.code ? `${div.code} - ${div.name}` : div.name}
                             </span>
-                            {isSelected && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
+                            {isSelected && <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 ml-2" />}
                           </div>
                         );
                       })}

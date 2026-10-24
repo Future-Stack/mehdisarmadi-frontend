@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { DocFooter } from "./DocFooter";
 import { DocumentHeader } from "./DocumentHeader";
-import { resolveQuoteData } from "./resolveQuoteData";
+import { resolveQuoteData, ResolvedQuote } from "./resolveQuoteData";
 
 /* ─── Shared section heading component ─── */
 const SectionHeading = ({ label }: { label: string }) => (
@@ -13,20 +13,28 @@ const SectionHeading = ({ label }: { label: string }) => (
 );
 
 /* ─── PAGE 1: Tender Info + Scope + Assumptions ─── */
-export const PageOne = ({ exportMode, quoteData }: { exportMode?: boolean; quoteData?: any }) => {
-    const resolved = resolveQuoteData(quoteData);
+export const PageOne = ({
+    exportMode,
+    quoteData,
+    resolvedData,
+}: {
+    exportMode?: boolean;
+    quoteData?: any;
+    resolvedData?: ResolvedQuote;
+}) => {
+    const resolved = resolvedData || resolveQuoteData(quoteData);
 
     return (
         <div className={exportMode
             ? "bg-white text-gray-900 font-sans"
-            : "bg-white text-gray-900 shadow-2xl border border-gray-200 mx-auto w-full max-w-full min-h-[1100px] flex flex-col font-sans rounded-xl overflow-hidden"
+            : "bg-white text-gray-900 shadow-2xl border border-gray-200 mx-auto w-full max-w-[850px] min-h-[1100px] flex flex-col font-sans rounded-xl overflow-hidden"
         }>
             {exportMode ? (
                 <div id="export-header" className="px-0 pt-0 pb-0">
-                    <DocumentHeader showFull quoteData={quoteData} />
+                    <DocumentHeader showFull quoteData={quoteData} resolvedData={resolved} />
                 </div>
             ) : (
-                <DocumentHeader showFull quoteData={quoteData} />
+                <DocumentHeader showFull quoteData={quoteData} resolvedData={resolved} />
             )}
 
             {/* Prepared For */}
@@ -120,7 +128,7 @@ export const PageOne = ({ exportMode, quoteData }: { exportMode?: boolean; quote
 
             {!exportMode && (
                 <div className="mt-6">
-                    <DocFooter quoteData={quoteData} />
+                    <DocFooter quoteData={quoteData} resolvedData={resolved} />
                 </div>
             )}
         </div>
